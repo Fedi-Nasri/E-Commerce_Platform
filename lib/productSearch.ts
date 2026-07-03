@@ -31,6 +31,44 @@ export function slugifySearch(q: string): string {
     .replace(/^-|-$/g, "");
 }
 
+function productSearchMatchSql(
+  qIdx: number,
+  slugIdx: number,
+  likeIdx: number,
+  skuKeysIdx: number,
+  prefixIdx: number,
+): string {
+  return `(
+    lower(regexp_replace(trim(p.name), '\\s+', ' ', 'g')) = $${qIdx}
+    OR lower(coalesce(p.source_product_id, '')) = $${qIdx}
+    OR lower(p.slug) = $${slugIdx}
+    OR lower(p.name) LIKE $${likeIdx}
+    OR lower(p.name) LIKE $${prefixIdx}
+    OR lower(coalesce(b.name, '')) LIKE $${likeIdx}
+    OR lower(coalesce(p.source_product_id, '')) LIKE $${likeIdx}
+    OR EXISTS (
+      SELECT 1 FROM product_specs ps_q
+      WHERE ps_q.product_id = p.id
+        AND (
+          lower(ps_q.spec_value) = $${qIdx}
+          OR (ps_q.spec_key = ANY($${skuKeysIdx}::text[]) AND lower(ps_q.spec_value) LIKE $${likeIdx})
+        )
+    )
+  )`;
+}
+
+function productTokenMatchSql(tokenIdx: number): string {
+  return `(
+    lower(p.name) LIKE $${tokenIdx}
+    OR lower(coalesce(b.name, '')) LIKE $${tokenIdx}
+    OR lower(coalesce(p.source_product_id, '')) LIKE $${tokenIdx}
+    OR EXISTS (
+      SELECT 1 FROM product_specs ps_t
+      WHERE ps_t.product_id = p.id AND lower(ps_t.spec_value) LIKE $${tokenIdx}
+    )
+  )`;
+}
+
 /** Push unified product search params; returns ORDER BY relevance expression or null. */
 export function appendProductSearch(
   rawQuery: string,
@@ -44,6 +82,7 @@ export function appendProductSearch(
   const slugQ = slugifySearch(q);
   const like = `%${qLower}%`;
   const prefix = `${qLower}%`;
+  const tokens = qLower.split(" ").filter((t) => t.length > 0);
 
   params.push(qLower, slugQ, like, SKU_SPEC_KEYS, prefix);
   const qIdx = params.length - 4;
@@ -52,22 +91,32 @@ export function appendProductSearch(
   const skuKeysIdx = params.length - 1;
   const prefixIdx = params.length;
 
-  conditions.push(`(
-    lower(regexp_replace(trim(p.name), '\\s+', ' ', 'g')) = $${qIdx}
-    OR lower(coalesce(p.source_product_id, '')) = $${qIdx}
-    OR lower(p.slug) = $${slugIdx}
-    OR lower(p.name) LIKE $${likeIdx}
-    OR lower(coalesce(b.name, '')) LIKE $${likeIdx}
-    OR lower(coalesce(p.source_product_id, '')) LIKE $${likeIdx}
-    OR EXISTS (
-      SELECT 1 FROM product_specs ps_q
-      WHERE ps_q.product_id = p.id
-        AND (
-          lower(ps_q.spec_value) = $${qIdx}
-          OR (ps_q.spec_key = ANY($${skuKeysIdx}::text[]) AND lower(ps_q.spec_value) LIKE $${likeIdx})
-        )
-    )
-  )`);
+  // Indices des params "%token%" (réutilisés pour la clause WHERE ET le score,
+  // pour ne PAS pousser de params uniquement utilisés dans l'ORDER BY — sinon
+  // la requête COUNT (qui n'a pas d'ORDER BY) échoue avec un mismatch de params).
+  const tokenParamIdx: number[] = [];
+  if (tokens.length <= 1) {
+    conditions.push(productSearchMatchSql(qIdx, slugIdx, likeIdx, skuKeysIdx, prefixIdx));
+  } else {
+    const tokenClauses = tokens.map((token) => {
+      params.push(`%${token}%`);
+      tokenParamIdx.push(params.length);
+      return productTokenMatchSql(params.length);
+    });
+    conditions.push(`(
+      ${productSearchMatchSql(qIdx, slugIdx, likeIdx, skuKeysIdx, prefixIdx)}
+      OR (${tokenClauses.join(" AND ")})
+    )`);
+  }
+
+  // Le score de tokens réutilise les indices déjà poussés (aucun param en plus).
+  // Pour une requête à 1 seul mot, PAS de terme de score (sinon "(0) DESC" est
+  // interprété par Postgres comme la position de colonne 0 → erreur).
+  const tokenScoreParts = tokenParamIdx.map(
+    (tIdx) => `CASE WHEN lower(p.name) LIKE $${tIdx} THEN 1 ELSE 0 END`,
+  );
+  const tokenScoreOrder =
+    tokens.length > 1 ? `MAX(${tokenScoreParts.join(" + ")}) DESC,` : "";
 
   return `
     MIN(
@@ -75,12 +124,12 @@ export function appendProductSearch(
         WHEN lower(regexp_replace(trim(p.name), '\\s+', ' ', 'g')) = $${qIdx} THEN 0
         WHEN lower(coalesce(p.source_product_id, '')) = $${qIdx} THEN 1
         WHEN lower(p.slug) = $${slugIdx} THEN 2
+        WHEN lower(p.name) LIKE $${likeIdx} THEN 3
         WHEN EXISTS (
           SELECT 1 FROM product_specs ps_r
           WHERE ps_r.product_id = p.id AND lower(ps_r.spec_value) = $${qIdx}
-        ) THEN 3
-        WHEN lower(p.name) LIKE $${prefixIdx} THEN 4
-        WHEN lower(p.name) LIKE $${likeIdx} THEN 5
+        ) THEN 4
+        WHEN lower(p.name) LIKE $${prefixIdx} THEN 5
         WHEN lower(coalesce(b.name, '')) LIKE $${likeIdx} THEN 6
         WHEN lower(coalesce(p.source_product_id, '')) LIKE $${likeIdx} THEN 7
         WHEN EXISTS (
@@ -92,6 +141,7 @@ export function appendProductSearch(
         ELSE 9
       END
     ) ASC,
+    ${tokenScoreOrder}
     length(p.name) ASC,
     p.name ASC
   `;

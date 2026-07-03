@@ -21,3 +21,10 @@ supermarché/
 # Large data files — kept out of git, transferred to VPS via scp
 products-clean-alimentation.jsonl
 products-all-shops-clean.jsonl
+
+# Large data dumps (not for git)
+full_products_catalog_retail.jsonl
+matched_products_retail.jsonl
+category_shop_price_rankings.json
+public/robot.mp4
+public/robot_clean.mp4

@@ -55,11 +55,22 @@ export function parseRetailListFilters(sp: URLSearchParams): RetailListFilters {
   const minPrice = minRaw != null && minRaw !== "" ? parseFloat(minRaw) : null;
   const maxPrice = maxRaw != null && maxRaw !== "" ? parseFloat(maxRaw) : null;
 
-  const sortRaw = sp.get("sort") ?? "price_desc";
+  const q = normalizeSearchText(sp.get("q") ?? "");
+  const sortRaw = sp.get("sort");
+
+  let sort: RetailSortOption = "price_desc";
+  if (sortRaw && VALID_SORTS.has(sortRaw)) {
+    sort = sortRaw as RetailSortOption;
+  } else if (q) {
+    sort = "relevance";
+  }
+  if (!q && sort === "relevance") {
+    sort = "price_desc";
+  }
 
   return {
     cat: (sp.get("cat") ?? "").trim().toLowerCase(),
-    q: normalizeSearchText(sp.get("q") ?? ""),
+    q,
     shop: (sp.get("shop") ?? "").trim().toLowerCase(),
     matched: sp.get("matched"),
     brand: (sp.get("brand") ?? "").trim(),
@@ -68,7 +79,7 @@ export function parseRetailListFilters(sp: URLSearchParams): RetailListFilters {
     specRam: (sp.get("spec_ram") ?? "").trim(),
     specStorage: (sp.get("spec_storage") ?? "").trim(),
     specScreen: (sp.get("spec_screen") ?? "").trim(),
-    sort: VALID_SORTS.has(sortRaw) ? (sortRaw as RetailSortOption) : "price_desc",
+    sort,
   };
 }
 

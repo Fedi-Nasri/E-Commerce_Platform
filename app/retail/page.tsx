@@ -20,6 +20,7 @@ import { countActiveRetailFilters, parseRetailListFilters, type RetailSortOption
 
 type Product = {
   name: string;
+  slug: string;
   brand: string;
   category: string;
   img: string;
@@ -290,11 +291,16 @@ function RetailPageInner() {
 
   useEffect(() => {
     const t = setTimeout(() => {
-      if (search.trim() === qFromUrl) return;
-      replaceParams({ q: search.trim() || null });
+      const trimmed = search.trim();
+      if (trimmed === qFromUrl) return;
+      const patch: Record<string, string | null> = { q: trimmed || null };
+      if (!trimmed && sortFromUrl === "relevance") {
+        patch.sort = null;
+      }
+      replaceParams(patch);
     }, 350);
     return () => clearTimeout(t);
-  }, [search, qFromUrl, replaceParams]);
+  }, [search, qFromUrl, sortFromUrl, replaceParams]);
 
   const totalPages = Math.ceil(total / LIMIT);
 
@@ -485,12 +491,11 @@ function RetailPageInner() {
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
             {products.map((p, i) => {
               const savings = p.maxPrice - p.minPrice;
-              const slug = p.name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
               const fmt = (n: number) => n.toLocaleString("fr-FR");
               return (
                 <Link
-                  key={p.name + i}
-                  href={`/retail/${slug}`}
+                  key={p.slug || `${p.name}-${i}`}
+                  href={`/retail/${p.slug}`}
                   className="card group relative flex flex-col overflow-hidden p-0 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-brand-gold/40 dark:hover:border-brand-gold/40"
                 >
                   {/* discount badge */}
