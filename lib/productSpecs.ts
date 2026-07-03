@@ -324,17 +324,22 @@ export function productType(name: string): string | null {
  * "climatiseur", pas "Condor Machine à Café".
  * Chaque entrée : mot-clé requête → regex des formes acceptées dans le titre.
  */
-const PRODUCT_NOUNS: [RegExp, RegExp][] = [
+// [regex requête, regex forme acceptée dans le titre, (opt) regex EXCLUSION titre]
+const PRODUCT_NOUNS: [RegExp, RegExp, RegExp?][] = [
   [/^climatiseur|^clim$/, /climatiseur|\bclim\b|split/],
   [/^smartphone|^telephone|^tel$/, /smartphone|t[ée]l[ée]phone|iphone|galaxy|redmi|smartphon/],
   [/^tablette/, /tablette|\bipad\b|\btab\b/],
-  [/^pc$|^ordinateur|^laptop|^portable/, /pc\b|ordinateur|laptop|notebook|macbook/],
-  [/^imprimante/, /imprimante|multifonction|printer/],
-  [/^ecran|^moniteur/, /[ée]cran|moniteur|monitor/],
-  [/^tv$|^television|^televiseur/, /\btv\b|t[ée]l[ée]vis/],
+  // "pc" : vrai ordinateur — EXCLUT magazine, jeu, manette, câble, table, support…
+  [/^pc$|^ordinateur|^laptop|^portable/, /pc\b|ordinateur|laptop|notebook|macbook/,
+    /magazine|revue|jeu|game|manette|c[âa]ble|support|table|meuble|sac|sacoche|refroidiss/],
+  [/^imprimante/, /imprimante|multifonction|printer/, /calculatrice|papier|cartouche|toner|encre\b/],
+  [/^ecran|^moniteur/, /[ée]cran|moniteur|monitor/, /protection|film|support|nappe/],
+  // "tv" : vrai téléviseur — EXCLUT box/récepteur/support/carte tv
+  [/^tv$|^television|^televiseur/, /t[ée]l[ée]vis|smart\s*tv|\btv\b/,
+    /\bbox\b|r[ée]cepteur|d[ée]codeur|support|carte\s*tv|antenne|cl[ée]\s*tv|stick/],
   [/^casque|^ecouteur|^ecouteurs/, /casque|[ée]couteur|earbuds|airpods/],
   [/^enceinte|^haut-parleur/, /enceinte|haut[- ]parleur|barre\s*de\s*son|soundbar/],
-  [/^refrigerateur|^frigo/, /r[ée]frig[ée]rateur|\bfrigo\b/],
+  [/^refrigerateur|^frigo/, /r[ée]frig[ée]rateur|\bfrigo\b|cong[ée]lateur/, /fontaine|distributeur\s*d.eau|filtre/],
   [/^congelateur/, /cong[ée]lateur/],
   [/^machine$|^lave-linge|^laveuse/, /machine\s*[àa]\s*laver|lave[- ]linge/],
   [/^lave-vaisselle/, /lave[- ]vaisselle/],
@@ -365,8 +370,11 @@ function leadingNounOK(queryText: string, prodName: string): boolean {
   const q = norm(queryText).trim();
   const n = norm(prodName);
   const firstWord = q.split(/\s+/)[0] || "";
-  for (const [qre, titleRe] of PRODUCT_NOUNS) {
+  for (const [qre, titleRe, excludeRe] of PRODUCT_NOUNS) {
     if (qre.test(q) || qre.test(firstWord)) {
+      // Exclusion : le titre contient un mot qui trahit un AUTRE produit
+      // (ex requête "pc" mais titre "Magazine Pc Update" → rejet).
+      if (excludeRe && excludeRe.test(n)) return false;
       // La requête désigne ce produit → le titre doit contenir la forme attendue
       // ET ce mot doit apparaître tôt (dans les 35 premiers caractères du titre).
       const m = n.match(titleRe);
@@ -461,12 +469,56 @@ export function matchesQuery(queryS: Specs, prodName: string, queryText?: string
   return true;
 }
 
+/**
+ * Extrait un CODE SKU / RÉFÉRENCE MODÈLE du nom (ex "SM2016S", "RDSA43S",
+ * "KS09-M4VIT3", "WFC3C26PX"). C'est le signal d'identité le plus fort :
+ * deux produits avec le MÊME sku sont le même produit, quelle que soit la
+ * formulation du titre ("Micro-Onde BRANDT SM2016S" == "Micro Onde SOLO
+ * BRANDT (SM2016S)"). Retourne le sku normalisé ou null.
+ */
+// Unités/capacités à NE PAS prendre pour un SKU (ce ne sont pas des références).
+const UNIT_SUFFIX = /^(GO|GB|TO|TB|MO|MB|L|KG|G|W|WATTS?|BTU|MAH|MP|HZ|CM|MM|M|POUCES?|V|VA|AH|KMH|TR|TRS|RPM|K|P)$/;
+const CAPACITY_TOKEN = /^\d{2,5}(GO|GB|TO|TB|L|KG|W|BTU|MAH|MP|HZ|CM|MM|V|VA|AH|K|P)$/;
+
+export function extractSku(name: string): string | null {
+  const raw = (name || "").toUpperCase();
+  const candidates: string[] = [];
+  // Références alphanumériques : mélange lettres+chiffres, éventuels tirets/points
+  // (ex SM2016S, KS09-M4VIT3, WFC3C26PX, RDSA43S).
+  const re = /\b([A-Z]{1,5}[-.]?\d{2,5}[A-Z0-9-]{0,8}|\d{3,5}[A-Z]{1,4}[A-Z0-9-]{0,6})\b/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(raw)) !== null) {
+    const tok = m[1].replace(/[-.]/g, "");
+    // Rejette : capacités/unités (128GO, 20L, 9000BTU, 5000MAH…) — ce n'est pas un sku
+    if (CAPACITY_TOKEN.test(tok) || UNIT_SUFFIX.test(tok)) continue;
+    // Rejette un nombre suivi d'une seule unité collée (ex "20L", "8KG")
+    if (/^\d+[A-Z]{1,3}$/.test(tok) && UNIT_SUFFIX.test(tok.replace(/^\d+/, ""))) continue;
+    // doit contenir AU MOINS une lettre ET au moins deux chiffres
+    if (/[A-Z]/.test(tok) && (tok.match(/\d/g)?.length ?? 0) >= 2 && tok.length >= 4 && tok.length <= 14) {
+      candidates.push(tok);
+    }
+  }
+  if (!candidates.length) return null;
+  // Prend le plus long candidat (le plus discriminant)
+  candidates.sort((a, b) => b.length - a.length);
+  return candidates[0];
+}
+
 /** Deux produits identiques (même marque + specs) → à regrouper.
+ *  PRIORITÉ AU SKU : si le nom contient un code modèle, on regroupe par
+ *  marque+SKU (identité forte, insensible à la formulation du titre).
+ *  Sinon on retombe sur marque + specs techniques.
  *  On IGNORE volontairement la couleur (non capturée) et, pour les
  *  téléphones identifiés par modèle, on ignore la RAM (souvent absente
  *  d'un shop à l'autre) pour ne pas fragmenter le groupe. */
 export function sameGroupKey(name: string): string {
   const s = extractSpecs(name);
+  // ── SKU d'abord : identité la plus fiable entre boutiques.
+  const sku = extractSku(name);
+  if (sku) {
+    const brand = typeof s.marque === "string" ? s.marque : "";
+    return `sku:${brand}:${sku}`;
+  }
   const isPhoneModel = typeof s.modele === "string";
   const parts = [
     s.marque, s.modele, s.btu, s.clim_type, s.clim_mode,

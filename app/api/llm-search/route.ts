@@ -210,6 +210,8 @@ export async function POST(req: NextRequest) {
     // s'applique à la connexion, remise à zéro au retour dans le pool est inutile
     // car on la refixe à chaque requête.
     await client.query(`SET hnsw.ef_search = ${EF_SEARCH}`);
+    // Seuil de similarité de mot pour l'opérateur trigram <% (tolérance typos).
+    await client.query(`SET pg_trgm.word_similarity_threshold = 0.6`);
 
     // 3a) RECHERCHE VECTORIELLE (sémantique) — tout le catalogue pertinent
     const knn = await client.query<Row>(
@@ -223,27 +225,44 @@ export async function POST(req: NextRequest) {
       [vecLiteral, KNN_LIMIT]
     );
 
-    // 3b) RECHERCHE MOT-CLÉ (trigram) — rattrape les produits que le vecteur
-    //     rate mais dont le nom contient littéralement les mots de la requête.
-    //     On construit un pattern à partir des mots significatifs (>=3 lettres).
+    // 3b) RECHERCHE MOT-CLÉ (exact + FUZZY trigram) — rattrape les produits que
+    //     le vecteur rate, y compris avec une FAUTE DE FRAPPE ("vaiselle" →
+    //     "vaisselle"). Chaque mot doit correspondre : soit littéralement (ILIKE),
+    //     soit par similarité trigram (mot proche présent dans le nom).
+    //     Mots courts autorisés (>=2) pour "pc", "tv"…
     const kwWords = query
       .toLowerCase()
       .normalize("NFD").replace(/[̀-ͯ]/g, "")
-      .split(/\s+/).filter((w) => w.length >= 3 && !STOPWORDS.has(w));
+      .split(/\s+/).filter((w) => w.length >= 2 && !STOPWORDS.has(w));
     let keywordRows: Row[] = [];
     if (kwWords.length) {
-      // chaque mot doit apparaître dans le nom (AND) → produits très pertinents
-      const conds = kwWords.map((_, i) => `name ILIKE $${i + 1}`).join(" AND ");
-      const params = kwWords.map((w) => `%${w}%`);
+      // Pour chaque mot : ILIKE '%mot%'  OU  un mot du nom ressemble au mot (trigram).
+      // word_similarity(mot, name) > 0.6 = très proche (tolère 1-2 lettres d'écart).
+      const parts: string[] = [];
+      const params: (string | number)[] = [];
+      for (const w of kwWords) {
+        params.push(`%${w}%`);          // ILIKE
+        const likeIdx = params.length;
+        params.push(w);                  // opérateur trigram indexable <%
+        const simIdx = params.length;
+        // mot présent littéralement OU un token très proche existe dans le nom.
+        // `$w <% name` = word_similarity indexable (GIN) → rapide + tolère les typos.
+        parts.push(`(name ILIKE $${likeIdx} OR $${simIdx} <% name)`);
+      }
+      const conds = parts.join(" AND ");
+      params.push(vecLiteral);           // pour le tri par similarité vectorielle
+      const vecIdx = params.length;
+      params.push(KEYWORD_LIMIT);
+      const limIdx = params.length;
       const kw = await client.query<Row>(
         `SELECT product_id, shop_key, shop_name, name, current_price, stock_status,
                 shop_product_url, image_url,
-                1 - (embedding_h <=> $${kwWords.length + 1}::halfvec) AS similarity
+                1 - (embedding_h <=> $${vecIdx}::halfvec) AS similarity
          FROM sem_products
          WHERE embedding_h IS NOT NULL AND ${conds}
          ORDER BY similarity DESC
-         LIMIT $${kwWords.length + 2}`,
-        [...params, vecLiteral, KEYWORD_LIMIT]
+         LIMIT $${limIdx}`,
+        params
       );
       keywordRows = kw.rows;
     }
