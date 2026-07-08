@@ -221,7 +221,7 @@ export default function ClassementPage() {
         {displayShops.length > 0 && (
           <div
             key={category}
-            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
           >
             {displayShops.map((shop, i) => (
               <div
@@ -230,7 +230,7 @@ export default function ClassementPage() {
                 style={{ animationDelay: `${Math.min(i * 50, 600)}ms` }}
               >
                 {loading ? (
-                  <div className="h-[280px] animate-pulse rounded-2xl border border-bg-border bg-bg-card" />
+                  <div className="h-[380px] animate-pulse rounded-3xl border border-bg-border bg-bg-card" />
                 ) : (
                   <ShopFlipCard shop={shop} category={CATEGORY_LABELS[category]} />
                 )}
