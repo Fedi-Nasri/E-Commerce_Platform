@@ -8,4 +8,5 @@ export const navLinks: NavLink[] = [
   { fr: "Magasins", ar: "المتاجر", href: "/retail", caret: true, megaMenu: true },
   { fr: "Couffin Tounsi", ar: "القفة التونسية", href: "/couffin" },
   { fr: "Comparaison", ar: "مقارنة", href: "/comparaison" },
+  { fr: "Classement", ar: "الترتيب", href: "/classement" },
 ];

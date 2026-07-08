@@ -6,7 +6,6 @@ import { GrandeDistribRow } from "@/components/GrandeDistribRow";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { IaPredictive } from "@/components/IaPredictive";
-import { Llm1111Search } from "@/components/Llm1111Search";
 import { MarketIndex } from "@/components/MarketIndex";
 import { Observatoire } from "@/components/Observatoire";
 import { PromoBanner } from "@/components/PromoBanner";
@@ -20,7 +19,6 @@ export default function HomePage() {
       <Header />
       <Hero />
       <PromoBanner />
-      <Llm1111Search />
       <TechOffers />
       <Categories />
       <GrandeDistribRow />
