@@ -130,27 +130,25 @@ export function ClimStockSlider({ data }: { data: ClimSliderData }) {
     <>
       {/* Lead card — hero + totals */}
       <div className={cardWrap}>
-        <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-bg-border bg-bg-card shadow-sm transition hover:border-brand-gold/30 hover:shadow-md dark:shadow-none dark:hover:border-brand-gold/25">
-          <div className="relative shrink-0 overflow-hidden p-5">
-            <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-white/45">
-              <Snowflake className="h-3 w-3 text-sky-500" /> Été 2026 · En stock
-            </p>
-            <h3 className="mt-1.5 text-xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">
-              {fmt(data.totals.climatiseurs)} climatiseurs
-            </h3>
-            <p className="mt-1 text-[11px] text-slate-500 dark:text-white/55">
-              disponibles chez {data.totals.boutiques} enseignes · {data.totals.marques} marques
-            </p>
-            <div className="mt-3 flex items-center justify-center">
-              <img
-                src="/climatiseur-category.png"
-                alt="Climatiseurs"
-                className="h-40 w-auto object-contain drop-shadow-md transition duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
+        <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-sky-500/25 bg-bg-card shadow-sm transition hover:border-sky-400/50 hover:shadow-md dark:shadow-none">
+          <div className="relative shrink-0 overflow-hidden bg-gradient-to-br from-sky-100 via-blue-50 to-white p-5 dark:from-sky-950/60 dark:via-[#0d1526] dark:to-bg-900">
+            <div className="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full bg-sky-400/15 blur-2xl" />
+            <div className="relative flex items-start justify-between gap-3">
+              <div>
+                <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-sky-600 dark:text-sky-300">
+                  <Snowflake className="h-3 w-3" /> Été 2026 · En stock
+                </p>
+                <h3 className="mt-1.5 text-xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">
+                  {fmt(data.totals.climatiseurs)} climatiseurs
+                </h3>
+                <p className="mt-1 text-[11px] text-slate-500 dark:text-white/55">
+                  disponibles chez {data.totals.boutiques} enseignes · {data.totals.marques} marques
+                </p>
+              </div>
+              <img src="/clim.png" alt="" className="h-16 w-16 shrink-0 object-contain drop-shadow-md transition duration-500 group-hover:scale-110" loading="lazy" />
             </div>
           </div>
-          <div className="flex flex-1 flex-col justify-center gap-2 p-4 pt-0">
+          <div className="flex flex-1 flex-col justify-center gap-2 p-4">
             {data.cheapest && (
               <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/[0.07] px-4 py-3">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
