@@ -53,10 +53,10 @@ export function TechOffers() {
   }, []);
 
   const updateArrows = () => {
-    const el = rowRef.current;
-    if (!el) return;
-    setCanLeft(el.scrollLeft > 4);
-    setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+    // With the seamless duplicate loop, the row is effectively infinite in both
+    // directions — arrows never disable.
+    setCanLeft(true);
+    setCanRight(true);
   };
 
   useEffect(() => {
@@ -67,7 +67,9 @@ export function TechOffers() {
     return () => el.removeEventListener("scroll", updateArrows);
   }, [loading]);
 
-  // Auto-scroll
+  // Seamless auto-scroll: the cards row is rendered twice back-to-back.
+  // When scrollLeft passes the width of the first set, we subtract that width
+  // instantly — the user sees the duplicate cards seamlessly continue.
   useEffect(() => {
     if (loading) return;
     const el = rowRef.current;
@@ -78,8 +80,11 @@ export function TechOffers() {
     const step = () => {
       if (!isPaused.current && el) {
         pos += SPEED;
-        const max = el.scrollWidth - el.clientWidth;
-        if (pos >= max - 1) pos = 0;
+        // scrollWidth = width of both sets. Half of that = width of the first
+        // (original) set. When we cross that boundary, teleport back by that
+        // same amount so the duplicate takes over invisibly.
+        const halfWidth = el.scrollWidth / 2;
+        if (pos >= halfWidth) pos -= halfWidth;
         el.scrollLeft = pos;
         updateArrows();
       } else if (el) {
@@ -109,6 +114,12 @@ export function TechOffers() {
     const el = rowRef.current;
     if (!el) return;
     isPaused.current = true;
+    const halfWidth = el.scrollWidth / 2;
+    // If scrolling left near the start, jump forward to the equivalent position
+    // in the duplicate set first so we can smoothly scroll left without hitting 0.
+    if (dir === "left" && el.scrollLeft < 360) {
+      el.scrollLeft += halfWidth;
+    }
     el.scrollBy({ left: dir === "left" ? -360 : 360, behavior: "smooth" });
     setTimeout(() => { isPaused.current = false; }, 1200);
   };
@@ -176,6 +187,18 @@ export function TechOffers() {
         <div ref={rowRef} className={scrollRowClass}>
           {cards.map(({ catalog, scope }) => (
             <div key={catalog.slug} className={cardWrapClass}>
+              <PriceRankingCard
+                catalog={catalog}
+                scopeName={scope.scope_name}
+                matchedProducts={scope.matched_products}
+                shopCount={scope.distinct_shops}
+                shops={scope.shops}
+              />
+            </div>
+          ))}
+          {/* Duplicate set for seamless infinite scroll — hidden from a11y */}
+          {cards.map(({ catalog, scope }) => (
+            <div key={`${catalog.slug}-dup`} className={cardWrapClass} aria-hidden="true">
               <PriceRankingCard
                 catalog={catalog}
                 scopeName={scope.scope_name}

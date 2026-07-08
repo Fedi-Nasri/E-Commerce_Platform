@@ -105,7 +105,9 @@ function RetailPageInner() {
   const specRamFromUrl = sp.get("spec_ram") ?? "";
   const specStorageFromUrl = sp.get("spec_storage") ?? "";
   const specScreenFromUrl = sp.get("spec_screen") ?? "";
-  const matchedFromUrl = sp.get("matched") ?? "";
+  // Default to "true" (Produits similaires) when the URL has no `matched` param —
+  // matched products are the meaningful comparison set, so we show them first.
+  const matchedFromUrl = sp.get("matched") ?? "true";
   const sortFromUrl = parseRetailListFilters(sp).sort;
 
   const [products, setProducts]   = useState<Product[]>([]);
@@ -394,12 +396,12 @@ function RetailPageInner() {
       <div className="mx-auto mt-4 max-w-[1600px] px-4 sm:mt-5">
         <div className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1 dark:border-white/[0.08] dark:bg-white/[0.04]">
           {[
-            { key: "",     label: "Catalogue complet" },
+            { key: "all",  label: "Catalogue complet" },
             { key: "true", label: "Produits similaires" },
           ].map(({ key, label }) => (
             <button
               key={key}
-              onClick={() => { setPage(0); replaceParams({ matched: key || null }); }}
+              onClick={() => { setPage(0); replaceParams({ matched: key }); }}
               className={`rounded-lg px-4 py-2 text-sm font-semibold transition-all ${
                 matchedFromUrl === key
                   ? "bg-white text-slate-900 shadow-sm dark:bg-white/[0.1] dark:text-white"
@@ -547,21 +549,33 @@ function RetailPageInner() {
                     {/* per-shop price rows */}
                     <div className="mt-2.5 flex flex-col gap-1 border-t border-slate-100 pt-2.5 dark:border-white/[0.06]">
                       {p.shopNames.slice(0, 3).map((shop, si) => {
-                        const price = p.shopNames.length === 1
+                        // All shops share the same price when the spread is
+                        // negligible — don't crown a "cheapest".
+                        const allEqual = savings <= 0.5;
+                        const price = allEqual || p.shopNames.length === 1
                           ? p.minPrice
                           : p.minPrice + (savings * si) / Math.max(p.shopNames.length - 1, 1);
+                        const highlightCheapest = si === 0 && !allEqual;
+                        const highlightEqual = si === 0 && allEqual && p.shopNames.length > 1;
                         return (
                           <div
                             key={shop}
                             className={`flex items-center justify-between rounded-md px-2 py-1 text-[11px] ${
-                              si === 0
+                              highlightCheapest
                                 ? "bg-emerald-50 font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"
+                                : highlightEqual
+                                ? "bg-sky-50 font-semibold text-sky-700 dark:bg-sky-500/10 dark:text-sky-300"
                                 : "text-slate-600 dark:text-white/60"
                             }`}
                           >
                             <span className="flex items-center gap-1 truncate">
-                              {si === 0 && <BadgeCheck className="h-3 w-3 shrink-0" />}
+                              {highlightCheapest && <BadgeCheck className="h-3 w-3 shrink-0" />}
                               <span className="truncate">{displayName(shop)}</span>
+                              {highlightEqual && (
+                                <span className="ml-1 shrink-0 rounded-full bg-sky-100 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-sky-700 dark:bg-sky-500/20 dark:text-sky-200">
+                                  Égalité
+                                </span>
+                              )}
                             </span>
                             <span className="shrink-0 tabular-nums font-bold">{fmt(price)} DT</span>
                           </div>

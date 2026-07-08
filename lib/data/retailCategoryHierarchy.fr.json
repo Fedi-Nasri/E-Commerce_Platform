@@ -88,9 +88,7 @@
       { "id": "kitchen_dining", "nom": "Cuisine et vaisselle" },
       { "id": "furniture", "nom": "Meubles" },
       { "id": "garden_outdoor", "nom": "Jardin et extérieur" },
-      { "id": "tools_hardware", "nom": "Outils et quincaillerie" },
       { "id": "bathroom_plumbing", "nom": "Salle de bain et plomberie" },
-      { "id": "lighting_electrical", "nom": "Éclairage et électricité" },
       { "id": "pools", "nom": "Piscines" }
     ]
   },

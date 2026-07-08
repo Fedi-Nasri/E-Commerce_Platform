@@ -1,6 +1,7 @@
 import { AcBarometer } from "@/components/AcBarometer";
 import { AppBanner } from "@/components/AppBanner";
 import { Categories } from "@/components/Categories";
+import { ClimStockSection } from "@/components/ClimStockSection";
 import { Footer } from "@/components/Footer";
 import { GrandeDistribRow } from "@/components/GrandeDistribRow";
 import { Header } from "@/components/Header";
@@ -22,6 +23,7 @@ export default function HomePage() {
       <PromoBanner />
       <Llm1111Search />
       <TechOffers />
+      <ClimStockSection />
       <Categories />
       <GrandeDistribRow />
       <StatRow />

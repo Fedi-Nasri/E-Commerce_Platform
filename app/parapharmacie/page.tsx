@@ -393,26 +393,36 @@ function ParapharmacyPageInner() {
                       )}
                     </div>
 
-                    {/* per-shop price list, cheapest first */}
+                    {/* per-shop price list, cheapest first (or "égalité" if all equal) */}
                     <div className="mt-2.5 flex flex-col gap-1 border-t border-slate-100 pt-2.5 dark:border-white/[0.06]">
                       {p.shopNames.slice(0, 3).map((shop, si) => {
-                        const price = p.shopNames.length === 1
+                        const allEqual = savings <= 0.5;
+                        const price = allEqual || p.shopNames.length === 1
                           ? p.minPrice
                           : p.minPrice + (savings * si) / Math.max(p.shopNames.length - 1, 1);
+                        const highlightCheapest = si === 0 && !allEqual;
+                        const highlightEqual = si === 0 && allEqual && p.shopNames.length > 1;
                         return (
                           <div
                             key={shop}
                             className={`group/row flex items-center justify-between rounded-md px-2 py-1.5 transition-all duration-300 hover:scale-[1.03] hover:shadow-sm ${
-                              si === 0
+                              highlightCheapest
                                 ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300 animate-shop-pulse"
+                                : highlightEqual
+                                ? "bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300"
                                 : "text-slate-700 hover:bg-slate-50 dark:text-white/75 dark:hover:bg-white/[0.04]"
                             }`}
                           >
                             <span className="flex items-center gap-1.5 truncate">
-                              {si === 0 && <BadgeCheck className="h-3.5 w-3.5 shrink-0 animate-pulse" />}
+                              {highlightCheapest && <BadgeCheck className="h-3.5 w-3.5 shrink-0 animate-pulse" />}
                               <span className="truncate text-[13px] font-extrabold capitalize tracking-tight transition-transform duration-300 group-hover/row:translate-x-0.5">
                                 {shop}
                               </span>
+                              {highlightEqual && (
+                                <span className="ml-1 shrink-0 rounded-full bg-sky-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-sky-700 dark:bg-sky-500/20 dark:text-sky-200">
+                                  Égalité
+                                </span>
+                              )}
                             </span>
                             <span className="shrink-0 text-[12px] tabular-nums font-bold">{fmt(price)} DT</span>
                           </div>
