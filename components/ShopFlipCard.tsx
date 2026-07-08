@@ -37,6 +37,14 @@ function fmtPrice(n: number): string {
   return n.toFixed(2).replace(/\.?0+$/, "").replace(".", ",");
 }
 
+function safeNum(n: number | undefined | null): number {
+  return typeof n === "number" && isFinite(n) ? n : 0;
+}
+
+function fmtCount(n: number | undefined | null): string {
+  return safeNum(n).toLocaleString("fr-FR");
+}
+
 function ShopLogoImg({ src, name, size = 56 }: { src: string | null; name: string; size?: number }) {
   const [broken, setBroken] = useState(false);
   if (!src || broken) {
@@ -155,7 +163,7 @@ export function ShopFlipCard({ shop, category }: { shop: ShopStat; category: str
                 {shop.displayName}
               </h3>
               <p className="mt-1 text-[11px] text-slate-500 dark:text-white/50">
-                {shop.totalProducts.toLocaleString("fr-FR")} produits
+                {fmtCount(shop.totalProducts)} produits
               </p>
             </div>
 
@@ -163,7 +171,7 @@ export function ShopFlipCard({ shop, category }: { shop: ShopStat; category: str
             <div className="flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1.5">
               <Zap className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
               <span className="text-[11px] font-bold tabular-nums text-emerald-600 dark:text-emerald-400">
-                {shop.cheapestCount.toLocaleString("fr-FR")} meilleurs prix
+                {fmtCount(shop.cheapestCount)} meilleurs prix
               </span>
             </div>
 
@@ -204,12 +212,12 @@ export function ShopFlipCard({ shop, category }: { shop: ShopStat; category: str
               <StatPill
                 icon={Package}
                 label="Produits"
-                value={shop.totalProducts.toLocaleString("fr-FR")}
+                value={fmtCount(shop.totalProducts)}
               />
               <StatPill
                 icon={Award}
                 label="Meilleur prix"
-                value={shop.cheapestCount.toLocaleString("fr-FR")}
+                value={fmtCount(shop.cheapestCount)}
                 tone="emerald"
               />
 
@@ -217,7 +225,7 @@ export function ShopFlipCard({ shop, category }: { shop: ShopStat; category: str
                 <StatPill
                   icon={TrendingUp}
                   label="Prix moyen"
-                  value={`${fmtPrice(shop.avgPrice)} DT`}
+                  value={`${fmtPrice(safeNum(shop.avgPrice))} DT`}
                   tone="gold"
                 />
               )}
@@ -226,7 +234,7 @@ export function ShopFlipCard({ shop, category }: { shop: ShopStat; category: str
                 <StatPill
                   icon={Package}
                   label="En concurrence"
-                  value={shop.similarProducts.toLocaleString("fr-FR")}
+                  value={fmtCount(shop.similarProducts)}
                   tone="blue"
                 />
               )}
@@ -244,7 +252,7 @@ export function ShopFlipCard({ shop, category }: { shop: ShopStat; category: str
                 <StatPill
                   icon={Zap}
                   label="Win rate"
-                  value={`${shop.cheapestRatePct.toFixed(1)}%`}
+                  value={`${safeNum(shop.cheapestRatePct).toFixed(1)}%`}
                   tone="emerald"
                 />
               )}
@@ -262,7 +270,7 @@ export function ShopFlipCard({ shop, category }: { shop: ShopStat; category: str
                 <StatPill
                   icon={TrendingUp}
                   label="Produits croisés"
-                  value={shop.crossedProducts.toLocaleString("fr-FR")}
+                  value={fmtCount(shop.crossedProducts)}
                   tone="blue"
                 />
               )}

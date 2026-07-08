@@ -259,6 +259,7 @@ function getSuperShops(): SuperShop[] {
       logo: localShopLogo(s.shop_name) ?? localShopLogo(s.shop_name?.toLowerCase()?.replace(/\s+/g, "")),
       totalProducts: Number(s.total_products) || 0,
       crossedProducts: Number(s.crossed_products) || 0,
+      cheapestCount: Number(s.cheapest_wins) || 0,
       cheapestWins: Number(s.cheapest_wins) || 0,
       cheapestRatePct: Number(s.cheapest_rate_pct) || 0,
       crossingRatePct: Number(s.crossing_rate_pct) || 0,
