@@ -171,6 +171,10 @@ export function buildRetailProductQuery(filters: RetailListFilters) {
 
   if (filters.matched === "true") {
     conditions.push("p.is_matched = TRUE");
+    // "Produits similaires" must only show products genuinely comparable
+    // across shops right now — the is_matched flag can go stale (e.g. a shop
+    // offer was removed after matching), so enforce the live shop count too.
+    having.push("COUNT(DISTINCT s.id) >= 2");
   } else if (filters.matched === "false") {
     conditions.push("p.is_matched = FALSE");
   }

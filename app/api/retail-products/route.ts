@@ -72,8 +72,8 @@ export async function GET(req: NextRequest) {
          MIN(sp.current_price) AS min_price,
          MAX(sp.current_price) AS max_price,
          array_agg(DISTINCT s.shop_key ORDER BY s.shop_key) AS shop_keys,
-         (SELECT pi.image_url FROM product_images pi WHERE pi.product_id = p.id ORDER BY pi.id ASC OFFSET 1 LIMIT 1) AS img2,
-         (SELECT pi.image_url FROM product_images pi WHERE pi.product_id = p.id ORDER BY pi.id ASC LIMIT 1) AS img1
+         (SELECT pi.image_url FROM product_images pi WHERE pi.product_id = p.id AND pi.image_url NOT ILIKE '%yatoo.com.tn%' ORDER BY pi.id ASC OFFSET 1 LIMIT 1) AS img2,
+         (SELECT pi.image_url FROM product_images pi WHERE pi.product_id = p.id AND pi.image_url NOT ILIKE '%yatoo.com.tn%' ORDER BY pi.id ASC LIMIT 1) AS img1
        ${baseJoins}
        ${where}
        GROUP BY p.id, p.name, p.slug, p.is_matched, b.name, tc.name

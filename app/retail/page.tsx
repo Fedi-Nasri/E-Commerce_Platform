@@ -151,11 +151,15 @@ function RetailPageInner() {
 
   // Give the "Aléatoire" (default) sort a per-session seed so the shuffle stays
   // stable across pagination instead of reshuffling on every request. Generated
-  // once on first load and written into the URL (no visible navigation).
+  // once, synchronously, on first render (not in an effect) so the very first
+  // fetch already uses it — writing it into the URL afterward is just for
+  // shareable/bookmarkable links, not load-bearing for correctness.
+  const [localSeed] = useState(() => String(Math.floor(Math.random() * 1_000_000_000)));
+
   useEffect(() => {
     if (sortFromUrl !== "random" || seedFromUrl) return;
     const params = new URLSearchParams(sp.toString());
-    params.set("seed", String(Math.floor(Math.random() * 1_000_000_000)));
+    params.set("seed", localSeed);
     const qs = params.toString();
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -258,7 +262,20 @@ function RetailPageInner() {
     setSearch(qFromUrl);
   }, [qFromUrl]);
 
-  const queryString = sp.toString();
+  // The actual params sent to the API must always carry the *effective*
+  // values (matched defaults to "true", sort defaults to "random" with a
+  // seed) even before the URL itself has been written to reflect them —
+  // otherwise the very first request on a fresh /retail visit queries the
+  // unfiltered full catalogue (or an unseeded random order) while the UI
+  // still displays "Produits similaires" as selected, which can render an
+  // empty/mismatched list until a later interaction corrects the URL.
+  const effectiveParams = useMemo(() => {
+    const params = new URLSearchParams(sp.toString());
+    if (!params.has("matched")) params.set("matched", "true");
+    if (!params.has("seed")) params.set("seed", localSeed);
+    return params;
+  }, [sp, localSeed]);
+  const queryString = effectiveParams.toString();
   const filterRef = useRef(queryString);
 
   const fetchProducts = useCallback(async (p: number, qs: string) => {

@@ -15,7 +15,7 @@ export async function GET(_req: NextRequest, { params }: { params: { slug: strin
          tc.name AS category,
          sc.name AS subcategory,
          lc.name AS low_category,
-         (SELECT pi.image_url FROM product_images pi WHERE pi.product_id = p.id ORDER BY pi.id ASC LIMIT 1) AS img
+         (SELECT pi.image_url FROM product_images pi WHERE pi.product_id = p.id AND pi.image_url NOT ILIKE '%yatoo.com.tn%' ORDER BY pi.id ASC LIMIT 1) AS img
        FROM products p
        LEFT JOIN brands b ON b.id = p.brand_id
        LEFT JOIN product_subcategories psc ON psc.product_id = p.id
@@ -35,7 +35,7 @@ export async function GET(_req: NextRequest, { params }: { params: { slug: strin
 
     const [imagesRes, pricesRes, historyRes, relatedRes, specsRes] = await Promise.all([
       client.query(
-        `SELECT pi.image_url FROM product_images pi WHERE pi.product_id = $1 ORDER BY pi.id ASC`,
+        `SELECT pi.image_url FROM product_images pi WHERE pi.product_id = $1 AND pi.image_url NOT ILIKE '%yatoo.com.tn%' ORDER BY pi.id ASC`,
         [head.id]
       ),
       client.query(
@@ -62,7 +62,7 @@ export async function GET(_req: NextRequest, { params }: { params: { slug: strin
            sc2.name AS subcategory,
            MIN(sp2.current_price) AS min_price,
            MAX(sp2.current_price) AS max_price,
-           (SELECT pi2.image_url FROM product_images pi2 WHERE pi2.product_id = p2.id ORDER BY pi2.id LIMIT 1) AS img,
+           (SELECT pi2.image_url FROM product_images pi2 WHERE pi2.product_id = p2.id AND pi2.image_url NOT ILIKE '%yatoo.com.tn%' ORDER BY pi2.id LIMIT 1) AS img,
            array_agg(DISTINCT s2.shop_key) AS shop_keys,
            MAX(CASE WHEN sc2.name IS NOT DISTINCT FROM $3 THEN 1 ELSE 0 END) AS sub_match,
            MAX(CASE WHEN lc2.name IS NOT DISTINCT FROM $4 THEN 1 ELSE 0 END) AS low_match,

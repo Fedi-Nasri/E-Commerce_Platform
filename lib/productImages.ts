@@ -15,6 +15,7 @@ export function productCoverImageFilterSql(alias?: string) {
   AND ${image} NOT ILIKE '%no-image%'
   AND ${image} NOT ILIKE '%not-found%'
   AND ${image} NOT ILIKE '%.gif%'
+  AND ${image} NOT ILIKE '%yatoo.com.tn%'
 `;
 }
 

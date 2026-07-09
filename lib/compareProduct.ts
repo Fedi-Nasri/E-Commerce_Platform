@@ -164,7 +164,7 @@ async function fetchRetailBySlug(slug: string): Promise<CompareProductPayload | 
     `SELECT p.id, p.name, p.slug, p.source_product_id,
             COALESCE(b.name, '') AS brand,
             tc.name AS top_cat, lc.name AS low_cat, sc.name AS sub_cat,
-            (SELECT pi.image_url FROM product_images pi WHERE pi.product_id = p.id ORDER BY pi.id ASC LIMIT 1) AS img
+            (SELECT pi.image_url FROM product_images pi WHERE pi.product_id = p.id AND pi.image_url NOT ILIKE '%yatoo.com.tn%' ORDER BY pi.id ASC LIMIT 1) AS img
      FROM products p
      LEFT JOIN brands b ON b.id = p.brand_id
      LEFT JOIN product_subcategories psc ON psc.product_id = p.id
@@ -468,7 +468,7 @@ async function searchRetailCompare(q: string, limit: number): Promise<CompareSea
   }>(
     `SELECT
       p.slug, p.name, COALESCE(b.name, '') AS brand,
-      (SELECT pi.image_url FROM product_images pi WHERE pi.product_id = p.id ORDER BY pi.id ASC LIMIT 1) AS img,
+      (SELECT pi.image_url FROM product_images pi WHERE pi.product_id = p.id AND pi.image_url NOT ILIKE '%yatoo.com.tn%' ORDER BY pi.id ASC LIMIT 1) AS img,
       MIN(sp.current_price) AS min_price,
       COUNT(DISTINCT s.id) AS shop_count,
       COALESCE(tc.name, lc.name, sc.name, '') AS category,

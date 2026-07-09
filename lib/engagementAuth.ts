@@ -77,7 +77,7 @@ async function resolveFromCatalog3DB(
       `SELECT p.slug,
               p.name,
               COALESCE(b.name, '') AS brand,
-              (SELECT image_url FROM product_images WHERE product_id = p.id ORDER BY id LIMIT 1) AS image,
+              (SELECT image_url FROM product_images WHERE product_id = p.id AND image_url NOT ILIKE '%yatoo.com.tn%' ORDER BY id LIMIT 1) AS image,
               MIN(sp.current_price) AS price,
               (
                 SELECT s.slug FROM shop_prices sp2

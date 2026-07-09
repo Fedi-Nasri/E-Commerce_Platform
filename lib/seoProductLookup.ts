@@ -28,6 +28,7 @@ async function lookup(pool: Pool, slug: string): Promise<SeoProduct | null> {
               (
                 SELECT image_url FROM product_images
                 WHERE product_id = p.id AND image_url ~ '^https?://'
+                  AND image_url NOT ILIKE '%yatoo.com.tn%'
                 ORDER BY id ASC LIMIT 1
               ) AS image,
               MIN(sp.current_price)::text AS min_price,
