@@ -100,9 +100,12 @@ function shopUrl(shopKey: string, productName: string): string {
   return pattern.replace("{q}", encodeURIComponent(productName));
 }
 
-function shopBadge(_name: string, isCheapest: boolean) {
+function shopBadge(_name: string, isCheapest: boolean, isEqual: boolean) {
   if (isCheapest) {
     return "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 ring-1 ring-emerald-500/30";
+  }
+  if (isEqual) {
+    return "bg-sky-500/15 text-sky-600 dark:text-sky-300 ring-1 ring-sky-500/30";
   }
   return "bg-brand-gold/10 text-brand-gold ring-1 ring-brand-gold/25";
 }
@@ -265,6 +268,14 @@ export function CatalogProductDetail({
     })
     .sort((a, b) => a.price - b.price);
 
+  // Multiple shops can genuinely tie on price — don't crown one "Moins cher"
+  // over an identical price, mirroring the "Égalité" treatment on listing cards.
+  const cheapestPrice = shopRows[0]?.price ?? null;
+  const tiedForCheapest = cheapestPrice != null
+    ? shopRows.filter((r) => Math.abs(r.price - cheapestPrice) <= 0.001).length
+    : 0;
+  const allShopsTied = tiedForCheapest > 1;
+
   const baseSpecs: [string, string][] = [
     ["Marque", product.brand],
     ["Catégorie", product.category],
@@ -424,7 +435,10 @@ export function CatalogProductDetail({
                 </h2>
                 <ul className="flex-1 space-y-2">
                   {shopRows.map(({ shop, price, href }, i) => {
-                    const isFirst = i === 0;
+                    const isTiedCheapest = i < tiedForCheapest;
+                    const isCheapest = isTiedCheapest && !allShopsTied;
+                    const isEqual = isTiedCheapest && allShopsTied;
+                    const highlighted = isCheapest || isEqual;
                     return (
                       <li key={shop}>
                         <a
@@ -432,28 +446,39 @@ export function CatalogProductDetail({
                           target="_blank"
                           rel="noopener noreferrer"
                           className={`grid grid-cols-[1fr_auto] items-center gap-3 rounded-xl px-3 py-3 transition-all duration-200 ${
-                            isFirst
+                            isCheapest
                               ? "border border-emerald-500/30 bg-emerald-500/10 hover:border-emerald-500/50 hover:bg-emerald-500/15"
+                              : isEqual
+                              ? "border border-sky-500/30 bg-sky-500/10 hover:border-sky-500/50 hover:bg-sky-500/15"
                               : "border border-slate-200 bg-slate-50 hover:border-brand-gold/40 hover:bg-brand-gold/5 dark:border-white/5 dark:bg-bg-800 dark:hover:border-brand-gold/40"
                           }`}
                         >
                           <div className="flex min-w-0 items-center gap-2.5">
                             <span
-                              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[11px] font-black ${shopBadge(shop, isFirst)}`}
+                              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[11px] font-black ${shopBadge(shop, isCheapest, isEqual)}`}
                             >
                               {shop.charAt(0).toUpperCase()}
                             </span>
                             <div className="min-w-0">
                               <span
                                 className={`block truncate text-sm font-semibold capitalize ${
-                                  isFirst ? "text-emerald-700 dark:text-emerald-300" : "text-slate-800 dark:text-white/85"
+                                  isCheapest
+                                    ? "text-emerald-700 dark:text-emerald-300"
+                                    : isEqual
+                                    ? "text-sky-700 dark:text-sky-300"
+                                    : "text-slate-800 dark:text-white/85"
                                 }`}
                               >
                                 {shop}
                               </span>
-                              {isFirst && (
+                              {isCheapest && (
                                 <span className="text-[10px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
                                   Moins cher
+                                </span>
+                              )}
+                              {isEqual && (
+                                <span className="text-[10px] font-bold uppercase tracking-wide text-sky-600 dark:text-sky-400">
+                                  Égalité
                                 </span>
                               )}
                             </div>
@@ -461,7 +486,11 @@ export function CatalogProductDetail({
                           <div className="flex shrink-0 items-center gap-2">
                             <span
                               className={`text-right text-sm font-extrabold tabular-nums ${
-                                isFirst ? "text-emerald-600 dark:text-emerald-400" : "text-slate-900 dark:text-white"
+                                highlighted
+                                  ? isCheapest
+                                    ? "text-emerald-600 dark:text-emerald-400"
+                                    : "text-sky-600 dark:text-sky-400"
+                                  : "text-slate-900 dark:text-white"
                               }`}
                             >
                               {price.toFixed(3)}
