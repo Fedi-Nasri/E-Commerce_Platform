@@ -22,6 +22,7 @@ export const RETAIL_FILTER_SPECS = [
 ] as const;
 
 export const RETAIL_SORT_OPTIONS = [
+  { value: "random", label: "Aléatoire" },
   { value: "price_desc", label: "Prix décroissant" },
   { value: "price_asc", label: "Prix croissant" },
   { value: "shops_desc", label: "Plus de boutiques" },
@@ -47,6 +48,8 @@ export type RetailListFilters = {
   specStorage: string;
   specScreen: string;
   sort: RetailSortOption;
+  /** Stable per-session seed used to make "random" order consistent across pagination. */
+  seed: string;
 };
 
 export function parseRetailListFilters(sp: URLSearchParams): RetailListFilters {
@@ -58,15 +61,21 @@ export function parseRetailListFilters(sp: URLSearchParams): RetailListFilters {
   const q = normalizeSearchText(sp.get("q") ?? "");
   const sortRaw = sp.get("sort");
 
-  let sort: RetailSortOption = "price_desc";
+  let sort: RetailSortOption = "random";
   if (sortRaw && VALID_SORTS.has(sortRaw)) {
     sort = sortRaw as RetailSortOption;
   } else if (q) {
     sort = "relevance";
   }
   if (!q && sort === "relevance") {
-    sort = "price_desc";
+    sort = "random";
   }
+
+  // Seed for stable "random" ordering across pagination within the same browse
+  // session. The client generates and persists this in the URL; if absent
+  // (first load / no-JS) fall back to a fixed value so results are still
+  // deterministic rather than re-shuffling on every request.
+  const seed = (sp.get("seed") ?? "0").replace(/[^0-9]/g, "").slice(0, 12) || "0";
 
   return {
     cat: (sp.get("cat") ?? "").trim().toLowerCase(),
@@ -80,6 +89,7 @@ export function parseRetailListFilters(sp: URLSearchParams): RetailListFilters {
     specStorage: (sp.get("spec_storage") ?? "").trim(),
     specScreen: (sp.get("spec_screen") ?? "").trim(),
     sort,
+    seed,
   };
 }
 
@@ -108,15 +118,25 @@ const BASE_JOINS = `
   LEFT JOIN shops s ON s.id = sp.shop_id
 `;
 
-function resolveRetailOrderBy(sort: RetailSortOption, searchRelevanceOrder: string | null): string {
+function resolveRetailOrderBy(
+  sort: RetailSortOption,
+  searchRelevanceOrder: string | null,
+  seed: string,
+): string {
   const priceAsc = "MIN(sp.current_price) ASC NULLS LAST, p.name ASC";
   const priceDesc = "MIN(sp.current_price) DESC NULLS LAST, p.name ASC";
+  // Stable pseudo-random order: hash each product id together with the
+  // per-session seed. Same seed -> same order across pages; a new seed
+  // (new browse session) -> a different shuffle. Cheap and index-free.
+  const random = `md5(p.id::text || '${seed}') ASC`;
 
   if (sort === "relevance" && searchRelevanceOrder) {
     return `${searchRelevanceOrder}, ${priceAsc}`;
   }
 
   switch (sort) {
+    case "random":
+      return random;
     case "price_desc":
       return priceDesc;
     case "shops_desc":
@@ -136,7 +156,7 @@ function resolveRetailOrderBy(sort: RetailSortOption, searchRelevanceOrder: stri
       if (searchRelevanceOrder) {
         return `${searchRelevanceOrder}, ${priceDesc}`;
       }
-      return priceDesc;
+      return random;
   }
 }
 
@@ -218,7 +238,7 @@ export function buildRetailProductQuery(filters: RetailListFilters) {
 
   const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
   const havingClause = having.length > 0 ? `HAVING ${having.join(" AND ")}` : "";
-  const orderBy = resolveRetailOrderBy(filters.sort, searchRelevanceOrder);
+  const orderBy = resolveRetailOrderBy(filters.sort, searchRelevanceOrder, filters.seed);
 
   return {
     baseJoins: BASE_JOINS,

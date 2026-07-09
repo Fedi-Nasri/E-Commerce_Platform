@@ -109,6 +109,7 @@ function RetailPageInner() {
   // matched products are the meaningful comparison set, so we show them first.
   const matchedFromUrl = sp.get("matched") ?? "true";
   const sortFromUrl = parseRetailListFilters(sp).sort;
+  const seedFromUrl = sp.get("seed") ?? "";
 
   const [products, setProducts]   = useState<Product[]>([]);
   const [total, setTotal]         = useState(0);
@@ -128,7 +129,7 @@ function RetailPageInner() {
     specStorage: "",
     specScreen: "",
     matched: "",
-    sort: "price_desc",
+    sort: "random",
   });
   const [dynShops, setDynShops]     = useState<{ key: string; name: string }[]>([]);
   const [dynCats, setDynCats]       = useState<{ id: number; name: string; slug: string }[]>([]);
@@ -147,6 +148,18 @@ function RetailPageInner() {
     },
     [router, pathname, sp],
   );
+
+  // Give the "Aléatoire" (default) sort a per-session seed so the shuffle stays
+  // stable across pagination instead of reshuffling on every request. Generated
+  // once on first load and written into the URL (no visible navigation).
+  useEffect(() => {
+    if (sortFromUrl !== "random" || seedFromUrl) return;
+    const params = new URLSearchParams(sp.toString());
+    params.set("seed", String(Math.floor(Math.random() * 1_000_000_000)));
+    const qs = params.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortFromUrl, seedFromUrl]);
 
   const syncDraftFromUrl = useCallback(() => {
     setFilterDraft({
@@ -194,7 +207,7 @@ function RetailPageInner() {
       spec_storage: filterDraft.specStorage || null,
       spec_screen: filterDraft.specScreen || null,
       matched: filterDraft.matched || null,
-      sort: filterDraft.sort === "price_desc" ? null : filterDraft.sort,
+      sort: filterDraft.sort === "random" ? null : filterDraft.sort,
     });
     setFiltersOpen(false);
   };
@@ -202,7 +215,7 @@ function RetailPageInner() {
   const setSort = useCallback(
     (sort: RetailSortOption) => {
       setPage(0);
-      replaceParams({ sort: sort === "price_desc" ? null : sort });
+      replaceParams({ sort: sort === "random" ? null : sort });
     },
     [replaceParams],
   );
@@ -219,7 +232,7 @@ function RetailPageInner() {
       specStorage: "",
       specScreen: "",
       matched: "",
-      sort: "price_desc",
+      sort: "random",
     });
     replaceParams({
       cat: null,
