@@ -11,6 +11,10 @@ export function generateStaticParams() {
   return PRICE_RANKING_CATALOG.map((c) => ({ slug: c.slug }));
 }
 
+/** Always render from DB at request time — avoids stale 404 pages when build ran without rankings data. */
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function generateMetadata({
   params,
 }: {

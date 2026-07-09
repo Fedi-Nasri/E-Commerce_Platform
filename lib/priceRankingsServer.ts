@@ -53,11 +53,39 @@ export type ScopeRanking = {
   shops: RankedShopRow[];
 };
 
+function num(v: unknown): number | undefined {
+  if (v == null || v === "") return undefined;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : undefined;
+}
+
 function mapShopRow(row: Record<string, unknown>): RankedShopRow {
+  const fairWin = num(row.fair_win_rate) ?? 0;
+  const avgIndex = num(row.avg_price_index);
+  const cheapest = num(row.cheapest_score);
+  const median = num(row.median_price_index);
   return {
-    ...row,
-    robust_index: Number(row.avg_price_index ?? row.cheapest_score ?? row.median_price_index ?? 1),
-  } as RankedShopRow;
+    rank: num(row.rank) ?? 0,
+    shop_key: String(row.shop_key ?? ""),
+    products_compared: num(row.products_compared) ?? 0,
+    fair_win_rate: fairWin,
+    cheapest_score: cheapest ?? 0,
+    median_price_index: median ?? 0,
+    avg_extra_cost_vs_cheapest: num(row.avg_extra_cost_vs_cheapest) ?? 0,
+    confidence: String(row.confidence ?? ""),
+    pairwise_comparisons: num(row.pairwise_comparisons),
+    wins: num(row.wins),
+    losses: num(row.losses),
+    ties: num(row.ties),
+    ecart_pct: num(row.ecart_pct),
+    win_rate_pct: num(row.win_rate_pct),
+    pvalue_binom: num(row.pvalue_binom),
+    statut: row.statut != null ? String(row.statut) : undefined,
+    fiabilite: row.fiabilite != null ? String(row.fiabilite) : undefined,
+    is_featured: Boolean(row.is_featured),
+    featured_rank: num(row.featured_rank),
+    robust_index: avgIndex ?? cheapest ?? median ?? 1,
+  };
 }
 
 const SHOP_COLS = `rank, shop_key, products_compared, fair_win_rate, cheapest_score,
@@ -146,8 +174,18 @@ export async function getFeaturedRankings(shopLimit = 3) {
     }
 
     return scopesRes.rows.map((s) => ({
-      ...s,
-      shops: byScope.get(s.scope_id) ?? [],
+      scope_id: s.scope_id,
+      scope_name: s.scope_name,
+      matched_products: num(s.matched_products) ?? 0,
+      distinct_shops: num(s.distinct_shops) ?? 0,
+      shops: (byScope.get(s.scope_id) ?? []).map((shop) => ({
+        ...shop,
+        rank: num(shop.rank) ?? shop.rank,
+        fair_win_rate: num(shop.fair_win_rate) ?? shop.fair_win_rate,
+        products_compared: num(shop.products_compared) ?? shop.products_compared,
+        ecart_pct: num(shop.ecart_pct) ?? shop.ecart_pct,
+        featured_rank: num(shop.featured_rank) ?? shop.featured_rank,
+      })),
     }));
   } finally {
     client.release();
