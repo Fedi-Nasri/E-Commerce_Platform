@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Medal } from "lucide-react";
 import { ShopLogo } from "@/components/shop/ShopLogo";
 import {
-  formatWinRate,
+  formatEcartPct,
   shopDisplayName,
   type PriceRankingCatalogEntry,
 } from "@/lib/priceRankings";
@@ -12,6 +12,8 @@ export type RankingShopPreview = {
   shop_key: string;
   fair_win_rate: number;
   products_compared: number;
+  ecart_pct?: number;
+  featured_rank?: number;
 };
 
 const MEDAL = {
@@ -59,7 +61,9 @@ export function PriceRankingCard({
   shopCount: number;
   shops: RankingShopPreview[];
 }) {
-  const top3 = [...shops.slice(0, 3)].sort((a, b) => a.rank - b.rank);
+  const top3 = [...shops.slice(0, 3)].sort(
+    (a, b) => (a.featured_rank ?? a.rank) - (b.featured_rank ?? b.rank),
+  );
 
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-bg-border bg-bg-card shadow-sm transition hover:border-brand-gold/30 hover:shadow-md dark:shadow-none dark:hover:border-brand-gold/25">
@@ -129,7 +133,9 @@ export function PriceRankingCard({
                   <span
                     className={`shrink-0 text-sm font-black tabular-nums ${medal.rate}`}
                   >
-                    {formatWinRate(shop.fair_win_rate)}
+                    {shop.ecart_pct != null
+                      ? formatEcartPct(shop.ecart_pct)
+                      : `${Math.round(shop.fair_win_rate * 1000) / 10}%`}
                   </span>
                 </li>
               );

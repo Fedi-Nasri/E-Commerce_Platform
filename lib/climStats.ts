@@ -1,4 +1,7 @@
 import raw from "@/lib/data/climatiseursEnStock.json";
+import { climBrandHref, climBrandSlug } from "@/lib/climBrandUtils";
+
+export { climBrandHref, climBrandSlug };
 
 // Server-side module for the "Climatiseurs en stock" stats (scraped snapshot).
 // Import only from server components / API routes — the JSON is ~370 KB.
@@ -33,6 +36,11 @@ export type ClimBtuRow = {
   marques_au_prix_min: string[];
 };
 
+export type ClimBtuRowWithUrl = ClimBtuRow & {
+  url: string | null;
+  title: string | null;
+};
+
 type ClimStockFile = {
   generated_at: string;
   mode: string;
@@ -57,6 +65,37 @@ export function climBtuComparison(btu: string): ClimBtuRow[] {
   return data.comparaison_globale_par_btu[btu] ?? [];
 }
 
+/** Cheapest listing URL for a shop at a given BTU tier (matches prix_min + brand hint). */
+export function climBtuRowOffer(btu: string, row: ClimBtuRow): Pick<ClimOffer, "url" | "title"> | null {
+  const brands = new Set(row.marques_au_prix_min.map((b) => b.toLowerCase()));
+  const target = Math.round(row.prix_min);
+  let best: ClimAnnonce | null = null;
+  let bestPrice = Infinity;
+
+  const consider = (a: ClimAnnonce, requireBrand: boolean) => {
+    if (a.shop !== row.shop || a.btu !== btu || !a.url) return;
+    const price = normalizedPrice(a);
+    if (price == null || Math.round(price) !== target) return;
+    if (requireBrand && brands.size && a.brand && !brands.has(a.brand.toLowerCase())) return;
+    if (price < bestPrice) {
+      best = a;
+      bestPrice = price;
+    }
+  };
+
+  for (const a of data.annonces) consider(a, true);
+  if (!best) for (const a of data.annonces) consider(a, false);
+  if (!best) return null;
+  return { url: best.url, title: best.title };
+}
+
+export function climBtuComparisonWithUrls(btu: string): ClimBtuRowWithUrl[] {
+  return climBtuComparison(btu).map((row) => {
+    const offer = climBtuRowOffer(btu, row);
+    return { ...row, url: offer?.url ?? null, title: offer?.title ?? null };
+  });
+}
+
 /** Per-shop stock, biggest catalog first. */
 export const climShops: ClimShopStock[] = [...data.par_boutique].sort(
   (a, b) => b.total_climatiseurs - a.total_climatiseurs,
@@ -74,6 +113,10 @@ export const climBrandTotals: { brand: string; count: number }[] = (() => {
     .map(([brand, count]) => ({ brand, count }))
     .sort((a, b) => b.count - a.count);
 })();
+
+const BRAND_BY_SLUG = new Map(
+  climBrandTotals.map((b) => [climBrandSlug(b.brand), b.brand]),
+);
 
 // Some shops list prices in thousands (e.g. qsnet "1.229" = 1 229 DT). A real
 // climatiseur never costs under 100 DT, so scale those up. Items without a BTU
@@ -245,4 +288,92 @@ export function climBrandLabel(brand: string): string {
 
 export function formatDT(n: number): string {
   return `${n.toLocaleString("fr-FR")} DT`;
+}
+
+/* ── Brand routing & filtering ───────────────────────────────────────────── */
+
+export function climBrandFromSlug(slug: string): string | null {
+  return BRAND_BY_SLUG.get(slug.toLowerCase()) ?? null;
+}
+
+export const climBrandSlugs = [...BRAND_BY_SLUG.keys()];
+
+export type ClimBrandDetail = {
+  brand: string;
+  label: string;
+  logo: string | null;
+  count: number;
+  shopCount: number;
+  minPrice: number | null;
+  maxPrice: number | null;
+  byBtu: { btu: string; count: number; minPrice: number }[];
+  byShop: { shop: string; count: number; minPrice: number }[];
+  offers: ClimOffer[];
+};
+
+function dedupeOffers(candidates: { a: ClimAnnonce; price: number }[]): ClimOffer[] {
+  const seen = new Set<string>();
+  const out: ClimOffer[] = [];
+  for (const { a, price } of candidates) {
+    const key = `${a.shop}:${a.url || a.title.toLowerCase()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({
+      shop: a.shop,
+      title: a.title,
+      brand: a.brand,
+      btu: a.btu,
+      tech: a.tech,
+      price,
+      url: a.url,
+    });
+  }
+  return out;
+}
+
+/** All in-stock climatiseurs for one brand, cheapest first. */
+export function climOffersByBrand(brand: string): ClimOffer[] {
+  const key = brand.toLowerCase();
+  const candidates = data.annonces
+    .filter((a) => a.brand?.toLowerCase() === key)
+    .map((a) => ({ a, price: normalizedPrice(a) }))
+    .filter((x): x is { a: ClimAnnonce; price: number } => x.price != null && x.price >= 400)
+    .sort((x, y) => x.price - y.price);
+  return dedupeOffers(candidates);
+}
+
+export function climBrandDetail(brand: string): ClimBrandDetail | null {
+  const offers = climOffersByBrand(brand);
+  if (!offers.length) return null;
+
+  const btuMap = new Map<string, { count: number; minPrice: number }>();
+  const shopMap = new Map<string, { count: number; minPrice: number }>();
+
+  for (const o of offers) {
+    if (o.btu) {
+      const cur = btuMap.get(o.btu);
+      if (!cur) btuMap.set(o.btu, { count: 1, minPrice: o.price });
+      else btuMap.set(o.btu, { count: cur.count + 1, minPrice: Math.min(cur.minPrice, o.price) });
+    }
+    const sc = shopMap.get(o.shop);
+    if (!sc) shopMap.set(o.shop, { count: 1, minPrice: o.price });
+    else shopMap.set(o.shop, { count: sc.count + 1, minPrice: Math.min(sc.minPrice, o.price) });
+  }
+
+  return {
+    brand,
+    label: climBrandLabel(brand),
+    logo: climBrandLogo(brand),
+    count: offers.length,
+    shopCount: shopMap.size,
+    minPrice: offers[0]?.price ?? null,
+    maxPrice: offers[offers.length - 1]?.price ?? null,
+    byBtu: [...btuMap.entries()]
+      .map(([btu, v]) => ({ btu, ...v }))
+      .sort((a, b) => Number(a.btu) - Number(b.btu)),
+    byShop: [...shopMap.entries()]
+      .map(([shop, v]) => ({ shop, ...v }))
+      .sort((a, b) => b.count - a.count),
+    offers,
+  };
 }

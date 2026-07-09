@@ -2,7 +2,7 @@ import {
   climBrandLabel,
   climBrandLogo,
   climBrandTotals,
-  climBtuComparison,
+  climBtuComparisonWithUrls,
   climBtuTiers,
   climCheapestOffers,
   climGeneratedAt,
@@ -15,7 +15,7 @@ import { ClimStockSlider, type ClimSliderData } from "@/components/ClimStockSlid
 // small computed summary to the client slider.
 export function ClimStockSection() {
   const btuCards = climBtuTiers.map((btu) => {
-    const rows = climBtuComparison(btu);
+    const rows = climBtuComparisonWithUrls(btu);
     return {
       btu,
       totalOffers: rows.reduce((a, r) => a + r.nb_annonces, 0),
@@ -27,6 +27,8 @@ export function ClimStockSection() {
         prixMoyen: r.prix_moyen,
         nbAnnonces: r.nb_annonces,
         marqueMin: r.marques_au_prix_min[0] ?? "",
+        url: r.url,
+        title: r.title,
       })),
     };
   });

@@ -15,6 +15,8 @@ type ScopePayload = {
     shop_key: string;
     fair_win_rate: number;
     products_compared: number;
+    ecart_pct?: number;
+    featured_rank?: number;
   }>;
 };
 
@@ -151,7 +153,7 @@ export function TechOffers() {
             Meilleurs prix par catégorie
           </h2>
           <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-slate-500 sm:text-[13.5px] dark:text-white/55">
-            Classement des enseignes par comparaison produit à produit
+            Classement robuste par indice prix shrinkage (stock confirmé)
             {totalProducts > 0 && (
               <>
                 {" "}—{" "}

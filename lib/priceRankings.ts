@@ -97,6 +97,43 @@ export function formatWinRate(rate: number) {
   return `${Math.round(rate * 1000) / 10}%`;
 }
 
+export function formatEcartPct(pct: number | null | undefined) {
+  if (pct == null || Number.isNaN(pct)) return "—";
+  const rounded = Math.round(pct * 10) / 10;
+  return `${rounded > 0 ? "+" : ""}${rounded}%`;
+}
+
+export function formatRobustIndex(index: number | null | undefined) {
+  if (index == null || Number.isNaN(index)) return "—";
+  return Number(index).toFixed(3);
+}
+
+export function statutLabel(statut: string | null | undefined) {
+  if (!statut) return "—";
+  const map: Record<string, string> = {
+    "MOINS CHER (fort)": "Moins cher (fort)",
+    "MOINS CHER": "Moins cher",
+    NEUTRE: "Neutre",
+    "PLUS CHER": "Plus cher",
+    "PLUS CHER (fort)": "Plus cher (fort)",
+    INSUFFISANT: "Échantillon insuffisant",
+  };
+  return map[statut] ?? statut;
+}
+
+export function statutTone(statut: string | null | undefined) {
+  if (!statut) return "neutral";
+  if (statut.includes("MOINS CHER")) return "cheap";
+  if (statut.includes("PLUS CHER")) return "expensive";
+  if (statut === "INSUFFISANT") return "low";
+  return "neutral";
+}
+
+export function fiabiliteLabel(f: string | null | undefined) {
+  if (!f) return "—";
+  return f;
+}
+
 export function confidenceLabel(c: string) {
   return c === "enough_data" ? "Données solides" : "Échantillon limité";
 }

@@ -1,21 +1,22 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
-// Brand logo tile with graceful fallback to initials when the favicon
-// service has nothing for the domain (or the brand has no known domain).
 export function ClimBrandBadge({
   label,
   logo,
   count,
+  href,
 }: {
   label: string;
   logo: string | null;
   count: number;
+  href?: string;
 }) {
   const [broken, setBroken] = useState(false);
-  return (
-    <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3.5 py-3 transition hover:border-sky-400/50 hover:shadow-sm dark:border-white/[0.07] dark:bg-white/[0.03]">
+  const inner = (
+    <>
       <span className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200/80 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-300/90 shadow-sm dark:border-slate-200/25 dark:from-slate-600 dark:via-slate-500 dark:to-slate-700">
         <span
           aria-hidden
@@ -42,6 +43,19 @@ export function ClimBrandBadge({
           {count} modèle{count > 1 ? "s" : ""} en stock
         </div>
       </div>
-    </div>
+    </>
   );
+
+  const className =
+    "flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3.5 py-3 transition hover:border-sky-400/50 hover:shadow-sm dark:border-white/[0.07] dark:bg-white/[0.03] dark:hover:border-sky-400/35";
+
+  if (href) {
+    return (
+      <Link href={href} className={className}>
+        {inner}
+      </Link>
+    );
+  }
+
+  return <div className={className}>{inner}</div>;
 }

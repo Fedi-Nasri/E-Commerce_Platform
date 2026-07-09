@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { PriceRankingDetail } from "@/components/PriceRankingDetail";
 import { PageShell } from "@/components/site/PageShell";
 import { PRICE_RANKING_CATALOG } from "@/lib/priceRankings";
-import { shopDisplayName } from "@/lib/priceRankings";
-import { getRankingBySlug } from "@/lib/priceRankingsServer";
+import { getRankingBySlug, scopeLeader } from "@/lib/priceRankingsServer";
+import { formatEcartPct, shopDisplayName } from "@/lib/priceRankings";
 import { pageMetadata } from "@/lib/seo";
 
 export function generateStaticParams() {
@@ -30,11 +30,12 @@ export default async function ClassementPage({
 }: {
   params: { slug: string };
 }) {
-  const data = await getRankingBySlug(params.slug, 15);
+  const data = await getRankingBySlug(params.slug, 50);
   if (!data) notFound();
 
   const { catalog, scope } = data;
-  const leader = scope.shops[0];
+  const leader = scopeLeader(scope);
+  const ecart = leader?.ecart_pct ?? leader?.avg_extra_cost_vs_cheapest;
 
   return (
     <PageShell
@@ -44,7 +45,7 @@ export default async function ClassementPage({
       arabic="أفضل الأسعار"
       description={
         leader
-          ? `${shopDisplayName(leader.shop_key)} en tête avec ${Math.round(leader.fair_win_rate * 1000) / 10} % de victoires équitables sur ${scope.matched_products?.toLocaleString("fr-FR")} produits comparés.`
+          ? `${shopDisplayName(leader.shop_key)} en tête des grandes enseignes avec ${formatEcartPct(ecart)} vs le marché sur ${scope.matched_products?.toLocaleString("fr-FR")} produits comparés (stock confirmé).`
           : `Comparaison des enseignes en ${catalog.title.toLowerCase()}.`
       }
     >

@@ -8,10 +8,11 @@ import { Reveal } from "@/components/site/Reveal";
 import { ShopLogo } from "@/components/shop/ShopLogo";
 import { ClimBrandBadge } from "@/components/ClimBrandBadge";
 import {
+  climBrandHref,
   climBrandLabel,
   climBrandLogo,
   climBrandTotals,
-  climBtuComparison,
+  climBtuComparisonWithUrls,
   climBtuTiers,
   climCheapestOffers,
   climGeneratedAt,
@@ -129,7 +130,7 @@ export default function ClimatiseursStockPage() {
         </Reveal>
         <div className="grid gap-5 lg:grid-cols-3">
           {climBtuTiers.map((btu, ti) => {
-            const rows = climBtuComparison(btu);
+            const rows = climBtuComparisonWithUrls(btu);
             return (
               <Reveal key={btu} delay={ti * 0.05}>
                 <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-white/[0.07] dark:bg-[#0d1220]">
@@ -143,26 +144,49 @@ export default function ClimatiseursStockPage() {
                     </span>
                   </div>
                   <ul className="divide-y divide-slate-100 dark:divide-white/[0.05]">
-                    {rows.slice(0, 8).map((r, i) => (
-                      <li key={r.shop} className="flex items-center gap-3 px-4 py-2.5">
-                        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-black tabular-nums ${rankBadgeClass(i)}`}>
-                          {i === 0 ? <Medal className="h-3.5 w-3.5" strokeWidth={2.25} /> : i + 1}
-                        </span>
-                        <ShopLogo shopKey={r.shop} size={30} className="shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-[12.5px] font-bold text-slate-900 dark:text-white">
-                            {climShopName(r.shop)}
-                          </p>
-                          <p className="truncate text-[10px] text-slate-400 dark:text-white/40">
-                            <span className="capitalize">{r.marques_au_prix_min.slice(0, 2).join(", ")}</span>
-                            {" · "}{r.nb_annonces} modèle{r.nb_annonces > 1 ? "s" : ""} · moy. {fmt(Math.round(r.prix_moyen))} DT
-                          </p>
-                        </div>
-                        <span className={`shrink-0 text-[13px] font-black tabular-nums ${i === 0 ? "text-emerald-600 dark:text-emerald-400" : "text-slate-800 dark:text-white/80"}`}>
-                          {fmt(r.prix_min)} <span className="text-[10px] font-bold">DT</span>
-                        </span>
-                      </li>
-                    ))}
+                    {rows.slice(0, 8).map((r, i) => {
+                      const inner = (
+                        <>
+                          <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-black tabular-nums ${rankBadgeClass(i)}`}>
+                            {i === 0 ? <Medal className="h-3.5 w-3.5" strokeWidth={2.25} /> : i + 1}
+                          </span>
+                          <ShopLogo shopKey={r.shop} size={30} className="shrink-0" />
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-[12.5px] font-bold text-slate-900 dark:text-white">
+                              {climShopName(r.shop)}
+                            </p>
+                            <p className="truncate text-[10px] text-slate-400 dark:text-white/40">
+                              <span className="capitalize">{r.marques_au_prix_min.slice(0, 2).join(", ")}</span>
+                              {" · "}{r.nb_annonces} modèle{r.nb_annonces > 1 ? "s" : ""} · moy. {fmt(Math.round(r.prix_moyen))} DT
+                            </p>
+                          </div>
+                          <span className={`shrink-0 text-[13px] font-black tabular-nums ${i === 0 ? "text-emerald-600 dark:text-emerald-400" : "text-slate-800 dark:text-white/80"}`}>
+                            {fmt(r.prix_min)} <span className="text-[10px] font-bold">DT</span>
+                          </span>
+                          {r.url && (
+                            <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-slate-300 transition group-hover:text-brand-gold dark:text-white/25" />
+                          )}
+                        </>
+                      );
+
+                      return (
+                        <li key={r.shop}>
+                          {r.url ? (
+                            <a
+                              href={r.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title={r.title ?? undefined}
+                              className="group flex items-center gap-3 px-4 py-2.5 transition hover:bg-sky-50/80 dark:hover:bg-sky-950/20"
+                            >
+                              {inner}
+                            </a>
+                          ) : (
+                            <div className="flex items-center gap-3 px-4 py-2.5">{inner}</div>
+                          )}
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               </Reveal>
@@ -251,6 +275,7 @@ export default function ClimatiseursStockPage() {
               label={climBrandLabel(b.brand)}
               logo={climBrandLogo(b.brand)}
               count={b.count}
+              href={climBrandHref(b.brand)}
             />
           ))}
         </div>

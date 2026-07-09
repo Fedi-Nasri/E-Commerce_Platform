@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, ChevronLeft, ChevronRight, Medal, Snowflake, Store, Tag, Wind } from "lucide-react";
 import { ShopLogo } from "@/components/shop/ShopLogo";
+import { climBrandHref, climBrandSlug } from "@/lib/climBrandUtils";
 
 export type ClimSliderBtuCard = {
   btu: string;
@@ -16,6 +17,8 @@ export type ClimSliderBtuCard = {
     prixMoyen: number;
     nbAnnonces: number;
     marqueMin: string;
+    url: string | null;
+    title: string | null;
   }[];
 };
 
@@ -50,7 +53,10 @@ const MEDAL_BADGE = [
 function BrandTile({ b }: { b: ClimSliderBrand }) {
   const [broken, setBroken] = useState(false);
   return (
-    <div className="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-2.5 py-2 dark:border-white/[0.06] dark:bg-white/[0.03]">
+    <Link
+      href={climBrandHref(b.brand)}
+      className="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-2.5 py-2 transition hover:border-sky-400/50 hover:bg-sky-50/80 hover:shadow-sm dark:border-white/[0.06] dark:bg-white/[0.03] dark:hover:border-sky-400/35 dark:hover:bg-sky-950/30"
+    >
       <span className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200/80 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-300/90 shadow-sm dark:border-slate-200/25 dark:from-slate-600 dark:via-slate-500 dark:to-slate-700">
         <span
           aria-hidden
@@ -73,7 +79,7 @@ function BrandTile({ b }: { b: ClimSliderBrand }) {
         <div className="truncate text-[11px] font-bold text-slate-800 dark:text-white/85">{b.label}</div>
         <div className="text-[9.5px] tabular-nums text-slate-400 dark:text-white/40">{b.count} modèles</div>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -219,34 +225,53 @@ export function ClimStockSlider({ data }: { data: ClimSliderData }) {
                 Top 3 moins chers
               </p>
               <ul className="flex flex-col gap-2.5">
-                {card.rows.map((row, i) => (
-                  <li
-                    key={row.shop}
-                    className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-all duration-500 ease-out will-change-transform ${
-                      i === activeRank
-                        ? "z-[2] scale-[1.075] -translate-y-0.5 shadow-[0_18px_34px_-18px_rgba(15,23,42,0.88)] ring-2 ring-brand-gold/35 brightness-[1.06]"
-                        : "scale-[0.985] opacity-[0.86]"
-                    } ${MEDAL_ROW[i] ?? MEDAL_ROW[2]}`}
-                  >
-                    <span
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-black tabular-nums ${MEDAL_BADGE[i] ?? MEDAL_BADGE[2]}`}
-                    >
-                      {row.rank === 1 ? <Medal className="h-4 w-4" strokeWidth={2.25} /> : row.rank}
-                    </span>
-                    <ShopLogo shopKey={row.shop} size={38} className="shrink-0" />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-[12.5px] font-extrabold tracking-tight text-slate-900 dark:text-white">
-                        {row.shopName}
-                      </p>
-                      <p className="truncate text-[10px] font-medium capitalize text-slate-500 dark:text-white/50">
-                        {row.marqueMin} · {row.nbAnnonces} modèles
-                      </p>
-                    </div>
-                    <span className="shrink-0 rounded-lg bg-white/70 px-2.5 py-1 text-sm font-black tabular-nums text-slate-900 ring-1 ring-black/5 dark:bg-white/[0.08] dark:text-brand-gold dark:ring-white/10">
-                      {fmt(row.prixMin)} <span className="text-[10px] font-bold opacity-80">DT</span>
-                    </span>
-                  </li>
-                ))}
+                {card.rows.map((row, i) => {
+                  const rowClass = `flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-all duration-500 ease-out will-change-transform ${
+                    i === activeRank
+                      ? "z-[2] scale-[1.075] -translate-y-0.5 shadow-[0_18px_34px_-18px_rgba(15,23,42,0.88)] ring-2 ring-brand-gold/35 brightness-[1.06]"
+                      : "scale-[0.985] opacity-[0.86]"
+                  } ${MEDAL_ROW[i] ?? MEDAL_ROW[2]} ${row.url ? "cursor-pointer hover:border-sky-400/40" : ""}`;
+
+                  const content = (
+                    <>
+                      <span
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-black tabular-nums ${MEDAL_BADGE[i] ?? MEDAL_BADGE[2]}`}
+                      >
+                        {row.rank === 1 ? <Medal className="h-4 w-4" strokeWidth={2.25} /> : row.rank}
+                      </span>
+                      <ShopLogo shopKey={row.shop} size={38} className="shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[12.5px] font-extrabold tracking-tight text-slate-900 dark:text-white">
+                          {row.shopName}
+                        </p>
+                        <p className="truncate text-[10px] font-medium capitalize text-slate-500 dark:text-white/50">
+                          {row.marqueMin} · {row.nbAnnonces} modèles
+                        </p>
+                      </div>
+                      <span className="shrink-0 rounded-lg bg-white/70 px-2.5 py-1 text-sm font-black tabular-nums text-slate-900 ring-1 ring-black/5 dark:bg-white/[0.08] dark:text-brand-gold dark:ring-white/10">
+                        {fmt(row.prixMin)} <span className="text-[10px] font-bold opacity-80">DT</span>
+                      </span>
+                    </>
+                  );
+
+                  return (
+                    <li key={row.shop}>
+                      {row.url ? (
+                        <a
+                          href={row.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title={row.title ?? undefined}
+                          className={rowClass}
+                        >
+                          {content}
+                        </a>
+                      ) : (
+                        <div className={rowClass}>{content}</div>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
             <div className="mt-auto border-t border-bg-border p-4 dark:border-white/[0.06]">

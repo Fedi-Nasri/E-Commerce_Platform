@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { localShopLogo } from "@/lib/shopLogos";
 
 const INITIALS_COLORS: Record<string, string> = {
   a: "bg-slate-600", b: "bg-slate-700", c: "bg-zinc-600", d: "bg-neutral-600",
@@ -16,6 +17,14 @@ function initialsColor(key: string) {
   return INITIALS_COLORS[key[0]?.toLowerCase() ?? "a"] ?? "bg-slate-600";
 }
 
+function buildFallbacks(shopKey: string): string[] {
+  const mapped = localShopLogo(shopKey, shopKey);
+  const exts = ["svg", "png", "webp", "jpg", "jpeg"] as const;
+  const guessed = exts.map((ext) => `/shop-logos/${shopKey}.${ext}`);
+  if (mapped) return [mapped, ...guessed.filter((p) => p !== mapped)];
+  return guessed;
+}
+
 export function ShopLogo({
   shopKey,
   size = 48,
@@ -28,13 +37,12 @@ export function ShopLogo({
   /** Scale + lift on hover */
   interactive?: boolean;
 }) {
-  const fallbacks = [
-    `/shop-logos/${shopKey}.svg`,
-    `/shop-logos/${shopKey}.png`,
-    `/shop-logos/${shopKey}.webp`,
-    `/shop-logos/${shopKey}.jpg`,
-  ];
+  const fallbacks = useMemo(() => buildFallbacks(shopKey), [shopKey]);
   const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    setIdx(0);
+  }, [shopKey, fallbacks]);
 
   const shellClass = [
     "relative flex shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200/90",
@@ -77,6 +85,7 @@ export function ShopLogo({
         className="pointer-events-none absolute inset-[2px] rounded-[10px] ring-1 ring-black/[0.12] dark:ring-white/[0.12]"
       />
       <img
+        key={`${shopKey}-${idx}`}
         src={fallbacks[idx]}
         alt=""
         onError={() => setIdx((i) => i + 1)}

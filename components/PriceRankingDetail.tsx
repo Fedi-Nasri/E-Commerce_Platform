@@ -7,14 +7,20 @@ import {
   Store,
   Trophy,
 } from "lucide-react";
+import { PriceRankingCharts } from "@/components/PriceRankingCharts";
 import { ShopLogo } from "@/components/shop/ShopLogo";
 import {
   confidenceLabel,
+  fiabiliteLabel,
+  formatEcartPct,
+  formatRobustIndex,
   formatWinRate,
   shopDisplayName,
+  statutLabel,
+  statutTone,
   type PriceRankingCatalogEntry,
 } from "@/lib/priceRankings";
-import type { RankedShopRow, ScopeRanking } from "@/lib/priceRankingsServer";
+import { featuredShops, type RankedShopRow, type ScopeRanking } from "@/lib/priceRankingsServer";
 
 function fmtDate(iso: string | null) {
   if (!iso) return null;
@@ -32,6 +38,13 @@ function fmtDate(iso: string | null) {
 const statCardClass =
   "rounded-xl border border-bg-border bg-bg-card p-4 shadow-sm dark:shadow-none";
 
+function statutBadgeClass(tone: string) {
+  if (tone === "cheap") return "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300";
+  if (tone === "expensive") return "bg-rose-500/10 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300";
+  if (tone === "low") return "bg-slate-500/10 text-slate-600 dark:bg-white/10 dark:text-white/55";
+  return "bg-amber-500/10 text-amber-800 dark:bg-amber-500/15 dark:text-amber-200";
+}
+
 export function PriceRankingDetail({
   catalog,
   scope,
@@ -40,13 +53,16 @@ export function PriceRankingDetail({
   scope: ScopeRanking;
 }) {
   const updated = fmtDate(scope.generated_at);
-  const top3 = scope.shops.slice(0, 3);
-  const maxRate = Math.max(...top3.map((s) => s.fair_win_rate), 0.01);
-  const podium = [...top3].sort((a, b) => b.rank - a.rank);
+  const isRobust = scope.method?.includes("robust") ?? false;
+  const podiumShops = featuredShops(scope);
+  const maxEcart = Math.max(
+    ...podiumShops.map((s) => Math.abs(Number(s.ecart_pct ?? s.avg_extra_cost_vs_cheapest ?? 0))),
+    0.1,
+  );
+  const podium = [...podiumShops].sort((a, b) => (b.featured_rank ?? b.rank) - (a.featured_rank ?? a.rank));
 
   return (
     <div className="min-w-0 space-y-5 sm:space-y-6">
-      {/* Hero */}
       <div className="relative overflow-hidden rounded-2xl border border-bg-border dark:border-white/[0.10]">
         <div className="relative aspect-[21/9] min-h-[160px] sm:min-h-[200px]">
           <img
@@ -70,12 +86,11 @@ export function PriceRankingDetail({
         </div>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
           { icon: BarChart3, label: "Produits comparés", value: scope.matched_products?.toLocaleString("fr-FR") ?? "—" },
           { icon: Store, label: "Enseignes", value: String(scope.distinct_shops ?? "—") },
-          { icon: ShieldCheck, label: "Méthode", value: "Tête-à-tête" },
+          { icon: ShieldCheck, label: "Méthode", value: isRobust ? "Indice shrinkage" : "Tête-à-tête" },
           { icon: Info, label: "Classement", value: `Top ${scope.shops.length}` },
         ].map((s) => (
           <div key={s.label} className={statCardClass}>
@@ -88,17 +103,18 @@ export function PriceRankingDetail({
         ))}
       </div>
 
-      {/* Podium */}
-      {top3.length > 0 && (
+      {podiumShops.length > 0 && (
         <div className={`${statCardClass} rounded-2xl p-5`}>
           <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-white/50">
-            Podium
+            Podium · grandes enseignes fiables
           </h2>
           <div className="mt-4 flex items-end justify-center gap-3 sm:gap-6">
             {podium.map((shop) => {
-              const ratio = shop.fair_win_rate / maxRate;
+              const ecart = Number(shop.ecart_pct ?? shop.avg_extra_cost_vs_cheapest ?? 0);
+              const ratio = Math.abs(ecart) / maxEcart;
               const h = Math.round(36 + ratio * 56);
-              const isFirst = shop.rank === 1;
+              const displayRank = shop.featured_rank ?? shop.rank;
+              const isFirst = displayRank === 1;
               return (
                 <div key={shop.shop_key} className="group/shop flex max-w-[140px] flex-1 flex-col items-center gap-2">
                   <ShopLogo
@@ -112,12 +128,15 @@ export function PriceRankingDetail({
                   </span>
                   <span
                     className={`rounded-full px-2 py-0.5 text-sm font-black tabular-nums ${
-                      isFirst
-                        ? "bg-brand-gold/15 text-brand-gold dark:bg-brand-gold/20"
-                        : "text-slate-500 dark:text-white/55"
+                      ecart <= 0
+                        ? "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
+                        : "bg-rose-500/10 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300"
                     }`}
                   >
-                    {formatWinRate(shop.fair_win_rate)}
+                    {formatEcartPct(ecart)}
+                  </span>
+                  <span className="text-[10px] text-slate-400 dark:text-white/40">
+                    indice {formatRobustIndex(shop.robust_index)}
                   </span>
                   <div
                     className={`flex w-full items-end justify-center overflow-hidden rounded-t-lg ${
@@ -136,7 +155,7 @@ export function PriceRankingDetail({
                           fillOpacity={0.15}
                         />
                       ) : (
-                        <span className="pb-0 text-sm font-black text-white sm:text-base">{shop.rank}</span>
+                        <span className="pb-0 text-sm font-black text-white sm:text-base">{displayRank}</span>
                       )}
                     </div>
                   </div>
@@ -147,34 +166,36 @@ export function PriceRankingDetail({
         </div>
       )}
 
-      {/* Methodology */}
+      <PriceRankingCharts shops={scope.shops} paliers={scope.paliers} />
+
       <div className="rounded-2xl border border-bg-border bg-gradient-to-br from-slate-50 via-white to-slate-100/80 p-5 sm:p-6 dark:border-white/[0.08] dark:from-bg-800 dark:via-bg-800 dark:to-bg-900">
         <h2 className="flex items-center gap-2 text-base font-bold text-slate-900 dark:text-white">
           <Info className="h-4 w-4 text-brand-gold" />
           Comment lire ce classement
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-white/70">
-          Ce n&apos;est pas un simple « panier moyen » ou un décompte de promotions. Nous comparons
-          les <strong className="font-semibold text-slate-800 dark:text-white/90">mêmes produits identifiés</strong> entre plusieurs boutiques tunisiennes et
-          mesurons qui propose le <strong className="font-semibold text-slate-800 dark:text-white/90">meilleur prix le plus souvent</strong>.
+          Nous comparons les <strong className="font-semibold text-slate-800 dark:text-white/90">mêmes produits identifiés</strong> entre
+          boutiques tunisiennes, <strong className="font-semibold text-slate-800 dark:text-white/90">en stock confirmé</strong>. Le score
+          principal est un <strong className="font-semibold text-slate-800 dark:text-white/90">indice prix shrinkage</strong> : plus il est bas,
+          plus l&apos;enseigne est compétitive sur son catalogue comparé.
         </p>
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           {[
             {
-              title: "Comparaisons équitables",
-              body: "Deux enseignes ne sont confrontées que sur les articles qu'elles vendent toutes les deux. Une boutique n'est pas pénalisée pour son catalogue plus restreint.",
+              title: "Indice log-prix",
+              body: "Chaque prix est rapporté à la médiane du cluster (ln(prix/médiane)). La moyenne par enseigne donne l'écart structurel vs le marché.",
             },
             {
-              title: "Taux de victoire",
-              body: "Le score principal (« fair win rate ») = (victoires + ½ × nuls) ÷ confrontations. Le moins cher remporte la manche ; les prix égaux comptent comme match nul.",
+              title: "Shrinkage bayésien",
+              body: "Score ajusté = indice brut × n/(n+15). Les petits catalogues sont tirés vers la neutralité pour éviter les faux champions.",
             },
             {
-              title: "Qualité des prix",
-              body: "Les erreurs d'échelle (millimes vs dinars) sont corrigées quand les prix voisins le prouvent. Les valeurs aberrantes extrêmes sont exclues.",
+              title: "Écart % vs marché",
+              body: "Dérivé de l'indice ajusté : négatif = moins cher que la médiane du marché sur les produits comparés.",
             },
             {
-              title: "Niveau de confiance",
-              body: "Le badge « Données solides » indique au moins 20 confrontations et 5 produits comparés — assez pour un signal fiable.",
+              title: "Fiabilité & statut",
+              body: "Test binomial + volume : MOINS CHER (fort), NEUTRE, PLUS CHER… Le podium met en avant les enseignes à large catalogue fiable.",
             },
           ].map((item) => (
             <div
@@ -190,7 +211,6 @@ export function PriceRankingDetail({
         </div>
       </div>
 
-      {/* Full table */}
       <div className="overflow-hidden rounded-2xl border border-bg-border dark:border-white/[0.08]">
         <div className="border-b border-bg-border bg-bg-card px-5 py-4 dark:border-white/[0.06]">
           <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-white">
@@ -198,20 +218,23 @@ export function PriceRankingDetail({
           </h2>
         </div>
         <div className="overflow-x-auto bg-bg-card">
-          <table className="w-full min-w-[640px] text-left text-sm">
+          <table className="w-full min-w-[720px] text-left text-sm">
             <thead>
               <tr className="border-b border-bg-border bg-slate-50/80 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:border-white/[0.06] dark:bg-white/[0.03] dark:text-white/45">
                 <th className="px-5 py-3">Rang</th>
                 <th className="px-3 py-3">Enseigne</th>
-                <th className="px-3 py-3">Victoires équitables</th>
+                <th className="px-3 py-3">Écart marché</th>
+                <th className="hidden px-3 py-3 sm:table-cell">Indice</th>
+                <th className="hidden px-3 py-3 md:table-cell">Win-rate</th>
                 <th className="hidden px-3 py-3 sm:table-cell">Produits</th>
-                <th className="hidden px-3 py-3 md:table-cell">Confrontations</th>
-                <th className="px-5 py-3">Confiance</th>
+                <th className="px-5 py-3">Statut</th>
               </tr>
             </thead>
             <tbody>
               {scope.shops.map((row: RankedShopRow) => {
                 const isLeader = row.rank === 1;
+                const ecart = row.ecart_pct ?? row.avg_extra_cost_vs_cheapest;
+                const tone = statutTone(row.statut);
                 return (
                   <tr
                     key={row.shop_key}
@@ -225,36 +248,39 @@ export function PriceRankingDetail({
                     <td className="px-3 py-3.5">
                       <div className="flex items-center gap-3">
                         <ShopLogo shopKey={row.shop_key} size={36} />
-                        <span className="font-semibold text-slate-900 dark:text-white">
-                          {shopDisplayName(row.shop_key)}
-                        </span>
+                        <div>
+                          <span className="font-semibold text-slate-900 dark:text-white">
+                            {shopDisplayName(row.shop_key)}
+                          </span>
+                          <div className="text-[10px] text-slate-400 dark:text-white/40">
+                            {fiabiliteLabel(row.fiabilite)}
+                          </div>
+                        </div>
                       </div>
                     </td>
                     <td className="px-3 py-3.5">
-                      <span className="text-base font-black tabular-nums text-slate-900 dark:text-white">
-                        {formatWinRate(row.fair_win_rate)}
+                      <span
+                        className={`text-base font-black tabular-nums ${
+                          (ecart ?? 0) <= 0
+                            ? "text-emerald-700 dark:text-emerald-300"
+                            : "text-rose-700 dark:text-rose-300"
+                        }`}
+                      >
+                        {formatEcartPct(ecart)}
                       </span>
-                      {row.wins != null && (
-                        <div className="text-[10px] text-slate-400 dark:text-white/40">
-                          {row.wins}V · {row.losses ?? 0}D · {row.ties ?? 0}N
-                        </div>
-                      )}
+                    </td>
+                    <td className="hidden px-3 py-3.5 tabular-nums text-slate-600 dark:text-white/65 sm:table-cell">
+                      {formatRobustIndex(row.robust_index)}
+                    </td>
+                    <td className="hidden px-3 py-3.5 tabular-nums text-slate-600 dark:text-white/65 md:table-cell">
+                      {row.win_rate_pct != null ? formatWinRate(row.win_rate_pct / 100) : formatWinRate(row.fair_win_rate)}
                     </td>
                     <td className="hidden px-3 py-3.5 tabular-nums text-slate-600 dark:text-white/65 sm:table-cell">
                       {row.products_compared}
                     </td>
-                    <td className="hidden px-3 py-3.5 tabular-nums text-slate-600 dark:text-white/65 md:table-cell">
-                      {row.pairwise_comparisons?.toLocaleString("fr-FR") ?? "—"}
-                    </td>
                     <td className="px-5 py-3.5">
-                      <span
-                        className={`inline-block rounded-md px-2 py-0.5 text-[10px] font-semibold ${
-                          row.confidence === "enough_data"
-                            ? "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
-                            : "bg-amber-500/10 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300"
-                        }`}
-                      >
-                        {confidenceLabel(row.confidence)}
+                      <span className={`inline-block rounded-md px-2 py-0.5 text-[10px] font-semibold ${statutBadgeClass(tone)}`}>
+                        {statutLabel(row.statut) || confidenceLabel(row.confidence)}
                       </span>
                     </td>
                   </tr>

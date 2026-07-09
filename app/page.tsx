@@ -11,6 +11,7 @@ import { MarketIndex } from "@/components/MarketIndex";
 import { Observatoire } from "@/components/Observatoire";
 import { PromoBanner } from "@/components/PromoBanner";
 import { QoffaSection } from "@/components/QoffaSection";
+import { ShopMarketSection } from "@/components/ShopMarketSection";
 import { StatRow } from "@/components/StatRow";
 import { TechOffers } from "@/components/TechOffers";
 
@@ -22,6 +23,7 @@ export default function HomePage() {
       <PromoBanner />
       <TechOffers />
       <ClimStockSection />
+      <ShopMarketSection />
       <Categories />
       <GrandeDistribRow />
       <StatRow />
