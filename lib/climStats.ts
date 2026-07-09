@@ -164,9 +164,38 @@ export function climShopName(key: string): string {
   return SHOP_NAMES[key] ?? key.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-// Brand → official domain, used to fetch a small logo via the Google favicon
-// service (same pattern as RetailSitesTable). Unknown brands fall back to a
-// letter tile in the UI.
+// Curated local logos (public/brand-logos) — preferred over remote favicons.
+const BRAND_LOGO_FILES: Record<string, string> = {
+  biolux: "/brand-logos/biolux.png",
+  bosch: "/brand-logos/bosch.png",
+  brandt: "/brand-logos/brandt.webp",
+  coala: "/brand-logos/coala.png",
+  comfee: "/brand-logos/comfee.png",
+  condor: "/brand-logos/condor.jpg",
+  cristor: "/brand-logos/cristor.png",
+  falcon: "/brand-logos/falcon.png",
+  focus: "/brand-logos/focus.webp",
+  fresh: "/brand-logos/fresh.png",
+  gree: "/brand-logos/gree.webp",
+  hisense: "/brand-logos/hisense.webp",
+  hyundai: "/brand-logos/hyundai.png",
+  indesit: "/brand-logos/indesit.png",
+  iris: "/brand-logos/iris.png",
+  lg: "/brand-logos/lg.webp",
+  maxwell: "/brand-logos/maxwell.png",
+  midea: "/brand-logos/midea.png",
+  orient: "/brand-logos/orient.png",
+  saba: "/brand-logos/saba.jpg",
+  samsung: "/brand-logos/samsung.webp",
+  sharp: "/brand-logos/sharp.webp",
+  tcl: "/brand-logos/tcl.webp",
+  tornado: "/brand-logos/tornado.png",
+  unionaire: "/brand-logos/unionaire.png",
+  vega: "/brand-logos/vega.png",
+  westpoint: "/brand-logos/westpoint.png",
+};
+
+// Fallback: official domain → Google favicon for brands without a local asset.
 const BRAND_DOMAINS: Record<string, string> = {
   gree: "gree.com",
   lg: "lg.com",
@@ -181,15 +210,31 @@ const BRAND_DOMAINS: Record<string, string> = {
   brandt: "brandt.com",
   indesit: "indesit.com",
   comfee: "comfee.com",
-  tornado: "tornado.com.eg",
+  tornado: "tornado.com",
   fresh: "fresh.com.eg",
   unionaire: "unionaire.com",
   saba: "saba.tn",
   biolux: "biolux.tn",
+  coala: "coala-tunisie.com",
+  focus: "focus.tn",
+  westpoint: "westpoint.tn",
+  iris: "iris.tn",
+  cristor: "cristor.com",
+  vega: "vega.tn",
+  orient: "orient.tn",
+  maxwell: "maxwell.com",
+  falcon: "falcon.com",
+  emtop: "emtop.tn",
+  newstar: "newstar.tn",
+  starone: "starone.tn",
+  "star one": "starone.tn",
 };
 
 export function climBrandLogo(brand: string): string | null {
-  const domain = BRAND_DOMAINS[brand.toLowerCase()];
+  const key = brand.toLowerCase();
+  const local = BRAND_LOGO_FILES[key];
+  if (local) return local;
+  const domain = BRAND_DOMAINS[key];
   return domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : null;
 }
 

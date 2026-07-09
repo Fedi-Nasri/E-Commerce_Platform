@@ -37,9 +37,9 @@ export type ClimSliderData = {
 const fmt = (n: number) => n.toLocaleString("fr-FR");
 
 const MEDAL_ROW = [
-  "border-brand-gold/35 bg-gradient-to-r from-amber-50/90 via-brand-gold/12 to-amber-50/40 dark:border-brand-gold/30 dark:from-brand-gold/14 dark:via-brand-gold/8 dark:to-transparent",
-  "border-slate-300/70 bg-gradient-to-r from-slate-100 via-white to-slate-50 dark:border-white/12 dark:from-white/[0.09] dark:via-white/[0.05] dark:to-transparent",
-  "border-amber-800/20 bg-gradient-to-r from-orange-50/80 via-amber-50/40 to-orange-50/20 dark:border-amber-700/25 dark:from-amber-950/50 dark:via-amber-900/20 dark:to-transparent",
+  "border-brand-gold/35 bg-gradient-to-r from-amber-50 via-brand-gold/12 to-amber-50/35 shadow-[0_8px_22px_-18px_rgba(245,166,35,0.9)] dark:border-brand-gold/35 dark:from-brand-gold/16 dark:via-brand-gold/8 dark:to-transparent",
+  "border-slate-300/80 bg-gradient-to-r from-slate-100 via-white to-slate-50 dark:border-white/15 dark:from-white/[0.11] dark:via-white/[0.06] dark:to-transparent",
+  "border-amber-700/30 bg-gradient-to-r from-orange-50/85 via-amber-50/45 to-orange-50/20 dark:border-amber-700/30 dark:from-amber-950/60 dark:via-amber-900/24 dark:to-transparent",
 ];
 const MEDAL_BADGE = [
   "bg-gradient-to-br from-[#f6d365] via-brand-gold to-[#d4a23a] text-slate-900 shadow-[0_2px_10px_rgba(246,196,83,0.45)] ring-1 ring-brand-gold/40",
@@ -51,18 +51,22 @@ function BrandTile({ b }: { b: ClimSliderBrand }) {
   const [broken, setBroken] = useState(false);
   return (
     <div className="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-2.5 py-2 dark:border-white/[0.06] dark:bg-white/[0.03]">
-      <span className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-slate-200 dark:ring-white/10">
+      <span className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200/80 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-300/90 shadow-sm dark:border-slate-200/25 dark:from-slate-600 dark:via-slate-500 dark:to-slate-700">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-[1.5px] rounded-[7px] ring-1 ring-black/[0.12] dark:ring-white/[0.14]"
+        />
         {b.logo && !broken ? (
           <img
             src={b.logo}
             alt=""
-            className="h-5 w-5 object-contain"
+            className="relative z-[1] h-6 w-6 object-contain contrast-[1.22] saturate-[1.14] drop-shadow-[0_1px_2px_rgba(15,23,42,0.55)]"
             loading="lazy"
             referrerPolicy="no-referrer"
             onError={() => setBroken(true)}
           />
         ) : (
-          <span className="text-[10px] font-black text-slate-500">{b.label.slice(0, 2).toUpperCase()}</span>
+          <span className="relative z-[1] text-[10px] font-black text-slate-600 dark:text-slate-100">{b.label.slice(0, 2).toUpperCase()}</span>
         )}
       </span>
       <div className="min-w-0 flex-1">
@@ -77,6 +81,7 @@ export function ClimStockSlider({ data }: { data: ClimSliderData }) {
   const rowRef = useRef<HTMLDivElement>(null);
   const isPaused = useRef(false);
   const autoRef = useRef<number | null>(null);
+  const [activeRank, setActiveRank] = useState(0);
 
   // Seamless duplicate-loop auto-scroll (cards rendered twice back-to-back).
   useEffect(() => {
@@ -112,6 +117,14 @@ export function ClimStockSlider({ data }: { data: ClimSliderData }) {
       el.removeEventListener("touchstart", pause);
       el.removeEventListener("touchend", resume);
     };
+  }, []);
+
+  // Subtle rank spotlight: 1 -> 2 -> 3 in a loop.
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveRank((prev) => (prev + 1) % 3);
+    }, 1100);
+    return () => clearInterval(timer);
   }, []);
 
   const scroll = (dir: "left" | "right") => {
@@ -205,21 +218,32 @@ export function ClimStockSlider({ data }: { data: ClimSliderData }) {
               <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/40">
                 Top 3 moins chers
               </p>
-              <ul className="flex flex-col gap-2">
+              <ul className="flex flex-col gap-2.5">
                 {card.rows.map((row, i) => (
-                  <li key={row.shop} className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 ${MEDAL_ROW[i] ?? MEDAL_ROW[2]}`}>
-                    <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-black tabular-nums ${MEDAL_BADGE[i] ?? MEDAL_BADGE[2]}`}>
+                  <li
+                    key={row.shop}
+                    className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-all duration-500 ease-out will-change-transform ${
+                      i === activeRank
+                        ? "z-[2] scale-[1.075] -translate-y-0.5 shadow-[0_18px_34px_-18px_rgba(15,23,42,0.88)] ring-2 ring-brand-gold/35 brightness-[1.06]"
+                        : "scale-[0.985] opacity-[0.86]"
+                    } ${MEDAL_ROW[i] ?? MEDAL_ROW[2]}`}
+                  >
+                    <span
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-black tabular-nums ${MEDAL_BADGE[i] ?? MEDAL_BADGE[2]}`}
+                    >
                       {row.rank === 1 ? <Medal className="h-4 w-4" strokeWidth={2.25} /> : row.rank}
                     </span>
-                    <ShopLogo shopKey={row.shop} size={32} className="shrink-0" />
+                    <ShopLogo shopKey={row.shop} size={38} className="shrink-0" />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-[13px] font-bold text-slate-900 dark:text-white">{row.shopName}</p>
-                      <p className="truncate text-[10px] capitalize text-slate-500 dark:text-white/45">
+                      <p className="truncate text-[12.5px] font-extrabold tracking-tight text-slate-900 dark:text-white">
+                        {row.shopName}
+                      </p>
+                      <p className="truncate text-[10px] font-medium capitalize text-slate-500 dark:text-white/50">
                         {row.marqueMin} · {row.nbAnnonces} modèles
                       </p>
                     </div>
-                    <span className="shrink-0 text-sm font-black tabular-nums text-slate-900 dark:text-brand-gold">
-                      {fmt(row.prixMin)} <span className="text-[10px] font-bold">DT</span>
+                    <span className="shrink-0 rounded-lg bg-white/70 px-2.5 py-1 text-sm font-black tabular-nums text-slate-900 ring-1 ring-black/5 dark:bg-white/[0.08] dark:text-brand-gold dark:ring-white/10">
+                      {fmt(row.prixMin)} <span className="text-[10px] font-bold opacity-80">DT</span>
                     </span>
                   </li>
                 ))}
@@ -270,39 +294,65 @@ export function ClimStockSlider({ data }: { data: ClimSliderData }) {
 
   return (
     <section className="mx-auto mt-8 max-w-[1600px] px-3 sm:px-4">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h2 className="section-title">CLIMATISEURS EN STOCK</h2>
-          <p className="mt-2 max-w-xl text-sm text-slate-500 dark:text-white/50">
-            Disponibilité et meilleurs prix en temps réel —{" "}
-            <span className="font-medium text-slate-700 dark:text-white/70">
-              {fmt(data.totals.climatiseurs)} climatiseurs
-            </span>{" "}
-            chez {data.totals.boutiques} enseignes
-          </p>
+      <div className="mb-6 space-y-4">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-sky-600 dark:text-sky-300">
+              Comparatif temps réel
+            </p>
+            <h2 className="mt-1 text-[1.65rem] font-black leading-[1.05] tracking-tight text-slate-900 sm:text-[1.8rem] dark:text-white">
+              Climatiseurs en stock
+            </h2>
+            <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-slate-500 sm:text-[13.5px] dark:text-white/55">
+              Disponibilité et meilleurs prix en temps réel —{" "}
+              <span className="font-extrabold text-slate-800 dark:text-white">
+                {fmt(data.totals.climatiseurs)} climatiseurs
+              </span>{" "}
+              chez{" "}
+              <span className="font-bold text-slate-700 dark:text-white/80">
+                {data.totals.boutiques} enseignes
+              </span>
+              .
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/climatiseurs-stock"
+              className="hidden items-center gap-1.5 rounded-xl border border-sky-500/30 bg-sky-500/10 px-3.5 py-2 text-xs font-bold text-sky-700 transition hover:bg-sky-500/20 sm:flex dark:text-sky-300"
+            >
+              Voir plus <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+            <button
+              onClick={() => scroll("left")}
+              aria-label="Précédent"
+              className="hidden h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-brand-gold/50 hover:text-brand-gold sm:flex dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => scroll("right")}
+              aria-label="Suivant"
+              className="hidden h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-brand-gold/50 hover:text-brand-gold sm:flex dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Link
-            href="/climatiseurs-stock"
-            className="hidden items-center gap-1.5 rounded-xl border border-sky-500/30 bg-sky-500/10 px-3.5 py-2 text-xs font-bold text-sky-700 transition hover:bg-sky-500/20 sm:flex dark:text-sky-300"
-          >
-            Voir plus <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-          <button
-            onClick={() => scroll("left")}
-            aria-label="Précédent"
-            className="hidden h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-brand-gold/50 hover:text-brand-gold sm:flex dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => scroll("right")}
-            aria-label="Suivant"
-            className="hidden h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-brand-gold/50 hover:text-brand-gold sm:flex dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        </div>
+
+        <Link
+          href="/climatiseurs-stock"
+          className="group relative block overflow-hidden rounded-2xl border border-orange-500/30 shadow-card transition hover:border-orange-400/60 hover:shadow-[0_0_32px_-8px_rgba(249,115,22,0.5)]"
+        >
+          <div className="relative w-full" style={{ aspectRatio: "1566 / 232" }}>
+            <img
+              src="/climatiseur-category.png"
+              alt="Climatiseurs · Meilleures offres"
+              className="block h-full w-full object-cover transition-transform duration-[6000ms] ease-out scale-105 group-hover:scale-110"
+              loading="lazy"
+            />
+            <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/15 via-transparent to-black/25" />
+          </div>
+        </Link>
       </div>
 
       <div

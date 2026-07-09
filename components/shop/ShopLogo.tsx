@@ -37,8 +37,9 @@ export function ShopLogo({
   const [idx, setIdx] = useState(0);
 
   const shellClass = [
-    "flex shrink-0 items-center justify-center rounded-xl border border-slate-200/90 bg-white shadow-sm",
-    "dark:border-slate-200/20 dark:bg-white dark:shadow-md dark:shadow-black/20",
+    "relative flex shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200/90",
+    "bg-gradient-to-br from-slate-200 via-slate-100 to-slate-300/90 shadow-sm",
+    "dark:border-slate-200/20 dark:from-slate-600 dark:via-slate-500 dark:to-slate-700 dark:shadow-md dark:shadow-black/20",
     interactive
       ? "cursor-pointer transition-all duration-300 ease-out hover:scale-[1.12] hover:-translate-y-1.5 hover:shadow-lg hover:shadow-black/30 hover:ring-2 hover:ring-brand-gold/45 active:scale-105"
       : "",
@@ -47,7 +48,7 @@ export function ShopLogo({
     .filter(Boolean)
     .join(" ");
 
-  const pad = Math.max(6, Math.round(size * 0.14));
+  const pad = Math.max(4, Math.round(size * 0.1));
   const imgSize = size - pad * 2;
 
   if (idx >= fallbacks.length) {
@@ -71,13 +72,17 @@ export function ShopLogo({
 
   return (
     <div style={{ width: size, height: size, padding: pad }} className={shellClass}>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-[2px] rounded-[10px] ring-1 ring-black/[0.12] dark:ring-white/[0.12]"
+      />
       <img
         src={fallbacks[idx]}
         alt=""
         onError={() => setIdx((i) => i + 1)}
         referrerPolicy="no-referrer"
         style={{ width: imgSize, height: imgSize }}
-        className="object-contain"
+        className="relative z-[1] object-contain contrast-[1.24] saturate-[1.14] drop-shadow-[0_1px_2px_rgba(15,23,42,0.55)]"
       />
     </div>
   );

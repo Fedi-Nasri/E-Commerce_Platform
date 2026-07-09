@@ -144,12 +144,24 @@ export function TechOffers() {
     <section className="mx-auto mt-8 max-w-[1600px] px-3 sm:px-4">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 className="section-title">MEILLEURS PRIX PAR CATÉGORIE</h2>
-          <p className="mt-2 max-w-xl text-sm text-slate-500 dark:text-white/50">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-sky-600 dark:text-sky-300">
+            Comparatif multi-catégories
+          </p>
+          <h2 className="mt-1 text-[1.65rem] font-black leading-[1.05] tracking-tight text-slate-900 sm:text-[1.8rem] dark:text-white">
+            Meilleurs prix par catégorie
+          </h2>
+          <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-slate-500 sm:text-[13.5px] dark:text-white/55">
             Classement des enseignes par comparaison produit à produit
             {totalProducts > 0 && (
-              <> — <span className="font-medium text-slate-700 dark:text-white/70">{totalProducts.toLocaleString("fr-FR")} références</span> analysées</>
+              <>
+                {" "}—{" "}
+                <span className="font-extrabold text-slate-800 dark:text-white">
+                  {totalProducts.toLocaleString("fr-FR")} références
+                </span>{" "}
+                analysées
+              </>
             )}
+            .
           </p>
         </div>
         {/* Arrow buttons — hidden on mobile */}
