@@ -69,24 +69,26 @@ export function climBtuComparison(btu: string): ClimBtuRow[] {
 export function climBtuRowOffer(btu: string, row: ClimBtuRow): Pick<ClimOffer, "url" | "title"> | null {
   const brands = new Set(row.marques_au_prix_min.map((b) => b.toLowerCase()));
   const target = Math.round(row.prix_min);
-  let best: ClimAnnonce | null = null;
-  let bestPrice = Infinity;
 
-  const consider = (a: ClimAnnonce, requireBrand: boolean) => {
-    if (a.shop !== row.shop || a.btu !== btu || !a.url) return;
-    const price = normalizedPrice(a);
-    if (price == null || Math.round(price) !== target) return;
-    if (requireBrand && brands.size && a.brand && !brands.has(a.brand.toLowerCase())) return;
-    if (price < bestPrice) {
-      best = a;
-      bestPrice = price;
+  const pick = (requireBrand: boolean): ClimAnnonce | null => {
+    let best: ClimAnnonce | null = null;
+    let bestPrice = Infinity;
+    for (const a of data.annonces) {
+      if (a.shop !== row.shop || a.btu !== btu || !a.url) continue;
+      const price = normalizedPrice(a);
+      if (price == null || Math.round(price) !== target) continue;
+      if (requireBrand && brands.size && a.brand && !brands.has(a.brand.toLowerCase())) continue;
+      if (price < bestPrice) {
+        best = a;
+        bestPrice = price;
+      }
     }
+    return best;
   };
 
-  for (const a of data.annonces) consider(a, true);
-  if (!best) for (const a of data.annonces) consider(a, false);
-  if (!best) return null;
-  return { url: best.url, title: best.title };
+  const hit = pick(true) ?? pick(false);
+  if (!hit) return null;
+  return { url: hit.url, title: hit.title };
 }
 
 export function climBtuComparisonWithUrls(btu: string): ClimBtuRowWithUrl[] {
