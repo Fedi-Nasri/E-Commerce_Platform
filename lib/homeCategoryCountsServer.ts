@@ -10,7 +10,8 @@ async function countRetailBySlugs(slugs: string[]): Promise<number> {
   const res = await pool.query<{ total: string }>(
     `SELECT COUNT(DISTINCT p.id)::text AS total
      FROM products p
-     WHERE EXISTS (
+     WHERE p.status = 'active'
+       AND EXISTS (
        SELECT 1
        FROM product_subcategories psc
        JOIN subcategories sc ON sc.id = psc.subcategory_id

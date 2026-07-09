@@ -161,7 +161,10 @@ function resolveRetailOrderBy(
 }
 
 export function buildRetailProductQuery(filters: RetailListFilters) {
-  const conditions: string[] = [];
+  // Archived products (delisted, or removed for corrupted data) must never
+  // surface in browse/search/filters — they're only kept in the DB for
+  // reversibility, not for display.
+  const conditions: string[] = ["p.status = 'active'"];
   const having: string[] = [];
   const params: (string | number | boolean | string[])[] = [];
   let searchRelevanceOrder: string | null = null;

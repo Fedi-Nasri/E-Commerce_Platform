@@ -174,19 +174,34 @@ export function PlateOrbit({ plates }: Props) {
       </div>
 
       {plates.length > 1 && (
-        <div className="mt-3 flex items-center justify-center gap-2">
-          {plates.map((p, i) => (
-            <button
-              key={p.id}
-              type="button"
-              aria-label={p.title}
-              aria-current={i === index ? "true" : undefined}
-              onClick={() => switchTo(i)}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                i === index ? "w-6 bg-brand-gold" : "w-2 bg-slate-300 dark:bg-white/20"
-              }`}
-            />
-          ))}
+        <div className="mt-3 flex items-center justify-center">
+          <div className="inline-flex rounded-full border border-slate-200/80 bg-white/90 p-1 shadow-sm dark:border-white/12 dark:bg-white/[0.06]">
+            {plates.map((p, i) => {
+              const active = i === index;
+              const short =
+                p.title.toLowerCase().includes("makrouna")
+                  ? "Makrouna"
+                  : p.title.toLowerCase().includes("ojja")
+                    ? "Ojja"
+                    : p.title;
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  aria-label={p.title}
+                  aria-current={active ? "true" : undefined}
+                  onClick={() => switchTo(i)}
+                  className={`rounded-full px-3 py-1.5 text-[11px] font-bold transition-all duration-300 ${
+                    active
+                      ? "bg-brand-gold text-slate-950 shadow-[0_4px_14px_-6px_rgba(246,196,83,0.8)]"
+                      : "text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-white/60 dark:hover:bg-white/[0.1] dark:hover:text-white"
+                  }`}
+                >
+                  {short}
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
 

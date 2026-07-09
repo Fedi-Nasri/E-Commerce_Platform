@@ -134,7 +134,8 @@ export async function GET() {
          JOIN products p ON p.id = sp.product_id
          JOIN shops s ON s.id = sp.shop_id
          JOIN per_product pp ON pp.product_id = sp.product_id
-         WHERE sp.current_price > 0
+         WHERE p.status = 'active'
+           AND sp.current_price > 0
            AND sp.regular_price > 0
            AND sp.current_price < sp.regular_price
            AND (sp.regular_price - sp.current_price) / sp.regular_price BETWEEN 0.08 AND 0.45

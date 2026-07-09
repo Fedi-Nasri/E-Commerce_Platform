@@ -91,6 +91,7 @@ export async function GET() {
                MAX(sp.current_price) AS max_p
         FROM products p
         JOIN shop_prices sp ON sp.product_id = p.id
+        WHERE p.status = 'active'
         GROUP BY p.id, p.name, p.slug
       ),
       ranked AS (

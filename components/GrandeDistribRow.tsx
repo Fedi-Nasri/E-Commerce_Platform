@@ -302,11 +302,12 @@ export function GrandeDistribRow() {
           {/* Product area */}
           <div className="relative flex flex-1 flex-col px-4 sm:px-5">
             {/* Image — pleine largeur, en haut */}
-            <div className="flex w-full items-center justify-center overflow-hidden rounded-xl bg-slate-100 py-4 dark:bg-white/5">
+            <div className="group/image relative flex w-full items-center justify-center overflow-hidden rounded-xl border border-slate-200/80 bg-gradient-to-br from-slate-100 via-white to-slate-200/70 py-4 shadow-inner dark:border-white/10 dark:from-slate-800/80 dark:via-slate-700/40 dark:to-slate-900/80">
+              <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-white/25 dark:from-black/20 dark:to-transparent" />
               <img
                 src={illogicalPromo?.img ?? "https://jumbo.tn/4425-large_default/tv-hisense-l5g-series-100-uhd-4k-smart-laser-tv-android-wifi.jpg"}
                 alt={illogicalPromo?.name ?? "TV Hisense L5G 100\""}
-                className="max-h-40 w-full object-contain drop-shadow-[0_4px_16px_rgba(239,68,68,0.3)]"
+                className="relative z-[1] max-h-44 w-full object-contain px-2 drop-shadow-[0_8px_20px_rgba(15,23,42,0.25)] transition-transform duration-500 group-hover/image:scale-[1.03] dark:drop-shadow-[0_10px_24px_rgba(0,0,0,0.45)]"
               />
             </div>
 

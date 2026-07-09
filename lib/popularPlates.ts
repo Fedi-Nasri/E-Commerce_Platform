@@ -140,7 +140,7 @@ const PLATE_META: Record<
   { arabicTitle: string; image: string }
 > = {
   "ojja-simple": { arabicTitle: "عجة بسيطة", image: "/ojja.png" },
-  "makrouna-thon": { arabicTitle: "مكرونة بالتونة", image: "/ojja.png" },
+  "makrouna-thon": { arabicTitle: "مكرونة بالتونة", image: "/pasta-plate.png" },
 };
 
 const INGREDIENT_ICONS: Record<string, string> = {

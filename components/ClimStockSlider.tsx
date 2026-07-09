@@ -301,7 +301,7 @@ export function ClimStockSlider({ data }: { data: ClimSliderData }) {
               Comparatif temps réel
             </p>
             <h2 className="mt-1 text-[1.65rem] font-black leading-[1.05] tracking-tight text-slate-900 sm:text-[1.8rem] dark:text-white">
-              Climatiseurs en stock
+              Les climatiseurs les moins chers du marché
             </h2>
             <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-slate-500 sm:text-[13.5px] dark:text-white/55">
               Disponibilité et meilleurs prix en temps réel —{" "}

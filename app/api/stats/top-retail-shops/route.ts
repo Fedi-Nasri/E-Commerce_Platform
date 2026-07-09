@@ -57,6 +57,7 @@ export async function GET() {
         JOIN shop_prices sp ON sp.shop_id = s.id
         JOIN products p ON p.id = sp.product_id
         WHERE p.is_matched = true
+          AND p.status = 'active'
           AND sp.current_price IS NOT NULL
         GROUP BY s.id, s.shop_key, s.name
         HAVING COUNT(DISTINCT sp.product_id) >= 10

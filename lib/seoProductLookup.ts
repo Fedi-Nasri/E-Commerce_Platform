@@ -41,7 +41,7 @@ async function lookup(pool: Pool, slug: string): Promise<SeoProduct | null> {
        FROM products p
        LEFT JOIN brands b ON b.id = p.brand_id
        LEFT JOIN shop_prices sp ON sp.product_id = p.id AND sp.current_price > 0
-       WHERE p.slug = $1
+       WHERE p.slug = $1 AND p.status = 'active'
        GROUP BY p.id, b.name
        LIMIT 1`,
       [slug]

@@ -22,7 +22,7 @@ export async function GET(_req: NextRequest, { params }: { params: { slug: strin
        LEFT JOIN subcategories sc ON sc.id = psc.subcategory_id
        LEFT JOIN low_categories lc ON lc.id = sc.low_category_id
        LEFT JOIN top_categories tc ON tc.id = lc.top_category_id
-       WHERE p.slug = $1
+       WHERE p.slug = $1 AND p.status = 'active'
        LIMIT 1`,
       [slug]
     );
@@ -76,6 +76,7 @@ export async function GET(_req: NextRequest, { params }: { params: { slug: strin
          LEFT JOIN shop_prices sp2 ON sp2.product_id = p2.id
          LEFT JOIN shops s2 ON s2.id = sp2.shop_id
          WHERE p2.id != $2
+           AND p2.status = 'active'
            AND (
              sc2.name IS NOT DISTINCT FROM $3
              OR lc2.name IS NOT DISTINCT FROM $4

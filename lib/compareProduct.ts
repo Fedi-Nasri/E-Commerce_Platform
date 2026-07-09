@@ -171,7 +171,7 @@ async function fetchRetailBySlug(slug: string): Promise<CompareProductPayload | 
      LEFT JOIN subcategories sc ON sc.id = psc.subcategory_id
      LEFT JOIN low_categories lc ON lc.id = sc.low_category_id
      LEFT JOIN top_categories tc ON tc.id = lc.top_category_id
-     WHERE p.slug = $1
+     WHERE p.slug = $1 AND p.status = 'active'
      LIMIT 1`,
     [slug],
   );
@@ -446,7 +446,7 @@ export async function searchCompareProducts(q: string, limit: number): Promise<C
 
 async function searchRetailCompare(q: string, limit: number): Promise<CompareSearchItem[]> {
   const pool = retailPool();
-  const conditions: string[] = [];
+  const conditions: string[] = ["p.status = 'active'"];
   const params: (string | number | boolean | string[])[] = [];
   conditions.push(retailTechFilterSql(params));
   const relevanceOrder = appendProductSearch(q, conditions, params);

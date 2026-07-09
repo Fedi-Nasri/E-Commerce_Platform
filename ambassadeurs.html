@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Liste des Ambassadeurs</title>
+  <style>
+    :root {
+      --bg: #f3f6fb;
+      --card: #ffffff;
+      --text: #14213d;
+      --muted: #5c6b80;
+      --accent: #3467eb;
+      --border: #e5e9f2;
+      --shadow: 0 10px 30px rgba(20, 33, 61, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at 10% 20%, #eef3ff 0, #f3f6fb 45%, #eef8ff 100%);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px 40px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #2854d8, #3879ff);
+      color: #fff;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+
+    .title {
+      margin: 0 0 8px;
+      font-size: 32px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      margin: 0;
+      opacity: 0.95;
+      font-size: 15px;
+    }
+
+    .controls {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 14px;
+      margin-bottom: 18px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .controls input, .controls select {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      font-size: 14px;
+      min-width: 220px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .stat {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .table-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: auto;
+      box-shadow: var(--shadow);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: #f8faff;
+      color: #20345f;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    tr:hover td {
+      background: #f7f9ff;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .empty {
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="header">
+      <h1 class="title">Liste des Ambassadeurs</h1>
+      <p class="subtitle">Visualisation claire, filtrable et triée par données personnelles et géographiques.</p>
+    </section>
+
+    <section class="controls">
+      <input id="searchInput" type="search" placeholder="Rechercher nom, prénom, téléphone, région..." />
+      <select id="regionFilter">
+        <option value="">Toutes les régions</option>
+      </select>
+      <select id="delegationFilter">
+        <option value="">Toutes les délégations</option>
+      </select>
+    </section>
+
+    <section class="stats">
+      <div class="stat">
+        <div class="stat-label">Total ambassadeurs</div>
+        <div id="totalStat" class="stat-value">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Régions couvertes</div>
+        <div id="regionsStat" class="stat-value">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Délégations couvertes</div>
+        <div id="delegationsStat" class="stat-value">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Résultats affichés</div>
+        <div id="resultsStat" class="stat-value">0</div>
+      </div>
+    </section>
+
+    <section class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nom Complet</th>
+            <th>Date de Naissance</th>
+            <th>Téléphone</th>
+            <th>Région</th>
+            <th>Délégation</th>
+            <th>Créé le</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div id="emptyState" class="empty">Aucun résultat ne correspond aux filtres actuels.</div>
+    </section>
+  </main>
+
+  <script>
+    const ambassadeurs = [
+      {"_id":{"$oid":"6a3ab5f9d90bcc0431193bbf"},"nom":"Ahmed","prenom":"Chayeb","dateNaissance":"2026-06-23","telephone":"94177476","region":"Tunis","delegation":"La Marsa","createdAt":{"$date":"2026-06-23T16:36:09.924Z"},"updatedAt":{"$date":"2026-06-23T16:36:09.924Z"},"__v":0},
+      {"_id":{"$oid":"6a3ac7bdd79b6a92e4777948"},"nom":"Sedki","prenom":"Dhia","dateNaissance":"1986-07-10","telephone":"95002829","region":"Ariana","delegation":"La Soukra","createdAt":{"$date":"2026-06-23T17:51:57.365Z"},"updatedAt":{"$date":"2026-06-23T17:51:57.365Z"},"__v":0},
+      {"_id":{"$oid":"6a3ad176ba962ccf58b6ae2c"},"nom":"Zouari","prenom":"Rahma","dateNaissance":"1991-03-04","telephone":"+21623467534","region":"Nabeul","delegation":"Kélibia","createdAt":{"$date":"2026-06-23T18:33:26.412Z"},"updatedAt":{"$date":"2026-06-23T18:33:26.412Z"},"__v":0},
+      {"_id":{"$oid":"6a3b2e9866a727de245df702"},"nom":"Maysa","prenom":"Kchaou","dateNaissance":"1996-08-28","telephone":"+21625444617","region":"Sfax","delegation":"Sfax Ville","createdAt":{"$date":"2026-06-24T01:10:48.735Z"},"updatedAt":{"$date":"2026-06-24T01:10:48.735Z"},"__v":0},
+      {"_id":{"$oid":"6a3e8bd414cfe155a36ab711"},"nom":"Safa","prenom":"Morri","dateNaissance":"2003-04-02","telephone":"99897401","region":"Tunis","delegation":"Bab El Bhar","createdAt":{"$date":"2026-06-26T14:25:24.381Z"},"updatedAt":{"$date":"2026-06-26T14:25:24.381Z"},"__v":0},
+      {"_id":{"$oid":"6a3e8ee70b341132d157f5e3"},"nom":"Sedki","prenom":"Dhia","dateNaissance":"1986-07-10","telephone":"95002829","region":"Ben Arous","delegation":"El Mourouj","createdAt":{"$date":"2026-06-26T14:38:31.654Z"},"updatedAt":{"$date":"2026-06-26T14:38:31.654Z"},"__v":0},
+      {"_id":{"$oid":"6a44e84e20f1cd43c302a28e"},"nom":"Khaled","prenom":"Mekni","dateNaissance":"1983-07-17","telephone":"+21622569204","region":"Tunis","delegation":"Bab El Bhar","createdAt":{"$date":"2026-07-01T10:13:34.778Z"},"updatedAt":{"$date":"2026-07-01T10:13:34.778Z"},"__v":0},
+      {"_id":{"$oid":"6a4505cc6eddbad2cacc1fcf"},"nom":"Sassi","prenom":"Yahya","dateNaissance":"2021-10-10","telephone":"23329425","region":"Sousse","delegation":"Sousse Jawhara","createdAt":{"$date":"2026-07-01T12:19:24.967Z"},"updatedAt":{"$date":"2026-07-01T12:19:24.967Z"},"__v":0},
+      {"_id":{"$oid":"6a46afb6bbd44c1f8958e78b"},"nom":"Oussama","prenom":"Jouini","dateNaissance":"1996-10-05","telephone":"53241115","region":"Manouba","delegation":"Borj El Amri","createdAt":{"$date":"2026-07-02T18:36:38.308Z"},"updatedAt":{"$date":"2026-07-02T18:36:38.308Z"},"__v":0},
+      {"_id":{"$oid":"6a4752a9a65ac3dcdb468b5b"},"nom":"Mgaidia","prenom":"Hedia","dateNaissance":"1975-07-25","telephone":"25379758","region":"Ariana","delegation":"La Soukra","createdAt":{"$date":"2026-07-03T06:11:53.435Z"},"updatedAt":{"$date":"2026-07-03T06:11:53.435Z"},"__v":0},
+      {"_id":{"$oid":"6a478c1d67b8b278a19fa992"},"nom":"TAJER","prenom":"KARIM","dateNaissance":"1999-10-10","telephone":"53478885","region":"Zaghouan","delegation":"Nadhour","createdAt":{"$date":"2026-07-03T10:17:01.682Z"},"updatedAt":{"$date":"2026-07-03T10:17:01.682Z"},"__v":0},
+      {"_id":{"$oid":"6a4cdbbe963513b9e28e927a"},"nom":"Mathlouthi","prenom":"Arwa","dateNaissance":"2000-12-07","telephone":"29496216","region":"Nabeul","delegation":"Menzel Bouzelfa","createdAt":{"$date":"2026-07-07T10:58:06.290Z"},"updatedAt":{"$date":"2026-07-07T10:58:06.290Z"},"__v":0},
+      {"_id":{"$oid":"6a4cdbc0d233533e0fd4568c"},"nom":"Hrizi","prenom":"Khalas","dateNaissance":"2001-10-20","telephone":"92859256","region":"Ariana","delegation":"Mnihla","createdAt":{"$date":"2026-07-07T10:58:08.826Z"},"updatedAt":{"$date":"2026-07-07T10:58:08.826Z"},"__v":0},
+      {"_id":{"$oid":"6a4cdbc183cbd0de950f460b"},"nom":"benali","prenom":"sara","dateNaissance":"1995-12-23","telephone":"94038316","region":"Sousse","delegation":"Kalâa Kebira","createdAt":{"$date":"2026-07-07T10:58:09.323Z"},"updatedAt":{"$date":"2026-07-07T10:58:09.323Z"},"__v":0},
+      {"_id":{"$oid":"6a4cdbc283cbd0de950f460c"},"nom":"Hachfi","prenom":"Montassar","dateNaissance":"2004-06-19","telephone":"+21656411573","region":"Sousse","delegation":"Hammam Sousse","createdAt":{"$date":"2026-07-07T10:58:10.641Z"},"updatedAt":{"$date":"2026-07-07T10:58:10.641Z"},"__v":0},
+      {"_id":{"$oid":"6a4cdbe083cbd0de950f460d"},"nom":"Hichri","prenom":"Ghazi","dateNaissance":"1975-03-11","telephone":"+21626822744","region":"Bizerte","delegation":"Menzel Bourguiba","createdAt":{"$date":"2026-07-07T10:58:40.840Z"},"updatedAt":{"$date":"2026-07-07T10:58:40.840Z"},"__v":0},
+      {"_id":{"$oid":"6a4cdbe983cbd0de950f460e"},"nom":"Lamine","prenom":"Jemli","dateNaissance":"2000-06-09","telephone":"25741779","region":"Tunis","delegation":"La Marsa","createdAt":{"$date":"2026-07-07T10:58:49.258Z"},"updatedAt":{"$date":"2026-07-07T10:58:49.258Z"},"__v":0},
+      {"_id":{"$oid":"6a4cdc0e83cbd0de950f460f"},"nom":"Chebbi","prenom":"Youssef","dateNaissance":"2001-08-04","telephone":"21699649032","region":"Ariana","delegation":"La Soukra","createdAt":{"$date":"2026-07-07T10:59:26.340Z"},"updatedAt":{"$date":"2026-07-07T10:59:26.340Z"},"__v":0},
+      {"_id":{"$oid":"6a4cdc1a83cbd0de950f4610"},"nom":"Brahmi","prenom":"Khaoula","dateNaissance":"1993-12-11","telephone":"+21692772863","region":"Ariana","delegation":"Raoued","createdAt":{"$date":"2026-07-07T10:59:38.378Z"},"updatedAt":{"$date":"2026-07-07T10:59:38.378Z"},"__v":0},
+      {"_id":{"$oid":"6a4cdc4383cbd0de950f4611"},"nom":"Ouri","prenom":"Eya","dateNaissance":"2006-10-29","telephone":"21920788","region":"Ben Arous","delegation":"Fouchana","createdAt":{"$date":"2026-07-07T11:00:19.297Z"},"updatedAt":{"$date":"2026-07-07T11:00:19.297Z"},"__v":0},
+      {"_id":{"$oid":"6a4cdc5383cbd0de950f4612"},"nom":"Eslem","prenom":"Ben Halima","dateNaissance":"2006-08-14","telephone":"24139696","region":"Ariana","delegation":"Raoued","createdAt":{"$date":"2026-07-07T11:00:35.609Z"},"updatedAt":{"$date":"2026-07-07T11:00:35.609Z"},"__v":0},
+      {"_id":{"$oid":"6a4cdc5383cbd0de950f4613"},"nom":"Gharbi","prenom":"Ghassen","dateNaissance":"1991-01-11","telephone":"24322767","region":"Ariana","delegation":"La Soukra","createdAt":{"$date":"2026-07-07T11:00:35.941Z"},"updatedAt":{"$date":"2026-07-07T11:00:35.941Z"},"__v":0},
+      {"_id":{"$oid":"6a4cdc5983cbd0de950f4614"},"nom":"Bettaieb","prenom":"Yasmine","dateNaissance":"2002-08-16","telephone":"52062720","region":"Gafsa","delegation":"Gafsa Sud","createdAt":{"$date":"2026-07-07T11:00:41.545Z"},"updatedAt":{"$date":"2026-07-07T11:00:41.545Z"},"__v":0},
+      {"_id":{"$oid":"6a4cdc7683cbd0de950f4615"},"nom":"Taboubi","prenom":"Mohamed Abderrahman","dateNaissance":"1997-12-07","telephone":"22241829","region":"Ben Arous","delegation":"Ben Arous","createdAt":{"$date":"2026-07-07T11:01:10.329Z"},"updatedAt":{"$date":"2026-07-07T11:01:10.329Z"},"__v":0},
+      {"_id":{"$oid":"6a4cdc9383cbd0de950f4616"},"nom":"الشريف","prenom":"كمال","dateNaissance":"1999-09-20","telephone":"+21628217909","region":"Ben Arous","delegation":"Khelidia","createdAt":{"$date":"2026-07-07T11:01:39.871Z"},"updatedAt":{"$date":"2026-07-07T11:01:39.871Z"},"__v":0},
+      {"_id":{"$oid":"6a4cdc9a83cbd0de950f4617"},"nom":"Sellami","prenom":"Ahmed","dateNaissance":"2002-07-11","telephone":"92204653","region":"Ariana","delegation":"Ariana Ville","createdAt":{"$date":"2026-07-07T11:01:46.844Z"},"updatedAt":{"$date":"2026-07-07T11:01:46.844Z"},"__v":0},
+      {"_id":{"$oid":"6a4cdcd083cbd0de950f4618"},"nom":"Hidri","prenom":"Farouk","dateNaissance":"1994-04-05","telephone":"+21626175875","region":"Manouba","delegation":"Manouba","createdAt":{"$date":"2026-07-07T11:02:40.498Z"},"updatedAt":{"$date":"2026-07-07T11:02:40.498Z"},"__v":0},
+      {"_id":{"$oid":"6a4cdd36d233533e0fd4568d"},"nom":"Bader","prenom":"Anouar","dateNaissance":"2000-01-13","telephone":"+21695443366","region":"Tunis","delegation":"El Kabaria","createdAt":{"$date":"2026-07-07T11:04:22.211Z"},"updatedAt":{"$date":"2026-07-07T11:04:22.211Z"},"__v":0},
+      {"_id":{"$oid":"6a4cdfebd80f2c8627435289"},"nom":"Ajbouni","prenom":"Mohamed amine","dateNaissance":"2006-02-18","telephone":"27140089","region":"Ben Arous","delegation":"El Mourouj","createdAt":{"$date":"2026-07-07T11:15:55.231Z"},"updatedAt":{"$date":"2026-07-07T11:15:55.231Z"},"__v":0},
+      {"_id":{"$oid":"6a4ce014d80f2c862743528a"},"nom":"Ajbouni","prenom":"Mohamed amine","dateNaissance":"2006-02-18","telephone":"22375150","region":"Ben Arous","delegation":"El Mourouj","createdAt":{"$date":"2026-07-07T11:16:36.336Z"},"updatedAt":{"$date":"2026-07-07T11:16:36.336Z"},"__v":0},
+      {"_id":{"$oid":"6a4ce0e4d80f2c862743528b"},"nom":"bouabidi","prenom":"hatem","dateNaissance":"1995-01-04","telephone":"29538386","region":"Tunis","delegation":"La Marsa","createdAt":{"$date":"2026-07-07T11:20:04.174Z"},"updatedAt":{"$date":"2026-07-07T11:20:04.174Z"},"__v":0},
+      {"_id":{"$oid":"6a4ce1b8d80f2c862743528c"},"nom":"Boushih","prenom":"Soumaya","dateNaissance":"1989-04-02","telephone":"53309510","region":"Manouba","delegation":"Mornaguia","createdAt":{"$date":"2026-07-07T11:23:36.394Z"},"updatedAt":{"$date":"2026-07-07T11:23:36.394Z"},"__v":0},
+      {"_id":{"$oid":"6a4ce1bcd80f2c862743528d"},"nom":"Trabelsi","prenom":"Fatma","dateNaissance":"1986-06-15","telephone":"90396290","region":"Bizerte","delegation":"Bizerte Sud","createdAt":{"$date":"2026-07-07T11:23:40.955Z"},"updatedAt":{"$date":"2026-07-07T11:23:40.955Z"},"__v":0},
+      {"_id":{"$oid":"6a4ce38d1db7368dff840ac8"},"nom":"Yassine","prenom":"Graidia","dateNaissance":"1991-08-09","telephone":"21625197695","region":"Manouba","delegation":"Mornaguia","createdAt":{"$date":"2026-07-07T11:31:25.410Z"},"updatedAt":{"$date":"2026-07-07T11:31:25.410Z"},"__v":0},
+      {"_id":{"$oid":"6a4cee5613b522abf370a411"},"nom":"Wael","prenom":"Jlassi","dateNaissance":"1996-03-24","telephone":"27619757","region":"Ariana","delegation":"Ariana Ville","createdAt":{"$date":"2026-07-07T12:17:26.101Z"},"updatedAt":{"$date":"2026-07-07T12:17:26.101Z"},"__v":0},
+      {"_id":{"$oid":"6a4d093b50672199a2590180"},"nom":"Amara","prenom":"Hamza","dateNaissance":"2006-07-07","telephone":"27952190","region":"Mahdia","delegation":"Ksour Essef","createdAt":{"$date":"2026-07-07T14:12:11.195Z"},"updatedAt":{"$date":"2026-07-07T14:12:11.195Z"},"__v":0},
+      {"_id":{"$oid":"6a4d21e264584044b7c7841f"},"nom":"Ghoul","prenom":"Khalil","dateNaissance":"2005-01-27","telephone":"23053365","region":"Nabeul","delegation":"Béni Khiar","createdAt":{"$date":"2026-07-07T15:57:22.051Z"},"updatedAt":{"$date":"2026-07-07T15:57:22.051Z"},"__v":0},
+      {"_id":{"$oid":"6a4d23fc6bfe6da7bebcc2b1"},"nom":"Trabelsi","prenom":"Motaz","dateNaissance":"1998-04-30","telephone":"+21696299103","region":"Ariana","delegation":"Raoued","createdAt":{"$date":"2026-07-07T16:06:20.594Z"},"updatedAt":{"$date":"2026-07-07T16:06:20.594Z"},"__v":0},
+      {"_id":{"$oid":"6a4d24c16bfe6da7bebcc2b2"},"nom":"Tarhouni","prenom":"Tasnim","dateNaissance":"2004-12-27","telephone":"+21624582788","region":"Ben Arous","delegation":"Mornag","createdAt":{"$date":"2026-07-07T16:09:37.336Z"},"updatedAt":{"$date":"2026-07-07T16:09:37.336Z"},"__v":0},
+      {"_id":{"$oid":"6a4d25986bfe6da7bebcc2b3"},"nom":"Ben Ftima","prenom":"Raed","dateNaissance":"1987-08-08","telephone":"25986604","region":"Ariana","delegation":"La Soukra","createdAt":{"$date":"2026-07-07T16:13:12.105Z"},"updatedAt":{"$date":"2026-07-07T16:13:12.105Z"},"__v":0},
+      {"_id":{"$oid":"6a4d26fcd84292a956fe3284"},"nom":"Yassine","prenom":"Smaani","dateNaissance":"2006-07-07","telephone":"20837804","region":"Sfax","delegation":"Sakiet Eddaïer","createdAt":{"$date":"2026-07-07T16:19:08.898Z"},"updatedAt":{"$date":"2026-07-07T16:19:08.898Z"},"__v":0},
+      {"_id":{"$oid":"6a4d2b742d2139b2c5131b47"},"nom":"Norhene","prenom":"Zormati","dateNaissance":"2003-07-19","telephone":"95239771","region":"Sousse","delegation":"Hammam Sousse","createdAt":{"$date":"2026-07-07T16:38:12.807Z"},"updatedAt":{"$date":"2026-07-07T16:38:12.807Z"},"__v":0},
+      {"_id":{"$oid":"6a4d2d11d191e396c34233c8"},"nom":"Jlassi","prenom":"Achref","dateNaissance":"1995-08-09","telephone":"0021656075076","region":"Tunis","delegation":"La Marsa","createdAt":{"$date":"2026-07-07T16:45:05.419Z"},"updatedAt":{"$date":"2026-07-07T16:45:05.419Z"},"__v":0},
+      {"_id":{"$oid":"6a4d314519b8dc3b186d3faf"},"nom":"Mani","prenom":"Maha","dateNaissance":"2001-08-18","telephone":"29389669","region":"Sousse","delegation":"Hammam Sousse","createdAt":{"$date":"2026-07-07T17:03:01.536Z"},"updatedAt":{"$date":"2026-07-07T17:03:01.536Z"},"__v":0},
+      {"_id":{"$oid":"6a4d33d357b05ecba55e0129"},"nom":"Trabelsi","prenom":"Cheima","dateNaissance":"1999-07-14","telephone":"+21650779913","region":"Manouba","delegation":"Tebourba","createdAt":{"$date":"2026-07-07T17:13:55.493Z"},"updatedAt":{"$date":"2026-07-07T17:13:55.493Z"},"__v":0},
+      {"_id":{"$oid":"6a4d3fa2c3161726fc6f9f4b"},"nom":"Khlayfya","prenom":"Saleh","dateNaissance":"1991-03-29","telephone":"+21654337788","region":"Gafsa","delegation":"Gafsa Sud","createdAt":{"$date":"2026-07-07T18:04:18.120Z"},"updatedAt":{"$date":"2026-07-07T18:04:18.120Z"},"__v":0},
+      {"_id":{"$oid":"6a4d3fbac3161726fc6f9f4c"},"nom":"KALLEL","prenom":"Mohamed Ali","dateNaissance":"1987-03-28","telephone":"25483686","region":"Sfax","delegation":"Sfax Ville","createdAt":{"$date":"2026-07-07T18:04:42.828Z"},"updatedAt":{"$date":"2026-07-07T18:04:42.828Z"},"__v":0},
+      {"_id":{"$oid":"6a4d40815d353ddbd5e4c7f1"},"nom":"Khlayfya","prenom":"Saleh","dateNaissance":"1991-03-29","telephone":"+21654337788","region":"Gafsa","delegation":"Gafsa Sud","createdAt":{"$date":"2026-07-07T18:08:01.723Z"},"updatedAt":{"$date":"2026-07-07T18:08:01.723Z"},"__v":0},
+      {"_id":{"$oid":"6a4d55aeb6bb76dadc68c2f0"},"nom":"Choaieb","prenom":"Achref","dateNaissance":"1989-06-28","telephone":"+21652899053","region":"Mahdia","delegation":"Sidi Alouane","createdAt":{"$date":"2026-07-07T19:38:22.297Z"},"updatedAt":{"$date":"2026-07-07T19:38:22.297Z"},"__v":0},
+      {"_id":{"$oid":"6a4d5fef6d534bcd0041889c"},"nom":"Amor","prenom":"Elyes","dateNaissance":"2003-07-13","telephone":"23468341","region":"Gabès","delegation":"Gabès Médina","createdAt":{"$date":"2026-07-07T20:22:07.535Z"},"updatedAt":{"$date":"2026-07-07T20:22:07.535Z"},"__v":0},
+      {"_id":{"$oid":"6a4d605e6d534bcd0041889d"},"nom":"Dallel","prenom":"Ahmed amine","dateNaissance":"1998-07-27","telephone":"22821696","region":"Ariana","delegation":"Mnihla","createdAt":{"$date":"2026-07-07T20:23:58.733Z"},"updatedAt":{"$date":"2026-07-07T20:23:58.733Z"},"__v":0},
+      {"_id":{"$oid":"6a4d60ee6d534bcd0041889e"},"nom":"Rais","prenom":"Malak","dateNaissance":"1989-09-14","telephone":"+21650581944","region":"Sousse","delegation":"Hammam Sousse","createdAt":{"$date":"2026-07-07T20:26:22.373Z"},"updatedAt":{"$date":"2026-07-07T20:26:22.373Z"},"__v":0},
+      {"_id":{"$oid":"6a4d648078dd860065b652de"},"nom":"Gdoura","prenom":"Mohamed","dateNaissance":"1993-01-11","telephone":"56777227","region":"Sfax","delegation":"Sfax Ville","createdAt":{"$date":"2026-07-07T20:41:36.712Z"},"updatedAt":{"$date":"2026-07-07T20:41:36.712Z"},"__v":0},
+      {"_id":{"$oid":"6a4d6d4cbd3e5ba624bc24df"},"nom":"SALOUEGE","prenom":"Iteb","dateNaissance":"1977-09-20","telephone":"53595954","region":"Ariana","delegation":"Kalâat el-Andalous","createdAt":{"$date":"2026-07-07T21:19:08.227Z"},"updatedAt":{"$date":"2026-07-07T21:19:08.227Z"},"__v":0},
+      {"_id":{"$oid":"6a4d729a61dabc3bcacb6735"},"nom":"Ben","prenom":"Mohmed","dateNaissance":"1982-07-09","telephone":"+21699188454","region":"Bizerte","delegation":"Bizerte Nord","createdAt":{"$date":"2026-07-07T21:41:46.576Z"},"updatedAt":{"$date":"2026-07-07T21:41:46.576Z"},"__v":0},
+      {"_id":{"$oid":"6a4d7644505b5b9ec2bd68e0"},"nom":"Labidi","prenom":"Mouhamed ismail","dateNaissance":"2003-03-29","telephone":"29027854","region":"Tunis","delegation":"Sidi Hassine","createdAt":{"$date":"2026-07-07T21:57:24.634Z"},"updatedAt":{"$date":"2026-07-07T21:57:24.634Z"},"__v":0},
+      {"_id":{"$oid":"6a4d779e19e176e67d0cccd4"},"nom":"may","prenom":"fifa","dateNaissance":"2004-02-13","telephone":"24529443","region":"Bizerte","delegation":"Menzel Bourguiba","createdAt":{"$date":"2026-07-07T22:03:10.265Z"},"updatedAt":{"$date":"2026-07-07T22:03:10.265Z"},"__v":0},
+      {"_id":{"$oid":"6a4d78b119e176e67d0cccd5"},"nom":"Mohamed amin","prenom":"Chourou","dateNaissance":"1986-06-01","telephone":"27513438","region":"Ben Arous","delegation":"Medina Jedida","createdAt":{"$date":"2026-07-07T22:07:45.683Z"},"updatedAt":{"$date":"2026-07-07T22:07:45.683Z"},"__v":0},
+      {"_id":{"$oid":"6a4d78cf19e176e67d0cccd6"},"nom":"Ouirghimmi","prenom":"Nada","dateNaissance":"2006-05-23","telephone":"95294042","region":"Médenine","delegation":"Djerba Houmt Souk","createdAt":{"$date":"2026-07-07T22:08:15.721Z"},"updatedAt":{"$date":"2026-07-07T22:08:15.721Z"},"__v":0},
+      {"_id":{"$oid":"6a4d78e619e176e67d0cccd7"},"nom":"Skander","prenom":"Beya","dateNaissance":"2003-12-16","telephone":"20482722","region":"Sousse","delegation":"M'saken","createdAt":{"$date":"2026-07-07T22:08:38.939Z"},"updatedAt":{"$date":"2026-07-07T22:08:38.939Z"},"__v":0},
+      {"_id":{"$oid":"6a4d794619e176e67d0cccd8"},"nom":"Salem","prenom":"dhaou","dateNaissance":"1997-09-07","telephone":"50158010","region":"Sousse","delegation":"Sousse Riadh","createdAt":{"$date":"2026-07-07T22:10:14.960Z"},"updatedAt":{"$date":"2026-07-07T22:10:14.960Z"},"__v":0},
+      {"_id":{"$oid":"6a4d7ae119e176e67d0cccd9"},"nom":"Haddada","prenom":"Marwen","dateNaissance":"2004-06-22","telephone":"48057929","region":"Sousse","delegation":"Sousse Riadh","createdAt":{"$date":"2026-07-07T22:17:05.361Z"},"updatedAt":{"$date":"2026-07-07T22:17:05.361Z"},"__v":0},
+      {"_id":{"$oid":"6a4d7b3b19e176e67d0cccda"},"nom":"Amine","prenom":"Barhoumi","dateNaissance":"1995-07-07","telephone":"21271197","region":"Tunis","delegation":"La Marsa","createdAt":{"$date":"2026-07-07T22:18:35.779Z"},"updatedAt":{"$date":"2026-07-07T22:18:35.779Z"},"__v":0},
+      {"_id":{"$oid":"6a4d7b5919e176e67d0cccdb"},"nom":"Bouhlel","prenom":"Yassine","dateNaissance":"1978-09-11","telephone":"97232322","region":"Sousse","delegation":"M'saken","createdAt":{"$date":"2026-07-07T22:19:05.702Z"},"updatedAt":{"$date":"2026-07-07T22:19:05.702Z"},"__v":0},
+      {"_id":{"$oid":"6a4d7bbb19e176e67d0cccdc"},"nom":"Abidi","prenom":"Mohammad","dateNaissance":"1993-07-09","telephone":"54452439","region":"Sousse","delegation":"Hammam Sousse","createdAt":{"$date":"2026-07-07T22:20:43.683Z"},"updatedAt":{"$date":"2026-07-07T22:20:43.683Z"},"__v":0},
+      {"_id":{"$oid":"6a4d7c6719e176e67d0cccdd"},"nom":"Ben helal","prenom":"Mohamed","dateNaissance":"1986-11-14","telephone":"26428484","region":"Bizerte","delegation":"Bizerte Nord","createdAt":{"$date":"2026-07-07T22:23:35.969Z"},"updatedAt":{"$date":"2026-07-07T22:23:35.969Z"},"__v":0},
+      {"_id":{"$oid":"6a4d7dee4b34156941dc4200"},"nom":"Hajri","prenom":"Montassar","dateNaissance":"1997-06-01","telephone":"+21650896909","region":"Ben Arous","delegation":"Radès","createdAt":{"$date":"2026-07-07T22:30:06.120Z"},"updatedAt":{"$date":"2026-07-07T22:30:06.120Z"},"__v":0},
+      {"_id":{"$oid":"6a4d7df04b34156941dc4201"},"nom":"Wissem","prenom":"Boufeden","dateNaissance":"1994-09-18","telephone":"24990461","region":"Ben Arous","delegation":"Fouchana","createdAt":{"$date":"2026-07-07T22:30:08.379Z"},"updatedAt":{"$date":"2026-07-07T22:30:08.379Z"},"__v":0},
+      {"_id":{"$oid":"6a4d7f977ed9693aaf973338"},"nom":"Nasri","prenom":"Yaakoub","dateNaissance":"1980-07-21","telephone":"+21624585518","region":"Sidi Bouzid","delegation":"Menzel Bouzaiane","createdAt":{"$date":"2026-07-07T22:37:11.515Z"},"updatedAt":{"$date":"2026-07-07T22:37:11.515Z"},"__v":0},
+      {"_id":{"$oid":"6a4d81abfd8543744bb5081b"},"nom":"Thami","prenom":"Alaeddine","dateNaissance":"1994-07-01","telephone":"+21628420213","region":"Nabeul","delegation":"Soliman","createdAt":{"$date":"2026-07-07T22:46:03.852Z"},"updatedAt":{"$date":"2026-07-07T22:46:03.852Z"},"__v":0},
+      {"_id":{"$oid":"6a4d81dffd8543744bb5081c"},"nom":"Haddeji","prenom":"Souhail","dateNaissance":"2002-12-26","telephone":"56563100","region":"Kairouan","delegation":"Kairouan Sud","createdAt":{"$date":"2026-07-07T22:46:55.429Z"},"updatedAt":{"$date":"2026-07-07T22:46:55.429Z"},"__v":0},
+      {"_id":{"$oid":"6a4d8436422057d9dd95fe07"},"nom":"Essaied","prenom":"Taher","dateNaissance":"1992-02-19","telephone":"54588891","region":"Ariana","delegation":"La Soukra","createdAt":{"$date":"2026-07-07T22:56:54.430Z"},"updatedAt":{"$date":"2026-07-07T22:56:54.430Z"},"__v":0},
+      {"_id":{"$oid":"6a4d85d18faebc8504f85c45"},"nom":"Tabbabi","prenom":"Ahmed","dateNaissance":"1991-09-24","telephone":"+21650164387","region":"Gafsa","delegation":"Redeyef","createdAt":{"$date":"2026-07-07T23:03:45.745Z"},"updatedAt":{"$date":"2026-07-07T23:03:45.745Z"},"__v":0},
+      {"_id":{"$oid":"6a4d870c8faebc8504f85c46"},"nom":"Gara ali","prenom":"Seif","dateNaissance":"2005-07-28","telephone":"95635228","region":"Sousse","delegation":"Sousse Riadh","createdAt":{"$date":"2026-07-07T23:09:00.993Z"},"updatedAt":{"$date":"2026-07-07T23:09:00.993Z"},"__v":0},
+      {"_id":{"$oid":"6a4d9848a1dec6768b2b1853"},"nom":"Riahi","prenom":"Tawfik","dateNaissance":"2003-05-31","telephone":"+21621445501","region":"Tunis","delegation":"La Marsa","createdAt":{"$date":"2026-07-08T00:22:32.377Z"},"updatedAt":{"$date":"2026-07-08T00:22:32.377Z"},"__v":0},
+      {"_id":{"$oid":"6a4d9acd8b2c60ac7b860b04"},"nom":"Zwidi","prenom":"Borhen","dateNaissance":"1987-03-08","telephone":"+21622481458","region":"Tunis","delegation":"Le Kram","createdAt":{"$date":"2026-07-08T00:33:17.526Z"},"updatedAt":{"$date":"2026-07-08T00:33:17.526Z"},"__v":0},
+      {"_id":{"$oid":"6a4d9ea75486850ed7893f30"},"nom":"Boubakri","prenom":"Choukri","dateNaissance":"1984-07-15","telephone":"+21622456615","region":"Tataouine","delegation":"Bir Lahmar","createdAt":{"$date":"2026-07-08T00:49:43.821Z"},"updatedAt":{"$date":"2026-07-08T00:49:43.821Z"},"__v":0},
+      {"_id":{"$oid":"6a4da2f7686f4ec318b23cda"},"nom":"Jlassi","prenom":"Houssemeddine","dateNaissance":"1997-03-16","telephone":"+21625925404","region":"Manouba","delegation":"Manouba","createdAt":{"$date":"2026-07-08T01:08:08.014Z"},"updatedAt":{"$date":"2026-07-08T01:08:08.014Z"},"__v":0},
+      {"_id":{"$oid":"6a4da311686f4ec318b23cdb"},"nom":"Bouallegui","prenom":"Med fourat","dateNaissance":"2002-12-01","telephone":"29075184","region":"Sousse","delegation":"Sousse Médina","createdAt":{"$date":"2026-07-08T01:08:33.601Z"},"updatedAt":{"$date":"2026-07-08T01:08:33.601Z"},"__v":0},
+      {"_id":{"$oid":"6a4daabe408a71fa73bc6db2"},"nom":"Messaidi","prenom":"Hamza","dateNaissance":"2003-10-10","telephone":"58136700","region":"Tunis","delegation":"Cité El Khadra","createdAt":{"$date":"2026-07-08T01:41:18.087Z"},"updatedAt":{"$date":"2026-07-08T01:41:18.087Z"},"__v":0},
+      {"_id":{"$oid":"6a4de6e82e688e0d6691c301"},"nom":"hammami","prenom":"mahdi","dateNaissance":"1996-05-29","telephone":"+21653445766","region":"Ariana","delegation":"Ariana Ville","createdAt":{"$date":"2026-07-08T05:58:00.482Z"},"updatedAt":{"$date":"2026-07-08T05:58:00.482Z"},"__v":0},
+      {"_id":{"$oid":"6a4df858a85691a0e8180d6d"},"nom":"Elharran","prenom":"Mohamed","dateNaissance":"1979-11-05","telephone":"+21658596769","region":"Médenine","delegation":"Sidi Makhloulf","createdAt":{"$date":"2026-07-08T07:12:24.866Z"},"updatedAt":{"$date":"2026-07-08T07:12:24.866Z"},"__v":0},
+      {"_id":{"$oid":"6a4e0734e2d5df3e171cc3d5"},"nom":"Ben yahia","prenom":"Mohamed","dateNaissance":"1995-01-27","telephone":"55993406","region":"Tataouine","delegation":"Tataouine Nord","createdAt":{"$date":"2026-07-08T08:15:48.911Z"},"updatedAt":{"$date":"2026-07-08T08:15:48.911Z"},"__v":0},
+      {"_id":{"$oid":"6a4e0d910b937e1155937345"},"nom":"kalai","prenom":"moez","dateNaissance":"1993-08-24","telephone":"21655616419","region":"Tunis","delegation":"Sidi Hassine","createdAt":{"$date":"2026-07-08T08:42:57.021Z"},"updatedAt":{"$date":"2026-07-08T08:42:57.021Z"},"__v":0},
+      {"_id":{"$oid":"6a4e1dad90aca9cca3f6704d"},"nom":"SALOUEGE","prenom":"Iteb","dateNaissance":"1977-09-20","telephone":"53595954","region":"Ariana","delegation":"Kalâat el-Andalous","createdAt":{"$date":"2026-07-08T09:51:41.656Z"},"updatedAt":{"$date":"2026-07-08T09:51:41.656Z"},"__v":0}
+    ];
+
+    const searchInput = document.getElementById("searchInput");
+    const regionFilter = document.getElementById("regionFilter");
+    const delegationFilter = document.getElementById("delegationFilter");
+    const tableBody = document.getElementById("tableBody");
+    const emptyState = document.getElementById("emptyState");
+
+    const totalStat = document.getElementById("totalStat");
+    const regionsStat = document.getElementById("regionsStat");
+    const delegationsStat = document.getElementById("delegationsStat");
+    const resultsStat = document.getElementById("resultsStat");
+
+    function formatDate(value) {
+      if (!value) return "-";
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return value;
+      return d.toLocaleDateString("fr-FR");
+    }
+
+    function getFullName(item) {
+      return `${item.nom || ""} ${item.prenom || ""}`.trim();
+    }
+
+    function populateFilters() {
+      const regions = [...new Set(ambassadeurs.map(a => a.region).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+      const delegations = [...new Set(ambassadeurs.map(a => a.delegation).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+
+      regions.forEach(region => {
+        const option = document.createElement("option");
+        option.value = region;
+        option.textContent = region;
+        regionFilter.appendChild(option);
+      });
+
+      delegations.forEach(delegation => {
+        const option = document.createElement("option");
+        option.value = delegation;
+        option.textContent = delegation;
+        delegationFilter.appendChild(option);
+      });
+    }
+
+    function render() {
+      const q = searchInput.value.toLowerCase().trim();
+      const region = regionFilter.value;
+      const delegation = delegationFilter.value;
+
+      const filtered = ambassadeurs.filter(item => {
+        const text = [
+          item.nom,
+          item.prenom,
+          item.telephone,
+          item.region,
+          item.delegation
+        ].join(" ").toLowerCase();
+
+        const matchesSearch = !q || text.includes(q);
+        const matchesRegion = !region || item.region === region;
+        const matchesDelegation = !delegation || item.delegation === delegation;
+        return matchesSearch && matchesRegion && matchesDelegation;
+      });
+
+      tableBody.innerHTML = "";
+      filtered.forEach(item => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${getFullName(item)}</strong></td>
+          <td>${formatDate(item.dateNaissance)}</td>
+          <td>${item.telephone || "-"}</td>
+          <td>${item.region || "-"}</td>
+          <td>${item.delegation || "-"}</td>
+          <td class="muted">${formatDate(item.createdAt?.$date)}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+
+      emptyState.style.display = filtered.length ? "none" : "block";
+
+      totalStat.textContent = ambassadeurs.length;
+      regionsStat.textContent = new Set(ambassadeurs.map(a => a.region).filter(Boolean)).size;
+      delegationsStat.textContent = new Set(ambassadeurs.map(a => a.delegation).filter(Boolean)).size;
+      resultsStat.textContent = filtered.length;
+    }
+
+    [searchInput, regionFilter, delegationFilter].forEach(el => {
+      el.addEventListener("input", render);
+      el.addEventListener("change", render);
+    });
+
+    populateFilters();
+    render();
+  </script>
+</body>
+</html>

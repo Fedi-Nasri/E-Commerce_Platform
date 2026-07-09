@@ -144,7 +144,7 @@ export function TechOffers() {
     <section className="mx-auto mt-8 max-w-[1600px] px-3 sm:px-4">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-sky-600 dark:text-sky-300">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-gold dark:text-brand-gold">
             Comparatif multi-catégories
           </p>
           <h2 className="mt-1 text-[1.65rem] font-black leading-[1.05] tracking-tight text-slate-900 sm:text-[1.8rem] dark:text-white">

@@ -105,7 +105,7 @@ function PanierSlider({ items }: { items: QoffaBasketItem[] }) {
           type="button"
           aria-label="Précédent"
           onClick={() => go(index - 1)}
-          className="flex w-6 shrink-0 items-center justify-center rounded-lg border border-slate-200/70 bg-white/60 text-slate-500 transition hover:border-brand-gold/40 hover:text-brand-gold dark:border-white/5 dark:bg-bg-900/55 dark:text-white/50"
+          className="flex w-6 shrink-0 items-center justify-center rounded-lg border border-slate-200/70 bg-white/60 text-slate-500 transition hover:border-brand-gold/40 hover:text-brand-gold dark:border-white/20 dark:bg-white/[0.10] dark:text-white/80"
         >
           <ChevronLeft className="h-3.5 w-3.5" />
         </button>
@@ -113,7 +113,7 @@ function PanierSlider({ items }: { items: QoffaBasketItem[] }) {
         <div className="min-w-0 flex-1 overflow-hidden">
           <div
             key={`${item.productId}-${index}`}
-            className="panier-slide-card rounded-lg border border-slate-200/70 bg-white/80 px-3 py-2.5 dark:border-white/5 dark:bg-bg-900/55"
+            className="panier-slide-card rounded-lg border border-slate-200/70 bg-white/80 px-3 py-2.5 dark:border-white/20 dark:bg-slate-800/90 dark:shadow-[0_10px_24px_-14px_rgba(0,0,0,0.85)]"
           >
             <div className="text-[10px] font-bold uppercase tracking-wide text-brand-gold">
               {item.category}
@@ -126,8 +126,8 @@ function PanierSlider({ items }: { items: QoffaBasketItem[] }) {
                 {fmtDt(item.price)} DT
               </span>
             </div>
-            <p className="mt-1 truncate text-[10px] text-slate-500 dark:text-white/50">{item.choice}</p>
-            <p className="mt-0.5 line-clamp-2 text-[10px] font-semibold leading-snug text-slate-600 dark:text-white/55">
+            <p className="mt-1 truncate text-[10px] text-slate-500 dark:text-white/70">{item.choice}</p>
+            <p className="mt-0.5 line-clamp-2 text-[10px] font-semibold leading-snug text-slate-600 dark:text-white/85">
               {item.shop}
             </p>
           </div>
@@ -137,7 +137,7 @@ function PanierSlider({ items }: { items: QoffaBasketItem[] }) {
           type="button"
           aria-label="Suivant"
           onClick={() => go(index + 1)}
-          className="flex w-6 shrink-0 items-center justify-center rounded-lg border border-slate-200/70 bg-white/60 text-slate-500 transition hover:border-brand-gold/40 hover:text-brand-gold dark:border-white/5 dark:bg-bg-900/55 dark:text-white/50"
+          className="flex w-6 shrink-0 items-center justify-center rounded-lg border border-slate-200/70 bg-white/60 text-slate-500 transition hover:border-brand-gold/40 hover:text-brand-gold dark:border-white/20 dark:bg-white/[0.10] dark:text-white/80"
         >
           <ChevronRight className="h-3.5 w-3.5" />
         </button>
