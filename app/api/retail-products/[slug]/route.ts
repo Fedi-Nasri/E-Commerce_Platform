@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { Pool } from "pg";
 import { nameSimilarityScore, resolveDetailPriceHistory } from "@/lib/productDetail";
 
+
+export const revalidate = 300;
+
 const pool = new Pool({ connectionString: process.env.RETAIL_DB_URL, max: 3 });
 
 export async function GET(_req: NextRequest, { params }: { params: { slug: string } }) {

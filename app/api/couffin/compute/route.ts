@@ -11,6 +11,9 @@ import { productCoverImageSql } from "@/lib/productImages";
 // Shops are ranked by coverage first, then total price — so the winner is the
 // cheapest shop that carries the most of your list. Also returns the absolute
 // "cheapest mix" (each item at its cheapest shop) for comparison.
+
+export const revalidate = 300;
+
 const pool = new Pool({ connectionString: process.env.ALIMENTATION_DB_URL, max: 5 });
 
 type Body = { items?: { id: number | string; qty?: number }[] };

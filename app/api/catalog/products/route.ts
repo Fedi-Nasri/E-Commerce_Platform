@@ -7,6 +7,9 @@ import { localShopLogo } from "@/lib/shopLogos";
 // The migration imported some rows where the scraper concatenated two URLs with
 // runs of whitespace (e.g. "https://agora.tn/fr/   https://agora.tn/fr/49281...jpg\n   ").
 // We grab the trailing usable URL and trim.
+
+export const revalidate = 300;
+
 function sanitizeImage(raw: string | null | undefined): string {
   if (!raw) return "";
   const matches = String(raw).match(/https?:\/\/\S+\.(?:jpg|jpeg|png|webp|gif|avif)(?:\?[^\s"']*)?/gi);

@@ -7,6 +7,9 @@ import { foodTopCategorySqlWhere, isFoodCategoryName } from "@/lib/couffinFoodFi
 // Search supermarché products to add to the couffin.
 // Filters out non-food / non-basket products (electronics, apparel, cosmetics,
 // etc.) by joining top_categories and applying an exclusion whitelist.
+
+export const revalidate = 300;
+
 export async function GET(req: NextRequest) {
   const q = normalizeSearchText(req.nextUrl.searchParams.get("q") ?? "");
   const limit = Math.min(20, Math.max(1, parseInt(req.nextUrl.searchParams.get("limit") ?? "10", 10)));

@@ -3,6 +3,9 @@ import { paraPool } from "@/lib/db";
 import { SITE_URL } from "@/lib/seo";
 
 // /sitemap-parapharmacie.xml — every parapharmacie product slug.
+
+export const revalidate = 300;
+
 const PAGE_SIZE = 5000;
 
 export async function generateSitemaps() {

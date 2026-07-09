@@ -3,7 +3,7 @@ node_modules/
 out/
 .DS_Store
 *.log
-.env*
+.env
 data/
 data_matching/
 # Static retail nav hierarchy (not large data dumps)
@@ -28,3 +28,6 @@ matched_products_retail.jsonl
 category_shop_price_rankings.json
 public/robot.mp4
 public/robot_clean.mp4
+public/
+lib/data/
+

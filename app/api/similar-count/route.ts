@@ -3,6 +3,9 @@ import { alimentPool } from "@/lib/db";
 
 // GET /api/similar-count
 // Counts products present in at least 2 shops (via shop_prices).
+
+export const revalidate = 300;
+
 export async function GET() {
   try {
     const pool = alimentPool();

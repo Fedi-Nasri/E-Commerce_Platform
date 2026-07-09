@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { Pool } from "pg";
 
+
+export const revalidate = 300;
+
 const pool = new Pool({
   connectionString: process.env.RETAIL_DB_URL,
   max: 3,

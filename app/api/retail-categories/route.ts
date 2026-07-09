@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { Pool } from "pg";
 import { RETAIL_CATEGORY_SLUGS } from "@/lib/retailCategories";
 
+
+export const revalidate = 300;
+export const dynamic = "force-dynamic";
+
 const pool = new Pool({ connectionString: process.env.RETAIL_DB_URL, max: 2 });
 
 type Cat = { id: number; name: string; slug: string; subcategories: { name: string; slug: string }[] };

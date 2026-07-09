@@ -12,6 +12,9 @@ import {
 } from "@/lib/productSearch";
 import { productCoverImageSql } from "@/lib/productImages";
 
+
+export const revalidate = 300;
+
 type Product = {
   name: string;
   brand: string;

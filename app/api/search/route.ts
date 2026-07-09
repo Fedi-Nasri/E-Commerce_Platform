@@ -7,6 +7,8 @@ import {
   type SearchProduct,
 } from "@/lib/productSearch";
 
+export const revalidate = 300;
+
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const q = normalizeSearchText(searchParams.get("q") ?? "");

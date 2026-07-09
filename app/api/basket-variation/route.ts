@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { Pool } from "pg";
 
+
+export const revalidate = 300;
+
 const pool = new Pool({ connectionString: process.env.ALIMENTATION_DB_URL, max: 3 });
 
 const SHOPS = ["Carrefour", "Geant", "Monoprix"] as const;

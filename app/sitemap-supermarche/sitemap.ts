@@ -4,6 +4,9 @@ import { SITE_URL } from "@/lib/seo";
 
 // /sitemap-supermarche.xml — every supermarché product slug.
 // Sharded by generateSitemaps so we stay under Google's 50 000-URL cap.
+
+export const revalidate = 300;
+
 const PAGE_SIZE = 5000;
 
 export async function generateSitemaps() {

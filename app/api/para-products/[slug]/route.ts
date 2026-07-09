@@ -4,6 +4,9 @@ import path from "path";
 import { Pool } from "pg";
 import { nameSimilarityScore, resolveDetailPriceHistory } from "@/lib/productDetail";
 
+
+export const revalidate = 300;
+
 type Product = {
   name: string;
   brand: string;

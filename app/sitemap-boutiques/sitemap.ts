@@ -4,6 +4,9 @@ import { SITE_URL } from "@/lib/seo";
 
 // /sitemap-boutiques.xml — boutiques landing pages + every per-shop product.
 // Pattern: /boutiques/<shop_slug>/<product_slug>
+
+export const revalidate = 300;
+
 const PAGE_SIZE = 5000;
 
 export async function generateSitemaps() {

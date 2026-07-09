@@ -7,8 +7,11 @@ import { getRankingBySlug, scopeLeader } from "@/lib/priceRankingsServer";
 import { formatEcartPct, shopDisplayName } from "@/lib/priceRankings";
 import { pageMetadata } from "@/lib/seo";
 
+export const revalidate = 300;
+export const dynamicParams = true;
+
 export function generateStaticParams() {
-  return PRICE_RANKING_CATALOG.map((c) => ({ slug: c.slug }));
+  return [];
 }
 
 /** Always render from DB at request time — avoids stale 404 pages when build ran without rankings data. */

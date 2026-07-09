@@ -3,6 +3,9 @@ import { Pool } from "pg";
 import { productCoverImageFilterSql, productCoverImageOrderSql, productCoverImageSql } from "@/lib/productImages";
 import { nameSimilarityScore, resolveDetailPriceHistory } from "@/lib/productDetail";
 
+
+export const revalidate = 300;
+
 const pool = new Pool({
   connectionString: process.env.ALIMENTATION_DB_URL,
   max: 5,

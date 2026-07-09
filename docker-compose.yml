@@ -1,0 +1,458 @@
+services:
+  postgres:
+    image: postgres:16.3-alpine3.20
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  retail-postgres:
+    image: postgres:16.3-alpine3.20
+    container_name: retail-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${RETAIL_DB_NAME}
+      POSTGRES_USER: ${RETAIL_DB_USER}
+      POSTGRES_PASSWORD: ${RETAIL_DB_PASSWORD}
+    volumes:
+      - retail_postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${RETAIL_DB_USER} -d ${RETAIL_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  para-postgres:
+    image: postgres:16.3-alpine3.20
+    container_name: para-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${PARA_DB_NAME}
+      POSTGRES_USER: ${PARA_DB_USER}
+      POSTGRES_PASSWORD: ${PARA_DB_PASSWORD}
+    volumes:
+      - para_postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PARA_DB_USER} -d ${PARA_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  alimentation-postgres:
+    image: postgres:16.3-alpine3.20
+    container_name: alimentation-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${ALIMENTATION_DB_NAME}
+      POSTGRES_USER: ${ALIMENTATION_DB_USER}
+      POSTGRES_PASSWORD: ${ALIMENTATION_DB_PASSWORD}
+    volumes:
+      - alimentation_postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${ALIMENTATION_DB_USER} -d ${ALIMENTATION_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  fashion-postgres:
+    image: postgres:16.3-alpine3.20
+    container_name: fashion-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${FASHION_DB_NAME}
+      POSTGRES_USER: ${FASHION_DB_USER}
+      POSTGRES_PASSWORD: ${FASHION_DB_PASSWORD}
+    volumes:
+      - fashion_postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${FASHION_DB_USER} -d ${FASHION_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  catalog-postgres:
+    image: postgres:16.3-alpine3.20
+    container_name: catalog-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${CATALOG_DB_NAME}
+      POSTGRES_USER: ${CATALOG_DB_USER}
+      POSTGRES_PASSWORD: ${CATALOG_DB_PASSWORD}
+    volumes:
+      - catalog_postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${CATALOG_DB_USER} -d ${CATALOG_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.13.3-management-alpine
+    container_name: rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+    image: 1111-frontend:${IMAGE_TAG:-latest}
+    container_name: frontend
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      CATALOG_DB_HOST: catalog-postgres
+      CATALOG_DB_PORT: 5432
+      CATALOG_DB_NAME: ${CATALOG_DB_NAME}
+      CATALOG_DB_USER: ${CATALOG_DB_USER}
+      CATALOG_DB_PASSWORD: ${CATALOG_DB_PASSWORD}
+      GATEWAY_INTERNAL_URL: http://gateway:3000
+    depends_on:
+      catalog-postgres:
+        condition: service_healthy
+      gateway:
+        condition: service_healthy
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  gateway:
+    build:
+      context: ./backend
+      dockerfile: gateway/Dockerfile
+    image: 1111-gateway:${IMAGE_TAG:-latest}
+    container_name: gateway
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      auth:
+        condition: service_healthy
+      user:
+        condition: service_healthy
+      retail:
+        condition: service_healthy
+      para:
+        condition: service_healthy
+      alimentation:
+        condition: service_healthy
+      fashion:
+        condition: service_healthy
+      mailer-api:
+        condition: service_healthy
+      engagement:
+        condition: service_healthy
+      web-control:
+        condition: service_healthy
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  auth:
+    build:
+      context: ./backend
+      dockerfile: services/auth/Dockerfile
+    image: 1111-auth:${IMAGE_TAG:-latest}
+    container_name: auth
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  user:
+    build:
+      context: ./backend
+      dockerfile: services/user/Dockerfile
+    image: 1111-user:${IMAGE_TAG:-latest}
+    container_name: user
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  retail:
+    build:
+      context: ./backend
+      dockerfile: services/retail/Dockerfile
+    image: 1111-retail:${IMAGE_TAG:-latest}
+    container_name: retail
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      retail-postgres:
+        condition: service_healthy
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3003/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  para:
+    build:
+      context: ./backend
+      dockerfile: services/para/Dockerfile
+    image: 1111-para:${IMAGE_TAG:-latest}
+    container_name: para
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      para-postgres:
+        condition: service_healthy
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3004/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  alimentation:
+    build:
+      context: ./backend
+      dockerfile: services/alimentation/Dockerfile
+    image: 1111-alimentation:${IMAGE_TAG:-latest}
+    container_name: alimentation
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      alimentation-postgres:
+        condition: service_healthy
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3005/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  fashion:
+    build:
+      context: ./backend
+      dockerfile: services/fashion/Dockerfile
+    image: 1111-fashion:${IMAGE_TAG:-latest}
+    container_name: fashion
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      fashion-postgres:
+        condition: service_healthy
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3007/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mailer-api:
+    build:
+      context: ./backend
+      dockerfile: services/mailer-api/Dockerfile
+    image: 1111-mailer-api:${IMAGE_TAG:-latest}
+    container_name: mailer-api
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3006/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  engagement:
+    build:
+      context: ./backend
+      dockerfile: services/engagement/Dockerfile
+    image: 1111-engagement:${IMAGE_TAG:-latest}
+    container_name: engagement
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3008/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web-control:
+    build:
+      context: ./backend
+      dockerfile: services/web-control/Dockerfile
+    image: 1111-web-control:${IMAGE_TAG:-latest}
+    container_name: web-control
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3009/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mailer:
+    build:
+      context: ./backend/services/mailer
+      dockerfile: Dockerfile
+    image: 1111-mailer:${IMAGE_TAG:-latest}
+    container_name: mailer
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - backend
+
+  token-cleanup:
+    image: postgres:16.3-alpine3.20
+    container_name: token-cleanup
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - backend
+    entrypoint:
+      - sh
+      - -c
+      - |
+        while true; do
+          PGPASSWORD=$$DB_PASSWORD psql -h postgres -U $$DB_USER -d $$DB_NAME \
+            -c "SELECT auth.purge_expired_tokens();"
+          sleep 86400
+        done
+
+volumes:
+  postgres_data:
+  retail_postgres_data:
+  para_postgres_data:
+  alimentation_postgres_data:
+  fashion_postgres_data:
+  catalog_postgres_data:
+  rabbitmq_data:
+  uploads:
+
+networks:
+  backend:
+    driver: bridge

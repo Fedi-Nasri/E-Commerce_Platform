@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { catalogPool } from "@/lib/db";
 import { resolveCatalogPriceHistory, nameSimilarityScore } from "@/lib/productDetail";
 
+
+export const revalidate = 300;
+
 function sanitizeImage(raw: string | null | undefined): string {
   if (!raw) return "";
   const matches = String(raw).match(/https?:\/\/\S+\.(?:jpg|jpeg|png|webp|gif|avif)(?:\?[^\s"']*)?/gi);

@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { catalogPool } from "@/lib/db";
 import { pageMetadata } from "@/lib/seo";
 
+
+export const revalidate = 300;
+
 async function lookupShop(slug: string): Promise<{ name: string; products: number } | null> {
   try {
     const r = await catalogPool().query<{ name: string; products: string }>(

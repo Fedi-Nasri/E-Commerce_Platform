@@ -4,6 +4,9 @@ import { catalogSortSql, parseCatalogSort } from "@/lib/catalogFilters";
 import { appendProductSearch, normalizeSearchText } from "@/lib/productSearch";
 import { productCoverImageSql } from "@/lib/productImages";
 
+
+export const revalidate = 300;
+
 const pool = new Pool({
   connectionString: process.env.ALIMENTATION_DB_URL,
   max: 5,

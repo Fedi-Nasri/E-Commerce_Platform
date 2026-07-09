@@ -10,6 +10,9 @@ import { SITE_URL } from "@/lib/seo";
 // catalog hubs get the highest priority since they're updated most often
 // and serve as primary entry points.
 
+
+export const revalidate = 300;
+
 type Entry = {
   path: string;
   changeFrequency?:

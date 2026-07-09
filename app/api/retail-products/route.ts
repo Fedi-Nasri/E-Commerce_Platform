@@ -5,6 +5,8 @@ import {
   parseRetailListFilters,
 } from "@/lib/retailProductQuery";
 
+export const revalidate = 300;
+
 const pool = new Pool({ connectionString: process.env.RETAIL_DB_URL, max: 4 });
 
 const TOP_CATEGORY_SLUGS = [
