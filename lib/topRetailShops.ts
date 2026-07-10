@@ -15,15 +15,32 @@ export type TopRetailShopRow = {
   winRatePct: number;
 };
 
+export type TopRetailCategoryRow = {
+  slug: string;
+  label: string;
+  clusterCount: number;
+  leader: string | null;
+  shops: {
+    shop: string;
+    totalProducts: number;
+    cheapestCount: number;
+    winRatePct: number;
+  }[];
+};
+
 export type TopRetailShopsData = {
   generated_at: string;
   source: string;
   stock_dir?: string | null;
   method: string;
   clusters_used: number;
+  scrapes_used?: number;
   min_products: number;
+  min_products_list?: number;
   in_stock_only?: boolean;
   shops: TopRetailShopRow[];
+  allShops?: TopRetailShopRow[];
+  categories?: TopRetailCategoryRow[];
 };
 
 const data = raw as unknown as TopRetailShopsData;
@@ -32,11 +49,12 @@ export function getTopRetailShopsData(): TopRetailShopsData {
   return data;
 }
 
-export function getTopRetailShopsForApi() {
-  return data.shops.map((s) => ({
+function enrichShop(s: TopRetailShopRow) {
+  return {
     shop: s.shop,
     displayName: shopDisplayName(s.shop),
     logo: localShopLogo(s.shop),
+    rank: s.rank,
     totalProducts: s.totalProducts,
     similarProducts: s.similarProducts,
     cheapestCount: s.cheapestCount,
@@ -44,5 +62,34 @@ export function getTopRetailShopsForApi() {
     competitiveCount: s.competitiveCount,
     competitivePct: s.competitivePct,
     winRatePct: s.winRatePct ?? (s.totalProducts > 0 ? Math.round((s.cheapestCount / s.totalProducts) * 100) : 0),
-  }));
+  };
+}
+
+export function getTopRetailShopsForApi() {
+  return data.shops.map(enrichShop);
+}
+
+export function getTopRetailRankingForApi() {
+  const all = data.allShops ?? data.shops;
+  return {
+    generatedAt: data.generated_at,
+    method: data.method,
+    clustersUsed: data.clusters_used,
+    scrapesUsed: data.scrapes_used ?? null,
+    stockDir: data.stock_dir ?? null,
+    minProducts: data.min_products,
+    minProductsList: data.min_products_list ?? 50,
+    inStockOnly: data.in_stock_only ?? true,
+    shops: all.map(enrichShop),
+    top5: data.shops.map(enrichShop),
+    categories: (data.categories ?? []).map((c) => ({
+      ...c,
+      leaderName: c.leader ? shopDisplayName(c.leader) : null,
+      shops: c.shops.map((s) => ({
+        ...s,
+        displayName: shopDisplayName(s.shop),
+        logo: localShopLogo(s.shop),
+      })),
+    })),
+  };
 }

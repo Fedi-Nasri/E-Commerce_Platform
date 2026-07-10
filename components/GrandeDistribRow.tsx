@@ -42,16 +42,164 @@ type RetailShopRow = {
   totalProducts: number;
   similarProducts: number;
   cheapestCount: number;
-  competitionScore?: number;
-  competitiveCount?: number;
-  competitivePct?: number;
   winRatePct?: number;
+  competitivePct?: number;
 };
+
+type RetailMeta = {
+  clustersUsed: number;
+  scrapesUsed: number | null;
+};
+
+function TopRetailRankRow({
+  shop,
+  rank,
+  animate,
+}: {
+  shop: RetailShopRow;
+  rank: number;
+  animate: boolean;
+}) {
+  const winPct =
+    shop.winRatePct ??
+    (shop.totalProducts > 0 ? Math.round((shop.cheapestCount / shop.totalProducts) * 100) : 0);
+  const isChampion = rank === 0;
+
+  return (
+    <li
+      className={`retail-row-enter rounded-xl border border-slate-200/90 bg-slate-50/90 p-2.5 transition duration-300 hover:-translate-y-0.5 hover:border-emerald-400/35 hover:shadow-md hover:shadow-emerald-500/10 dark:border-white/5 dark:bg-bg-800 dark:hover:border-emerald-500/25 ${
+        isChampion ? "retail-champion-glow border-emerald-400/30 dark:border-emerald-500/30" : ""
+      }`}
+      style={{ animationDelay: animate ? `${rank * 70}ms` : "0ms" }}
+    >
+      <div className="flex items-center gap-3">
+        {shop.logo ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={shop.logo}
+            alt={shop.displayName}
+            className="h-14 w-14 shrink-0 object-contain"
+          />
+        ) : (
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center text-lg font-black text-slate-500 dark:text-white/60">
+            {shop.displayName.slice(0, 1).toUpperCase()}
+          </span>
+        )}
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-xs font-semibold text-slate-900 dark:text-white">{shop.displayName}</div>
+          <div className="text-[10px] tabular-nums text-slate-500 dark:text-white/50">
+            {shop.cheapestCount.toLocaleString("fr-FR")}
+            <span className="mx-0.5 text-slate-400">/</span>
+            {shop.totalProducts.toLocaleString("fr-FR")}
+          </div>
+        </div>
+        <div className="text-right">
+          <div className="text-lg font-black tabular-nums leading-none text-emerald-600 dark:text-emerald-400">{winPct}%</div>
+        </div>
+      </div>
+      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-white/10">
+        <div
+          className={`h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-600 ${animate ? "retail-win-bar" : ""}`}
+          style={{
+            width: `${winPct}%`,
+            animationDelay: animate ? `${rank * 70 + 120}ms` : undefined,
+          }}
+        />
+      </div>
+    </li>
+  );
+}
+
+function shortShopLabel(name: string) {
+  const clean = name.replace(/\s+/g, " ").trim();
+  if (clean.length <= 7) return clean;
+  return clean.split(" ")[0].slice(0, 7);
+}
+
+function TopRetailBarChart({
+  shops,
+  animate,
+}: {
+  shops: RetailShopRow[];
+  animate: boolean;
+}) {
+  const max = Math.max(...shops.map((s) => s.cheapestCount), 1);
+  const totalWins = shops.reduce((sum, s) => sum + s.cheapestCount, 0);
+  const leader = shops[0];
+
+  return (
+    <div className="retail-row-enter flex flex-1 flex-col rounded-xl border border-emerald-500/20 bg-gradient-to-b from-emerald-50/80 to-white/60 p-3 dark:from-emerald-950/40 dark:to-bg-800/80 dark:border-emerald-500/15">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">
+          Meilleurs prix
+        </span>
+        <span className="text-[10px] tabular-nums text-slate-500 dark:text-white/45">
+          {totalWins.toLocaleString("fr-FR")} au total
+        </span>
+      </div>
+
+      <div className="mt-3 flex h-[5.5rem] items-end justify-between gap-1.5">
+        {shops.map((s, i) => {
+          const h = Math.max(12, Math.round((s.cheapestCount / max) * 100));
+          const winPct =
+            s.winRatePct ??
+            (s.totalProducts > 0 ? Math.round((s.cheapestCount / s.totalProducts) * 100) : 0);
+          return (
+            <div key={s.shop} className="flex min-w-0 flex-1 flex-col items-center gap-1">
+              <span className="text-[9px] font-bold tabular-nums text-emerald-600 dark:text-emerald-400">
+                {winPct}%
+              </span>
+              <div className="relative flex h-16 w-full items-end justify-center">
+                <div
+                  className={`w-[85%] max-w-10 rounded-t-md bg-gradient-to-t from-emerald-600 via-emerald-500 to-emerald-300 shadow-[0_-2px_12px_rgba(16,185,129,0.25)] ${animate ? "retail-col-grow" : ""}`}
+                  style={{
+                    height: `${h}%`,
+                    animationDelay: animate ? `${i * 90 + 200}ms` : undefined,
+                  }}
+                  title={`${s.displayName}: ${s.cheapestCount.toLocaleString("fr-FR")} meilleurs prix`}
+                />
+              </div>
+              <span className="w-full truncate text-center text-[8px] font-medium text-slate-500 dark:text-white/45">
+                {shortShopLabel(s.displayName)}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      {leader ? (
+        <div className="mt-3 grid grid-cols-3 gap-1.5 text-center">
+          <div className="rounded-lg bg-white/70 px-1.5 py-1.5 ring-1 ring-slate-200/80 dark:bg-white/5 dark:ring-white/10">
+            <div className="text-[9px] text-slate-500 dark:text-white/45">Leader</div>
+            <div className="truncate text-[10px] font-bold text-slate-800 dark:text-white">{leader.displayName}</div>
+          </div>
+          <div className="rounded-lg bg-white/70 px-1.5 py-1.5 ring-1 ring-slate-200/80 dark:bg-white/5 dark:ring-white/10">
+            <div className="text-[9px] text-slate-500 dark:text-white/45">Meilleurs prix</div>
+            <div className="text-[10px] font-bold tabular-nums text-emerald-600 dark:text-emerald-400">
+              {leader.cheapestCount.toLocaleString("fr-FR")}
+            </div>
+          </div>
+          <div className="rounded-lg bg-white/70 px-1.5 py-1.5 ring-1 ring-slate-200/80 dark:bg-white/5 dark:ring-white/10">
+            <div className="text-[9px] text-slate-500 dark:text-white/45">Taux #1</div>
+            <div className="text-[10px] font-bold tabular-nums text-emerald-600 dark:text-emerald-400">
+              {(leader.winRatePct ??
+                (leader.totalProducts > 0
+                  ? Math.round((leader.cheapestCount / leader.totalProducts) * 100)
+                  : 0))}%
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 export function GrandeDistribRow() {
   const basket = getEssentialBasketData().fiveShop;
   const illogicalPromo = null as IllogicalPromo | null;
   const [topRetailShops, setTopRetailShops] = useState<RetailShopRow[]>([]);
+  const [retailMeta, setRetailMeta] = useState<RetailMeta | null>(null);
+  const [retailReady, setRetailReady] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -60,8 +208,17 @@ export function GrandeDistribRow() {
       .then((d) => {
         if (cancelled) return;
         if (Array.isArray(d?.shops)) setTopRetailShops(d.shops as RetailShopRow[]);
+        if (d?.meta) {
+          setRetailMeta({
+            clustersUsed: Number(d.meta.clustersUsed) || 0,
+            scrapesUsed: d.meta.scrapesUsed != null ? Number(d.meta.scrapesUsed) : null,
+          });
+        }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) requestAnimationFrame(() => setRetailReady(true));
+      });
     return () => { cancelled = true; };
   }, []);
 
@@ -183,34 +340,30 @@ export function GrandeDistribRow() {
 
         {/* TOP 5 RETAIL CHEAPEST */}
         <div className="card card-pad relative flex flex-col overflow-hidden border-emerald-500/30">
-          <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-emerald-500/20 blur-2xl" />
-          <div className="absolute -left-10 bottom-0 h-32 w-32 rounded-full bg-emerald-500/10 blur-3xl" />
+          <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-emerald-500/20 blur-2xl" />
+          <div className="pointer-events-none absolute -left-10 bottom-0 h-32 w-32 rounded-full bg-emerald-500/10 blur-3xl" />
 
-          {/* Header */}
-          <div className="relative flex items-center justify-between">
+          <div className="relative flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/15 ring-1 ring-emerald-500/40">
                 <Store className="h-3.5 w-3.5 text-emerald-500" />
               </span>
-              <div className="leading-tight">
-                <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Top 5 Retails</div>
-                <div className="font-arabic text-[10px] text-slate-400 dark:text-white/40" dir="rtl">أرخص متاجر التجزئة</div>
-              </div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                Top 5 retail
+              </span>
             </div>
-            <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-300">
+            <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2 py-0.5 text-[9px] font-semibold text-emerald-600 dark:text-emerald-300">
               En stock
             </span>
           </div>
 
-          {/* Sub-header */}
-          <div className="relative mt-2 text-[11px] leading-relaxed text-slate-500 dark:text-white/55">
-            Classement par{" "}
-            <span className="font-semibold text-slate-700 dark:text-white/80">nombre de meilleurs prix</span>
-            {" "}sur des produits identiques en stock, vendus par au moins 2 boutiques.
-          </div>
+          <p className="relative mt-1.5 text-[10px] leading-snug text-slate-500 dark:text-white/50">
+            Enseignes qui affichent le plus souvent le{" "}
+            <span className="font-medium text-slate-600 dark:text-white/70">meilleur prix</span>
+            {" "}sur des produits identiques en stock (≥2 boutiques).
+          </p>
 
-          {/* Rows */}
-          <ul className="relative mt-3 space-y-2">
+          <ul className="relative mt-2.5 space-y-1.5">
             {(topRetailShops.length > 0 ? topRetailShops : Array.from({ length: 5 }).map((_, i) => ({
               shop: `shop-${i}`,
               displayName: "—",
@@ -219,65 +372,43 @@ export function GrandeDistribRow() {
               similarProducts: 0,
               cheapestCount: 0,
               winRatePct: 0,
-            }))).slice(0, 5).map((s, i) => {
-              const rankBg =
-                i === 0 ? "bg-gradient-to-br from-emerald-400 to-emerald-600 text-white ring-1 ring-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]" :
-                i === 1 ? "bg-gradient-to-br from-lime-400 to-lime-600 text-white ring-1 ring-lime-400" :
-                i === 2 ? "bg-gradient-to-br from-yellow-400 to-amber-500 text-white ring-1 ring-yellow-400" :
-                i === 3 ? "bg-gradient-to-br from-orange-400 to-orange-600 text-white ring-1 ring-orange-400" :
-                          "bg-gradient-to-br from-red-500 to-red-700 text-white ring-1 ring-red-500";
-              const winPct = s.winRatePct ?? (s.totalProducts > 0 ? Math.round((s.cheapestCount / s.totalProducts) * 100) : 0);
-              return (
-                <li key={s.shop} className="rounded-xl border border-slate-200 bg-slate-50 p-2 dark:border-white/5 dark:bg-bg-800">
-                  <div className="flex items-center gap-2.5">
-                    <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-black shadow-sm ${rankBg}`}>
-                      {i === 0 ? "🏆" : i + 1}
-                    </span>
-                    {s.logo ? (
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white p-1 ring-1 ring-slate-200 dark:ring-white/10">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={s.logo} alt={s.displayName} className="h-full w-full object-contain" />
-                      </span>
-                    ) : (
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-200 text-xs font-black text-slate-600 dark:bg-white/10 dark:text-white/70">
-                        {s.displayName.slice(0, 1).toUpperCase()}
-                      </span>
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate text-xs font-semibold text-slate-900 dark:text-white">{s.displayName}</div>
-                      <div className="text-[10px] text-slate-500 dark:text-white/55">
-                        <span className="tabular-nums font-semibold text-slate-700 dark:text-white/75">{s.totalProducts.toLocaleString("fr-FR")}</span>
-                        <span className="ml-1">produits en stock comparables</span>
-                      </div>
-                    </div>
-                    <div className="text-right leading-tight">
-                      <div className="text-base font-black tabular-nums text-emerald-600 dark:text-emerald-400">{s.cheapestCount.toLocaleString("fr-FR")}</div>
-                      <div className="text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-white/50">Meilleurs prix</div>
-                    </div>
-                  </div>
-                  <div className="mt-2 flex items-center justify-between text-[10px]">
-                    <span className="text-slate-500 dark:text-white/50">Taux meilleur prix</span>
-                    <span className="font-black tabular-nums text-emerald-600 dark:text-emerald-400">{winPct}%</span>
-                  </div>
-                  <div className="mt-1 flex items-center gap-2">
-                    <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200 dark:bg-white/10">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-600 transition-all duration-700"
-                        style={{ width: `${winPct}%` }}
-                      />
-                    </div>
-                    <span className="w-9 shrink-0 text-right text-[10px] font-black tabular-nums text-emerald-600 dark:text-emerald-400">
-                      {winPct}%
-                    </span>
-                  </div>
-                </li>
-              );
-            })}
+            }))).slice(0, 5).map((s, i) => (
+              <TopRetailRankRow key={s.shop} shop={s} rank={i} animate={retailReady && topRetailShops.length > 0} />
+            ))}
           </ul>
 
-          {/* Actions */}
-          <div className="relative mt-auto pt-3">
-            <Link href="/retail" className="btn-primary w-full">Voir le catalogue retail</Link>
+          <div className="relative mt-2.5 flex min-h-[11rem] flex-1 flex-col gap-2">
+            {retailMeta ? (
+              <div className="flex flex-wrap gap-1.5">
+                <span className="rounded-full border border-emerald-400/25 bg-emerald-500/10 px-2 py-0.5 text-[9px] font-semibold tabular-nums text-emerald-700 dark:text-emerald-300">
+                  {retailMeta.clustersUsed.toLocaleString("fr-FR")} produits comparés
+                </span>
+                {retailMeta.scrapesUsed ? (
+                  <span className="rounded-full border border-slate-200/80 bg-slate-50 px-2 py-0.5 text-[9px] font-medium text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-white/55">
+                    {retailMeta.scrapesUsed} boutiques scrappées
+                  </span>
+                ) : null}
+              </div>
+            ) : null}
+
+            <TopRetailBarChart
+              shops={(topRetailShops.length > 0 ? topRetailShops : Array.from({ length: 5 }).map((_, i) => ({
+                shop: `shop-${i}`,
+                displayName: "—",
+                logo: null,
+                totalProducts: 0,
+                similarProducts: 0,
+                cheapestCount: 0,
+                winRatePct: 0,
+              }))).slice(0, 5)}
+              animate={retailReady && topRetailShops.length > 0}
+            />
+          </div>
+
+          <div className="relative pt-2.5">
+            <Link href="/classement-retail" className="btn-primary w-full">
+              Voir le classement détaillé
+            </Link>
           </div>
         </div>
 

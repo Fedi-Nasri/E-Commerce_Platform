@@ -15,6 +15,7 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { mapCategory, slugToLabel } from "./retail-category-slug.mjs";
 
 const args = process.argv.slice(2);
 const inPath = args.find((a) => a.endsWith(".json") && !a.startsWith("--"));
@@ -46,6 +47,7 @@ const RETAIL_SHOPS = new Set(
 );
 
 const MIN_PRODUCTS = 1000;
+const MIN_PRODUCTS_LIST = 50;
 const TOP_N = 5;
 const COMPETITIVE_MARGIN = 1.05;
 
@@ -181,6 +183,10 @@ const fractionalWins = new Map();
 const competitionScore = new Map();
 /** @type {Map<string, number>} */
 const competitiveCount = new Map();
+/** @type {Map<string, Map<string, { products: Set<string>, wins: number }>>} */
+const shopCatStats = new Map();
+/** @type {Map<string, number>} */
+const catClusterCount = new Map();
 
 const clusters = JSON.parse(readFileSync(inPath, "utf-8"));
 let clustersUsed = 0;
@@ -215,6 +221,9 @@ for (const c of clusters) {
 
   clustersUsed++;
 
+  const catSlug = mapCategory(c.canonical_top_category);
+  catClusterCount.set(catSlug, (catClusterCount.get(catSlug) || 0) + 1);
+
   const offers = [...bestByShop.values()].sort((a, b) => a.price - b.price || a.shop.localeCompare(b.shop));
   const minPrice = offers[0].price;
   const tied = offers.filter((o) => o.price === minPrice);
@@ -225,6 +234,11 @@ for (const c of clusters) {
   for (const o of offers) {
     if (!shopProducts.has(o.shop)) shopProducts.set(o.shop, new Set());
     shopProducts.get(o.shop).add(productId);
+    if (!shopCatStats.has(o.shop)) shopCatStats.set(o.shop, new Map());
+    if (!shopCatStats.get(o.shop).has(catSlug)) {
+      shopCatStats.get(o.shop).set(catSlug, { products: new Set(), wins: 0 });
+    }
+    shopCatStats.get(o.shop).get(catSlug).products.add(productId);
     if (o.price <= minPrice * COMPETITIVE_MARGIN) {
       competitiveCount.set(o.shop, (competitiveCount.get(o.shop) || 0) + 1);
     }
@@ -233,64 +247,92 @@ for (const c of clusters) {
   for (const t of tied) {
     fractionalWins.set(t.shop, (fractionalWins.get(t.shop) || 0) + share);
     competitionScore.set(t.shop, (competitionScore.get(t.shop) || 0) + points);
+    shopCatStats.get(t.shop).get(catSlug).wins += share;
   }
 }
 
-/** @type {{ shop: string, totalProducts: number, competitionScore: number, fractionalWins: number, competitiveCount: number }[]} */
-const allShops = [];
+function buildShopRow(shop, rank, top5Keys) {
+  const productSet = shopProducts.get(shop);
+  const totalProducts = productSet.size;
+  const fractional = fractionalWins.get(shop) || 0;
+  const comp = competitiveCount.get(shop) || 0;
+  let similarProducts = 0;
+  if (top5Keys) {
+    for (const pid of productSet) {
+      for (const other of top5Keys) {
+        if (other === shop) continue;
+        if (shopProducts.get(other)?.has(pid)) {
+          similarProducts++;
+          break;
+        }
+      }
+    }
+  }
+  return {
+    rank,
+    shop,
+    totalProducts,
+    cheapestCount: Math.round(fractional),
+    competitionScore: Math.round(competitionScore.get(shop) || 0),
+    competitiveCount: comp,
+    competitivePct: totalProducts > 0 ? Math.round((comp / totalProducts) * 100) : 0,
+    similarProducts,
+    overlapPct: totalProducts > 0 && top5Keys ? Math.round((similarProducts / totalProducts) * 100) : 0,
+    winRatePct: totalProducts > 0 ? Math.round((fractional / totalProducts) * 100) : 0,
+  };
+}
+
+/** @type {{ shop: string, totalProducts: number, fractionalWins: number }[]} */
+const rankedShops = [];
 
 for (const [shop, products] of shopProducts) {
   const totalProducts = products.size;
-  if (totalProducts < MIN_PRODUCTS) continue;
-
-  allShops.push({
+  if (totalProducts < MIN_PRODUCTS_LIST) continue;
+  rankedShops.push({
     shop,
     totalProducts,
-    competitionScore: competitionScore.get(shop) || 0,
     fractionalWins: fractionalWins.get(shop) || 0,
-    competitiveCount: competitiveCount.get(shop) || 0,
   });
 }
 
-allShops.sort(
+rankedShops.sort(
   (a, b) =>
     b.fractionalWins - a.fractionalWins ||
     b.totalProducts - a.totalProducts,
 );
 
-const top5Keys = new Set(allShops.slice(0, TOP_N).map((s) => s.shop));
+const top5Eligible = rankedShops.filter((s) => s.totalProducts >= MIN_PRODUCTS);
+const top5Keys = new Set(top5Eligible.slice(0, TOP_N).map((s) => s.shop));
 
-const shops = allShops.slice(0, TOP_N).map((s, i) => {
-  const productSet = shopProducts.get(s.shop);
-  let similarProducts = 0;
-  for (const pid of productSet) {
-    for (const other of top5Keys) {
-      if (other === s.shop) continue;
-      if (shopProducts.get(other)?.has(pid)) {
-        similarProducts++;
-        break;
-      }
+const shops = top5Eligible.slice(0, TOP_N).map((s, i) => buildShopRow(s.shop, i + 1, top5Keys));
+
+const allShops = rankedShops.map((s, i) => buildShopRow(s.shop, i + 1, null));
+
+const categories = [...catClusterCount.entries()]
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 20)
+  .map(([slug, clusterCount]) => {
+    const shopRows = [];
+    for (const [shop, catMap] of shopCatStats) {
+      const st = catMap.get(slug);
+      if (!st || st.products.size === 0) continue;
+      const total = st.products.size;
+      shopRows.push({
+        shop,
+        totalProducts: total,
+        cheapestCount: Math.round(st.wins),
+        winRatePct: Math.round((st.wins / total) * 100),
+      });
     }
-  }
-
-  const competitivePct =
-    s.totalProducts > 0 ? Math.round((s.competitiveCount / s.totalProducts) * 100) : 0;
-  const winRatePct =
-    s.totalProducts > 0 ? Math.round((s.fractionalWins / s.totalProducts) * 100) : 0;
-
-  return {
-    rank: i + 1,
-    shop: s.shop,
-    totalProducts: s.totalProducts,
-    cheapestCount: Math.round(s.fractionalWins),
-    competitionScore: Math.round(s.competitionScore),
-    competitiveCount: s.competitiveCount,
-    competitivePct,
-    similarProducts,
-    overlapPct: s.totalProducts > 0 ? Math.round((similarProducts / s.totalProducts) * 100) : 0,
-    winRatePct,
-  };
-});
+    shopRows.sort((a, b) => b.cheapestCount - a.cheapestCount);
+    return {
+      slug,
+      label: slugToLabel(slug),
+      clusterCount,
+      shops: shopRows.slice(0, 8),
+      leader: shopRows[0]?.shop ?? null,
+    };
+  });
 
 const payload = {
   generated_at: new Date().toISOString(),
@@ -298,16 +340,19 @@ const payload = {
   stock_dir: STOCK_DIR,
   scrapes_used: scrapeMeta.length,
   method:
-    "Produits comparables en stock (dernier scrape par enseigne, ≥2 boutiques, catalogue ≥1 000 refs). Classement par nombre de meilleurs prix (ex æquo partagé).",
+    "Produits comparables en stock (dernier scrape par enseigne, ≥2 boutiques). Classement par nombre de meilleurs prix (ex æquo partagé). Toutes catégories retail du fichier clusters.",
   clusters_used: clustersUsed,
   min_products: MIN_PRODUCTS,
+  min_products_list: MIN_PRODUCTS_LIST,
   in_stock_only: Boolean(STOCK_DIR),
   shops,
+  allShops,
+  categories,
 };
 
 writeFileSync(outPath, JSON.stringify(payload, null, 2) + "\n", "utf-8");
 
-console.log(`✓ ${clustersUsed} in-stock clusters → top ${TOP_N} shops → ${outPath}`);
+console.log(`✓ ${clustersUsed} in-stock clusters → ${allShops.length} shops → top ${TOP_N} → ${outPath}`);
 if (STOCK_DIR) {
   console.log(`  excluded not in stock: ${skippedNotInStock.toLocaleString("fr-FR")}`);
 }

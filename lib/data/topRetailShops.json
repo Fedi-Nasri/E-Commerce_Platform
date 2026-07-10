@@ -1,11 +1,12 @@
 {
-  "generated_at": "2026-07-10T10:42:16.409Z",
+  "generated_at": "2026-07-10T11:03:08.829Z",
   "source": "C:\\Users\\stage.td\\Downloads\\ynqqn w\\my_run_117\\product_clusters.json",
   "stock_dir": "C:/Users/stage.td/Desktop/current_scrapping/data",
   "scrapes_used": 55,
-  "method": "Produits comparables en stock (dernier scrape par enseigne, ≥2 boutiques, catalogue ≥1 000 refs). Classement par nombre de meilleurs prix (ex æquo partagé).",
+  "method": "Produits comparables en stock (dernier scrape par enseigne, ≥2 boutiques). Classement par nombre de meilleurs prix (ex æquo partagé). Toutes catégories retail du fichier clusters.",
   "clusters_used": 13213,
   "min_products": 1000,
+  "min_products_list": 50,
   "in_stock_only": true,
   "shops": [
     {
@@ -67,6 +68,1646 @@
       "similarProducts": 2656,
       "overlapPct": 76,
       "winRatePct": 30
+    }
+  ],
+  "allShops": [
+    {
+      "rank": 1,
+      "shop": "mytek",
+      "totalProducts": 5100,
+      "cheapestCount": 1870,
+      "competitionScore": 5155,
+      "competitiveCount": 3779,
+      "competitivePct": 74,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 37
+    },
+    {
+      "rank": 2,
+      "shop": "spacenet",
+      "totalProducts": 4013,
+      "cheapestCount": 1448,
+      "competitionScore": 4110,
+      "competitiveCount": 2963,
+      "competitivePct": 74,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 36
+    },
+    {
+      "rank": 3,
+      "shop": "tunisianet",
+      "totalProducts": 3979,
+      "cheapestCount": 1305,
+      "competitionScore": 3796,
+      "competitiveCount": 2856,
+      "competitivePct": 72,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 33
+    },
+    {
+      "rank": 4,
+      "shop": "carthagoinformatique",
+      "totalProducts": 3581,
+      "cheapestCount": 1247,
+      "competitionScore": 2902,
+      "competitiveCount": 2700,
+      "competitivePct": 75,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 35
+    },
+    {
+      "rank": 5,
+      "shop": "affariyet",
+      "totalProducts": 3477,
+      "cheapestCount": 1036,
+      "competitionScore": 3247,
+      "competitiveCount": 2043,
+      "competitivePct": 59,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 30
+    },
+    {
+      "rank": 6,
+      "shop": "bestbuytunisie",
+      "totalProducts": 1974,
+      "cheapestCount": 939,
+      "competitionScore": 1910,
+      "competitiveCount": 1897,
+      "competitivePct": 96,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 48
+    },
+    {
+      "rank": 7,
+      "shop": "tunewtec",
+      "totalProducts": 2431,
+      "cheapestCount": 721,
+      "competitionScore": 2132,
+      "competitiveCount": 1297,
+      "competitivePct": 53,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 30
+    },
+    {
+      "rank": 8,
+      "shop": "qsnet",
+      "totalProducts": 1076,
+      "cheapestCount": 495,
+      "competitionScore": 1691,
+      "competitiveCount": 844,
+      "competitivePct": 78,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 46
+    },
+    {
+      "rank": 9,
+      "shop": "technopro",
+      "totalProducts": 996,
+      "cheapestCount": 443,
+      "competitionScore": 1565,
+      "competitiveCount": 607,
+      "competitivePct": 61,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 44
+    },
+    {
+      "rank": 10,
+      "shop": "jumbo",
+      "totalProducts": 1621,
+      "cheapestCount": 382,
+      "competitionScore": 1188,
+      "competitiveCount": 989,
+      "competitivePct": 61,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 24
+    },
+    {
+      "rank": 11,
+      "shop": "infotec",
+      "totalProducts": 686,
+      "cheapestCount": 310,
+      "competitionScore": 1173,
+      "competitiveCount": 442,
+      "competitivePct": 64,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 45
+    },
+    {
+      "rank": 12,
+      "shop": "maalejaudio",
+      "totalProducts": 577,
+      "cheapestCount": 211,
+      "competitionScore": 947,
+      "competitiveCount": 376,
+      "competitivePct": 65,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 37
+    },
+    {
+      "rank": 13,
+      "shop": "bstech",
+      "totalProducts": 699,
+      "cheapestCount": 198,
+      "competitionScore": 646,
+      "competitiveCount": 419,
+      "competitivePct": 60,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 28
+    },
+    {
+      "rank": 14,
+      "shop": "krichen",
+      "totalProducts": 423,
+      "cheapestCount": 160,
+      "competitionScore": 638,
+      "competitiveCount": 292,
+      "competitivePct": 69,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 38
+    },
+    {
+      "rank": 15,
+      "shop": "alarabia",
+      "totalProducts": 887,
+      "cheapestCount": 160,
+      "competitionScore": 462,
+      "competitiveCount": 360,
+      "competitivePct": 41,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 18
+    },
+    {
+      "rank": 16,
+      "shop": "zoom",
+      "totalProducts": 710,
+      "cheapestCount": 159,
+      "competitionScore": 542,
+      "competitiveCount": 374,
+      "competitivePct": 53,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 22
+    },
+    {
+      "rank": 17,
+      "shop": "darty",
+      "totalProducts": 782,
+      "cheapestCount": 159,
+      "competitionScore": 499,
+      "competitiveCount": 307,
+      "competitivePct": 39,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 20
+    },
+    {
+      "rank": 18,
+      "shop": "agora",
+      "totalProducts": 433,
+      "cheapestCount": 158,
+      "competitionScore": 561,
+      "competitiveCount": 275,
+      "competitivePct": 64,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 36
+    },
+    {
+      "rank": 19,
+      "shop": "kamounhome",
+      "totalProducts": 361,
+      "cheapestCount": 148,
+      "competitionScore": 488,
+      "competitiveCount": 231,
+      "competitivePct": 64,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 41
+    },
+    {
+      "rank": 20,
+      "shop": "acspace",
+      "totalProducts": 498,
+      "cheapestCount": 134,
+      "competitionScore": 533,
+      "competitiveCount": 301,
+      "competitivePct": 60,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 27
+    },
+    {
+      "rank": 21,
+      "shop": "expert_gaming",
+      "totalProducts": 507,
+      "cheapestCount": 126,
+      "competitionScore": 429,
+      "competitiveCount": 340,
+      "competitivePct": 67,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 25
+    },
+    {
+      "rank": 22,
+      "shop": "try_and_buy",
+      "totalProducts": 537,
+      "cheapestCount": 112,
+      "competitionScore": 426,
+      "competitiveCount": 250,
+      "competitivePct": 47,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 21
+    },
+    {
+      "rank": 23,
+      "shop": "imag",
+      "totalProducts": 112,
+      "cheapestCount": 110,
+      "competitionScore": 449,
+      "competitiveCount": 111,
+      "competitivePct": 99,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 98
+    },
+    {
+      "rank": 24,
+      "shop": "electrochaabani",
+      "totalProducts": 269,
+      "cheapestCount": 103,
+      "competitionScore": 359,
+      "competitiveCount": 178,
+      "competitivePct": 66,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 38
+    },
+    {
+      "rank": 25,
+      "shop": "allani",
+      "totalProducts": 294,
+      "cheapestCount": 98,
+      "competitionScore": 350,
+      "competitiveCount": 173,
+      "competitivePct": 59,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 33
+    },
+    {
+      "rank": 26,
+      "shop": "tokyo_store",
+      "totalProducts": 175,
+      "cheapestCount": 95,
+      "competitionScore": 319,
+      "competitiveCount": 111,
+      "competitivePct": 63,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 54
+    },
+    {
+      "rank": 27,
+      "shop": "wiki",
+      "totalProducts": 344,
+      "cheapestCount": 82,
+      "competitionScore": 250,
+      "competitiveCount": 167,
+      "competitivePct": 49,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 24
+    },
+    {
+      "rank": 28,
+      "shop": "batam",
+      "totalProducts": 298,
+      "cheapestCount": 77,
+      "competitionScore": 297,
+      "competitiveCount": 164,
+      "competitivePct": 55,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 26
+    },
+    {
+      "rank": 29,
+      "shop": "chaktech",
+      "totalProducts": 208,
+      "cheapestCount": 69,
+      "competitionScore": 198,
+      "competitiveCount": 134,
+      "competitivePct": 64,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 33
+    },
+    {
+      "rank": 30,
+      "shop": "jmb",
+      "totalProducts": 251,
+      "cheapestCount": 62,
+      "competitionScore": 223,
+      "competitiveCount": 137,
+      "competitivePct": 55,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 25
+    },
+    {
+      "rank": 31,
+      "shop": "electrohadjkacem",
+      "totalProducts": 266,
+      "cheapestCount": 59,
+      "competitionScore": 189,
+      "competitiveCount": 156,
+      "competitivePct": 59,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 22
+    },
+    {
+      "rank": 32,
+      "shop": "taktek",
+      "totalProducts": 140,
+      "cheapestCount": 56,
+      "competitionScore": 216,
+      "competitiveCount": 59,
+      "competitivePct": 42,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 40
+    },
+    {
+      "rank": 33,
+      "shop": "sbs",
+      "totalProducts": 158,
+      "cheapestCount": 55,
+      "competitionScore": 160,
+      "competitiveCount": 117,
+      "competitivePct": 74,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 35
+    },
+    {
+      "rank": 34,
+      "shop": "mbm",
+      "totalProducts": 144,
+      "cheapestCount": 53,
+      "competitionScore": 190,
+      "competitiveCount": 67,
+      "competitivePct": 47,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 37
+    },
+    {
+      "rank": 35,
+      "shop": "techland",
+      "totalProducts": 197,
+      "cheapestCount": 49,
+      "competitionScore": 147,
+      "competitiveCount": 115,
+      "competitivePct": 58,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 25
+    },
+    {
+      "rank": 36,
+      "shop": "psstore",
+      "totalProducts": 105,
+      "cheapestCount": 45,
+      "competitionScore": 188,
+      "competitiveCount": 54,
+      "competitivePct": 51,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 43
+    },
+    {
+      "rank": 37,
+      "shop": "emh",
+      "totalProducts": 152,
+      "cheapestCount": 43,
+      "competitionScore": 161,
+      "competitiveCount": 75,
+      "competitivePct": 49,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 28
+    },
+    {
+      "rank": 38,
+      "shop": "gamershop",
+      "totalProducts": 102,
+      "cheapestCount": 37,
+      "competitionScore": 126,
+      "competitiveCount": 85,
+      "competitivePct": 83,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 36
+    },
+    {
+      "rank": 39,
+      "shop": "electrobennjima",
+      "totalProducts": 130,
+      "cheapestCount": 35,
+      "competitionScore": 123,
+      "competitiveCount": 72,
+      "competitivePct": 55,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 27
+    },
+    {
+      "rank": 40,
+      "shop": "itechstore",
+      "totalProducts": 257,
+      "cheapestCount": 31,
+      "competitionScore": 73,
+      "competitiveCount": 80,
+      "competitivePct": 31,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 12
+    },
+    {
+      "rank": 41,
+      "shop": "dokani",
+      "totalProducts": 156,
+      "cheapestCount": 29,
+      "competitionScore": 78,
+      "competitiveCount": 51,
+      "competitivePct": 33,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 18
+    },
+    {
+      "rank": 42,
+      "shop": "sangour",
+      "totalProducts": 56,
+      "cheapestCount": 25,
+      "competitionScore": 61,
+      "competitiveCount": 33,
+      "competitivePct": 59,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 45
+    },
+    {
+      "rank": 43,
+      "shop": "skymill",
+      "totalProducts": 72,
+      "cheapestCount": 14,
+      "competitionScore": 47,
+      "competitiveCount": 39,
+      "competitivePct": 54,
+      "similarProducts": 0,
+      "overlapPct": 0,
+      "winRatePct": 19
+    }
+  ],
+  "categories": [
+    {
+      "slug": "non-categorise",
+      "label": "Non catégorisé",
+      "clusterCount": 5759,
+      "shops": [
+        {
+          "shop": "mytek",
+          "totalProducts": 2059,
+          "cheapestCount": 708,
+          "winRatePct": 34
+        },
+        {
+          "shop": "carthagoinformatique",
+          "totalProducts": 1957,
+          "cheapestCount": 684,
+          "winRatePct": 35
+        },
+        {
+          "shop": "spacenet",
+          "totalProducts": 1587,
+          "cheapestCount": 549,
+          "winRatePct": 35
+        },
+        {
+          "shop": "bestbuytunisie",
+          "totalProducts": 1132,
+          "cheapestCount": 538,
+          "winRatePct": 47
+        },
+        {
+          "shop": "affariyet",
+          "totalProducts": 1634,
+          "cheapestCount": 505,
+          "winRatePct": 31
+        },
+        {
+          "shop": "tunisianet",
+          "totalProducts": 1284,
+          "cheapestCount": 391,
+          "winRatePct": 30
+        },
+        {
+          "shop": "jumbo",
+          "totalProducts": 886,
+          "cheapestCount": 220,
+          "winRatePct": 25
+        },
+        {
+          "shop": "technopro",
+          "totalProducts": 479,
+          "cheapestCount": 207,
+          "winRatePct": 43
+        }
+      ],
+      "leader": "mytek"
+    },
+    {
+      "slug": "accessoires-informatiques",
+      "label": "Accessoires informatiques",
+      "clusterCount": 2536,
+      "shops": [
+        {
+          "shop": "mytek",
+          "totalProducts": 1119,
+          "cheapestCount": 442,
+          "winRatePct": 40
+        },
+        {
+          "shop": "tunisianet",
+          "totalProducts": 1093,
+          "cheapestCount": 349,
+          "winRatePct": 32
+        },
+        {
+          "shop": "spacenet",
+          "totalProducts": 943,
+          "cheapestCount": 339,
+          "winRatePct": 36
+        },
+        {
+          "shop": "tunewtec",
+          "totalProducts": 740,
+          "cheapestCount": 217,
+          "winRatePct": 29
+        },
+        {
+          "shop": "affariyet",
+          "totalProducts": 700,
+          "cheapestCount": 192,
+          "winRatePct": 27
+        },
+        {
+          "shop": "qsnet",
+          "totalProducts": 319,
+          "cheapestCount": 172,
+          "winRatePct": 54
+        },
+        {
+          "shop": "carthagoinformatique",
+          "totalProducts": 430,
+          "cheapestCount": 144,
+          "winRatePct": 33
+        },
+        {
+          "shop": "bestbuytunisie",
+          "totalProducts": 212,
+          "cheapestCount": 97,
+          "winRatePct": 46
+        }
+      ],
+      "leader": "mytek"
+    },
+    {
+      "slug": "gros-electromenager",
+      "label": "Gros électroménager",
+      "clusterCount": 1374,
+      "shops": [
+        {
+          "shop": "mytek",
+          "totalProducts": 601,
+          "cheapestCount": 193,
+          "winRatePct": 32
+        },
+        {
+          "shop": "affariyet",
+          "totalProducts": 456,
+          "cheapestCount": 133,
+          "winRatePct": 29
+        },
+        {
+          "shop": "tunisianet",
+          "totalProducts": 407,
+          "cheapestCount": 128,
+          "winRatePct": 31
+        },
+        {
+          "shop": "spacenet",
+          "totalProducts": 390,
+          "cheapestCount": 115,
+          "winRatePct": 29
+        },
+        {
+          "shop": "qsnet",
+          "totalProducts": 195,
+          "cheapestCount": 106,
+          "winRatePct": 54
+        },
+        {
+          "shop": "jumbo",
+          "totalProducts": 307,
+          "cheapestCount": 73,
+          "winRatePct": 24
+        },
+        {
+          "shop": "carthagoinformatique",
+          "totalProducts": 253,
+          "cheapestCount": 58,
+          "winRatePct": 23
+        },
+        {
+          "shop": "imag",
+          "totalProducts": 53,
+          "cheapestCount": 53,
+          "winRatePct": 100
+        }
+      ],
+      "leader": "mytek"
+    },
+    {
+      "slug": "imprimantes-et-scanners",
+      "label": "Imprimantes Et Scanners",
+      "clusterCount": 781,
+      "shops": [
+        {
+          "shop": "mytek",
+          "totalProducts": 387,
+          "cheapestCount": 149,
+          "winRatePct": 39
+        },
+        {
+          "shop": "tunewtec",
+          "totalProducts": 459,
+          "cheapestCount": 146,
+          "winRatePct": 32
+        },
+        {
+          "shop": "tunisianet",
+          "totalProducts": 350,
+          "cheapestCount": 124,
+          "winRatePct": 36
+        },
+        {
+          "shop": "spacenet",
+          "totalProducts": 222,
+          "cheapestCount": 107,
+          "winRatePct": 48
+        },
+        {
+          "shop": "technopro",
+          "totalProducts": 107,
+          "cheapestCount": 56,
+          "winRatePct": 52
+        },
+        {
+          "shop": "qsnet",
+          "totalProducts": 116,
+          "cheapestCount": 52,
+          "winRatePct": 44
+        },
+        {
+          "shop": "affariyet",
+          "totalProducts": 183,
+          "cheapestCount": 41,
+          "winRatePct": 22
+        },
+        {
+          "shop": "carthagoinformatique",
+          "totalProducts": 112,
+          "cheapestCount": 26,
+          "winRatePct": 23
+        }
+      ],
+      "leader": "mytek"
+    },
+    {
+      "slug": "reseaux-serveurs-et-securite",
+      "label": "Réseaux & sécurité",
+      "clusterCount": 775,
+      "shops": [
+        {
+          "shop": "mytek",
+          "totalProducts": 296,
+          "cheapestCount": 143,
+          "winRatePct": 48
+        },
+        {
+          "shop": "carthagoinformatique",
+          "totalProducts": 262,
+          "cheapestCount": 100,
+          "winRatePct": 38
+        },
+        {
+          "shop": "tunisianet",
+          "totalProducts": 265,
+          "cheapestCount": 92,
+          "winRatePct": 35
+        },
+        {
+          "shop": "spacenet",
+          "totalProducts": 218,
+          "cheapestCount": 92,
+          "winRatePct": 42
+        },
+        {
+          "shop": "bestbuytunisie",
+          "totalProducts": 164,
+          "cheapestCount": 82,
+          "winRatePct": 50
+        },
+        {
+          "shop": "tunewtec",
+          "totalProducts": 341,
+          "cheapestCount": 80,
+          "winRatePct": 23
+        },
+        {
+          "shop": "affariyet",
+          "totalProducts": 247,
+          "cheapestCount": 64,
+          "winRatePct": 26
+        },
+        {
+          "shop": "technopro",
+          "totalProducts": 73,
+          "cheapestCount": 36,
+          "winRatePct": 49
+        }
+      ],
+      "leader": "mytek"
+    },
+    {
+      "slug": "composants",
+      "label": "Composants",
+      "clusterCount": 456,
+      "shops": [
+        {
+          "shop": "carthagoinformatique",
+          "totalProducts": 250,
+          "cheapestCount": 117,
+          "winRatePct": 47
+        },
+        {
+          "shop": "bestbuytunisie",
+          "totalProducts": 190,
+          "cheapestCount": 95,
+          "winRatePct": 50
+        },
+        {
+          "shop": "spacenet",
+          "totalProducts": 108,
+          "cheapestCount": 45,
+          "winRatePct": 41
+        },
+        {
+          "shop": "expert_gaming",
+          "totalProducts": 116,
+          "cheapestCount": 45,
+          "winRatePct": 38
+        },
+        {
+          "shop": "tunewtec",
+          "totalProducts": 116,
+          "cheapestCount": 40,
+          "winRatePct": 34
+        },
+        {
+          "shop": "mytek",
+          "totalProducts": 98,
+          "cheapestCount": 35,
+          "winRatePct": 36
+        },
+        {
+          "shop": "tunisianet",
+          "totalProducts": 92,
+          "cheapestCount": 24,
+          "winRatePct": 26
+        },
+        {
+          "shop": "qsnet",
+          "totalProducts": 26,
+          "cheapestCount": 14,
+          "winRatePct": 52
+        }
+      ],
+      "leader": "carthagoinformatique"
+    },
+    {
+      "slug": "televisions",
+      "label": "Télévisions",
+      "clusterCount": 431,
+      "shops": [
+        {
+          "shop": "mytek",
+          "totalProducts": 192,
+          "cheapestCount": 74,
+          "winRatePct": 38
+        },
+        {
+          "shop": "tunisianet",
+          "totalProducts": 188,
+          "cheapestCount": 70,
+          "winRatePct": 37
+        },
+        {
+          "shop": "spacenet",
+          "totalProducts": 164,
+          "cheapestCount": 51,
+          "winRatePct": 31
+        },
+        {
+          "shop": "infotec",
+          "totalProducts": 51,
+          "cheapestCount": 40,
+          "winRatePct": 79
+        },
+        {
+          "shop": "affariyet",
+          "totalProducts": 131,
+          "cheapestCount": 28,
+          "winRatePct": 22
+        },
+        {
+          "shop": "darty",
+          "totalProducts": 56,
+          "cheapestCount": 20,
+          "winRatePct": 35
+        },
+        {
+          "shop": "tunewtec",
+          "totalProducts": 45,
+          "cheapestCount": 18,
+          "winRatePct": 41
+        },
+        {
+          "shop": "jumbo",
+          "totalProducts": 67,
+          "cheapestCount": 12,
+          "winRatePct": 17
+        }
+      ],
+      "leader": "mytek"
+    },
+    {
+      "slug": "smartphones",
+      "label": "Smartphones",
+      "clusterCount": 393,
+      "shops": [
+        {
+          "shop": "spacenet",
+          "totalProducts": 194,
+          "cheapestCount": 71,
+          "winRatePct": 37
+        },
+        {
+          "shop": "affariyet",
+          "totalProducts": 116,
+          "cheapestCount": 71,
+          "winRatePct": 61
+        },
+        {
+          "shop": "tunisianet",
+          "totalProducts": 106,
+          "cheapestCount": 51,
+          "winRatePct": 48
+        },
+        {
+          "shop": "mytek",
+          "totalProducts": 134,
+          "cheapestCount": 50,
+          "winRatePct": 37
+        },
+        {
+          "shop": "alarabia",
+          "totalProducts": 59,
+          "cheapestCount": 23,
+          "winRatePct": 39
+        },
+        {
+          "shop": "chaktech",
+          "totalProducts": 56,
+          "cheapestCount": 19,
+          "winRatePct": 33
+        },
+        {
+          "shop": "itechstore",
+          "totalProducts": 29,
+          "cheapestCount": 12,
+          "winRatePct": 40
+        },
+        {
+          "shop": "tunewtec",
+          "totalProducts": 36,
+          "cheapestCount": 10,
+          "winRatePct": 27
+        }
+      ],
+      "leader": "spacenet"
+    },
+    {
+      "slug": "tablettes",
+      "label": "Tablettes",
+      "clusterCount": 194,
+      "shops": [
+        {
+          "shop": "darty",
+          "totalProducts": 62,
+          "cheapestCount": 46,
+          "winRatePct": 74
+        },
+        {
+          "shop": "carthagoinformatique",
+          "totalProducts": 79,
+          "cheapestCount": 29,
+          "winRatePct": 37
+        },
+        {
+          "shop": "bestbuytunisie",
+          "totalProducts": 44,
+          "cheapestCount": 21,
+          "winRatePct": 48
+        },
+        {
+          "shop": "tunisianet",
+          "totalProducts": 38,
+          "cheapestCount": 16,
+          "winRatePct": 41
+        },
+        {
+          "shop": "agora",
+          "totalProducts": 22,
+          "cheapestCount": 14,
+          "winRatePct": 64
+        },
+        {
+          "shop": "spacenet",
+          "totalProducts": 33,
+          "cheapestCount": 12,
+          "winRatePct": 38
+        },
+        {
+          "shop": "tunewtec",
+          "totalProducts": 36,
+          "cheapestCount": 10,
+          "winRatePct": 27
+        },
+        {
+          "shop": "mytek",
+          "totalProducts": 29,
+          "cheapestCount": 9,
+          "winRatePct": 30
+        }
+      ],
+      "leader": "darty"
+    },
+    {
+      "slug": "montres-et-objets-connectes",
+      "label": "Montres Et Objets Connectes",
+      "clusterCount": 128,
+      "shops": [
+        {
+          "shop": "mytek",
+          "totalProducts": 55,
+          "cheapestCount": 30,
+          "winRatePct": 54
+        },
+        {
+          "shop": "carthagoinformatique",
+          "totalProducts": 43,
+          "cheapestCount": 21,
+          "winRatePct": 48
+        },
+        {
+          "shop": "bestbuytunisie",
+          "totalProducts": 39,
+          "cheapestCount": 19,
+          "winRatePct": 48
+        },
+        {
+          "shop": "spacenet",
+          "totalProducts": 28,
+          "cheapestCount": 15,
+          "winRatePct": 52
+        },
+        {
+          "shop": "tunisianet",
+          "totalProducts": 20,
+          "cheapestCount": 8,
+          "winRatePct": 42
+        },
+        {
+          "shop": "zoom",
+          "totalProducts": 8,
+          "cheapestCount": 4,
+          "winRatePct": 44
+        },
+        {
+          "shop": "tunewtec",
+          "totalProducts": 12,
+          "cheapestCount": 4,
+          "winRatePct": 33
+        },
+        {
+          "shop": "tokyo_store",
+          "totalProducts": 6,
+          "cheapestCount": 4,
+          "winRatePct": 58
+        }
+      ],
+      "leader": "mytek"
+    },
+    {
+      "slug": "stockage",
+      "label": "Stockage",
+      "clusterCount": 75,
+      "shops": [
+        {
+          "shop": "carthagoinformatique",
+          "totalProducts": 40,
+          "cheapestCount": 19,
+          "winRatePct": 48
+        },
+        {
+          "shop": "bestbuytunisie",
+          "totalProducts": 27,
+          "cheapestCount": 14,
+          "winRatePct": 51
+        },
+        {
+          "shop": "tunewtec",
+          "totalProducts": 23,
+          "cheapestCount": 11,
+          "winRatePct": 50
+        },
+        {
+          "shop": "tunisianet",
+          "totalProducts": 24,
+          "cheapestCount": 7,
+          "winRatePct": 31
+        },
+        {
+          "shop": "qsnet",
+          "totalProducts": 11,
+          "cheapestCount": 6,
+          "winRatePct": 55
+        },
+        {
+          "shop": "mbm",
+          "totalProducts": 5,
+          "cheapestCount": 4,
+          "winRatePct": 80
+        },
+        {
+          "shop": "spacenet",
+          "totalProducts": 15,
+          "cheapestCount": 3,
+          "winRatePct": 20
+        },
+        {
+          "shop": "mytek",
+          "totalProducts": 27,
+          "cheapestCount": 3,
+          "winRatePct": 11
+        }
+      ],
+      "leader": "carthagoinformatique"
+    },
+    {
+      "slug": "pc-de-bureau",
+      "label": "PC de bureau",
+      "clusterCount": 64,
+      "shops": [
+        {
+          "shop": "carthagoinformatique",
+          "totalProducts": 31,
+          "cheapestCount": 14,
+          "winRatePct": 45
+        },
+        {
+          "shop": "bestbuytunisie",
+          "totalProducts": 29,
+          "cheapestCount": 12,
+          "winRatePct": 42
+        },
+        {
+          "shop": "bstech",
+          "totalProducts": 13,
+          "cheapestCount": 8,
+          "winRatePct": 59
+        },
+        {
+          "shop": "mbm",
+          "totalProducts": 6,
+          "cheapestCount": 5,
+          "winRatePct": 83
+        },
+        {
+          "shop": "qsnet",
+          "totalProducts": 6,
+          "cheapestCount": 5,
+          "winRatePct": 83
+        },
+        {
+          "shop": "tunisianet",
+          "totalProducts": 11,
+          "cheapestCount": 4,
+          "winRatePct": 32
+        },
+        {
+          "shop": "spacenet",
+          "totalProducts": 10,
+          "cheapestCount": 4,
+          "winRatePct": 36
+        },
+        {
+          "shop": "tunewtec",
+          "totalProducts": 14,
+          "cheapestCount": 3,
+          "winRatePct": 24
+        }
+      ],
+      "leader": "carthagoinformatique"
+    },
+    {
+      "slug": "pc-portables",
+      "label": "PC portables",
+      "clusterCount": 63,
+      "shops": [
+        {
+          "shop": "spacenet",
+          "totalProducts": 28,
+          "cheapestCount": 12,
+          "winRatePct": 41
+        },
+        {
+          "shop": "tunisianet",
+          "totalProducts": 26,
+          "cheapestCount": 9,
+          "winRatePct": 33
+        },
+        {
+          "shop": "mytek",
+          "totalProducts": 27,
+          "cheapestCount": 9,
+          "winRatePct": 32
+        },
+        {
+          "shop": "bstech",
+          "totalProducts": 18,
+          "cheapestCount": 7,
+          "winRatePct": 36
+        },
+        {
+          "shop": "qsnet",
+          "totalProducts": 8,
+          "cheapestCount": 6,
+          "winRatePct": 75
+        },
+        {
+          "shop": "tunewtec",
+          "totalProducts": 26,
+          "cheapestCount": 5,
+          "winRatePct": 19
+        },
+        {
+          "shop": "affariyet",
+          "totalProducts": 6,
+          "cheapestCount": 2,
+          "winRatePct": 25
+        },
+        {
+          "shop": "wiki",
+          "totalProducts": 4,
+          "cheapestCount": 2,
+          "winRatePct": 50
+        }
+      ],
+      "leader": "spacenet"
+    },
+    {
+      "slug": "pc-de-bureau-gamer",
+      "label": "PC de bureau gamer",
+      "clusterCount": 42,
+      "shops": [
+        {
+          "shop": "carthagoinformatique",
+          "totalProducts": 26,
+          "cheapestCount": 11,
+          "winRatePct": 42
+        },
+        {
+          "shop": "spacenet",
+          "totalProducts": 17,
+          "cheapestCount": 8,
+          "winRatePct": 46
+        },
+        {
+          "shop": "mytek",
+          "totalProducts": 22,
+          "cheapestCount": 7,
+          "winRatePct": 33
+        },
+        {
+          "shop": "tunisianet",
+          "totalProducts": 15,
+          "cheapestCount": 5,
+          "winRatePct": 30
+        },
+        {
+          "shop": "expert_gaming",
+          "totalProducts": 23,
+          "cheapestCount": 5,
+          "winRatePct": 24
+        },
+        {
+          "shop": "technopro",
+          "totalProducts": 1,
+          "cheapestCount": 1,
+          "winRatePct": 100
+        },
+        {
+          "shop": "zoom",
+          "totalProducts": 1,
+          "cheapestCount": 1,
+          "winRatePct": 50
+        },
+        {
+          "shop": "tunewtec",
+          "totalProducts": 9,
+          "cheapestCount": 1,
+          "winRatePct": 11
+        }
+      ],
+      "leader": "carthagoinformatique"
+    },
+    {
+      "slug": "ecrans-et-moniteurs",
+      "label": "Écrans & moniteurs",
+      "clusterCount": 41,
+      "shops": [
+        {
+          "shop": "tunisianet",
+          "totalProducts": 21,
+          "cheapestCount": 11,
+          "winRatePct": 53
+        },
+        {
+          "shop": "spacenet",
+          "totalProducts": 12,
+          "cheapestCount": 6,
+          "winRatePct": 51
+        },
+        {
+          "shop": "mytek",
+          "totalProducts": 15,
+          "cheapestCount": 5,
+          "winRatePct": 32
+        },
+        {
+          "shop": "bstech",
+          "totalProducts": 8,
+          "cheapestCount": 4,
+          "winRatePct": 54
+        },
+        {
+          "shop": "carthagoinformatique",
+          "totalProducts": 7,
+          "cheapestCount": 3,
+          "winRatePct": 46
+        },
+        {
+          "shop": "qsnet",
+          "totalProducts": 10,
+          "cheapestCount": 3,
+          "winRatePct": 31
+        },
+        {
+          "shop": "tunewtec",
+          "totalProducts": 10,
+          "cheapestCount": 2,
+          "winRatePct": 20
+        },
+        {
+          "shop": "expert_gaming",
+          "totalProducts": 6,
+          "cheapestCount": 2,
+          "winRatePct": 26
+        }
+      ],
+      "leader": "tunisianet"
+    },
+    {
+      "slug": "pc-portables-gamer",
+      "label": "PC portables gamer",
+      "clusterCount": 39,
+      "shops": [
+        {
+          "shop": "spacenet",
+          "totalProducts": 22,
+          "cheapestCount": 13,
+          "winRatePct": 59
+        },
+        {
+          "shop": "tunisianet",
+          "totalProducts": 24,
+          "cheapestCount": 10,
+          "winRatePct": 43
+        },
+        {
+          "shop": "expert_gaming",
+          "totalProducts": 13,
+          "cheapestCount": 5,
+          "winRatePct": 37
+        },
+        {
+          "shop": "mytek",
+          "totalProducts": 11,
+          "cheapestCount": 4,
+          "winRatePct": 39
+        },
+        {
+          "shop": "zoom",
+          "totalProducts": 2,
+          "cheapestCount": 2,
+          "winRatePct": 75
+        },
+        {
+          "shop": "tunewtec",
+          "totalProducts": 4,
+          "cheapestCount": 2,
+          "winRatePct": 50
+        },
+        {
+          "shop": "gamershop",
+          "totalProducts": 2,
+          "cheapestCount": 1,
+          "winRatePct": 50
+        },
+        {
+          "shop": "infotec",
+          "totalProducts": 1,
+          "cheapestCount": 1,
+          "winRatePct": 100
+        }
+      ],
+      "leader": "spacenet"
+    },
+    {
+      "slug": "climatiseurs",
+      "label": "Climatiseurs",
+      "clusterCount": 26,
+      "shops": [
+        {
+          "shop": "imag",
+          "totalProducts": 4,
+          "cheapestCount": 4,
+          "winRatePct": 100
+        },
+        {
+          "shop": "spacenet",
+          "totalProducts": 9,
+          "cheapestCount": 3,
+          "winRatePct": 34
+        },
+        {
+          "shop": "mytek",
+          "totalProducts": 12,
+          "cheapestCount": 3,
+          "winRatePct": 28
+        },
+        {
+          "shop": "batam",
+          "totalProducts": 3,
+          "cheapestCount": 2,
+          "winRatePct": 61
+        },
+        {
+          "shop": "qsnet",
+          "totalProducts": 3,
+          "cheapestCount": 2,
+          "winRatePct": 75
+        },
+        {
+          "shop": "jumbo",
+          "totalProducts": 3,
+          "cheapestCount": 2,
+          "winRatePct": 50
+        },
+        {
+          "shop": "allani",
+          "totalProducts": 5,
+          "cheapestCount": 2,
+          "winRatePct": 30
+        },
+        {
+          "shop": "electrobennjima",
+          "totalProducts": 4,
+          "cheapestCount": 2,
+          "winRatePct": 50
+        }
+      ],
+      "leader": "imag"
+    },
+    {
+      "slug": "ordinateurs-apple",
+      "label": "Ordinateurs Apple",
+      "clusterCount": 16,
+      "shops": [
+        {
+          "shop": "psstore",
+          "totalProducts": 8,
+          "cheapestCount": 8,
+          "winRatePct": 100
+        },
+        {
+          "shop": "itechstore",
+          "totalProducts": 9,
+          "cheapestCount": 3,
+          "winRatePct": 33
+        },
+        {
+          "shop": "tunisianet",
+          "totalProducts": 2,
+          "cheapestCount": 1,
+          "winRatePct": 50
+        },
+        {
+          "shop": "spacenet",
+          "totalProducts": 1,
+          "cheapestCount": 1,
+          "winRatePct": 100
+        },
+        {
+          "shop": "tokyo_store",
+          "totalProducts": 1,
+          "cheapestCount": 1,
+          "winRatePct": 100
+        },
+        {
+          "shop": "mytek",
+          "totalProducts": 1,
+          "cheapestCount": 1,
+          "winRatePct": 100
+        },
+        {
+          "shop": "ispace",
+          "totalProducts": 3,
+          "cheapestCount": 1,
+          "winRatePct": 33
+        },
+        {
+          "shop": "mbm",
+          "totalProducts": 1,
+          "cheapestCount": 0,
+          "winRatePct": 0
+        }
+      ],
+      "leader": "psstore"
+    },
+    {
+      "slug": "home-cinema-et-streaming",
+      "label": "Home Cinema Et Streaming",
+      "clusterCount": 10,
+      "shops": [
+        {
+          "shop": "spacenet",
+          "totalProducts": 8,
+          "cheapestCount": 4,
+          "winRatePct": 46
+        },
+        {
+          "shop": "mytek",
+          "totalProducts": 5,
+          "cheapestCount": 3,
+          "winRatePct": 57
+        },
+        {
+          "shop": "tunisianet",
+          "totalProducts": 4,
+          "cheapestCount": 1,
+          "winRatePct": 29
+        },
+        {
+          "shop": "zoom",
+          "totalProducts": 2,
+          "cheapestCount": 1,
+          "winRatePct": 25
+        },
+        {
+          "shop": "bstech",
+          "totalProducts": 1,
+          "cheapestCount": 1,
+          "winRatePct": 50
+        },
+        {
+          "shop": "jmb",
+          "totalProducts": 1,
+          "cheapestCount": 1,
+          "winRatePct": 100
+        },
+        {
+          "shop": "technopro",
+          "totalProducts": 1,
+          "cheapestCount": 0,
+          "winRatePct": 0
+        },
+        {
+          "shop": "tunewtec",
+          "totalProducts": 1,
+          "cheapestCount": 0,
+          "winRatePct": 0
+        }
+      ],
+      "leader": "spacenet"
+    },
+    {
+      "slug": "petit-electromenager",
+      "label": "Petit électroménager",
+      "clusterCount": 6,
+      "shops": [
+        {
+          "shop": "try_and_buy",
+          "totalProducts": 2,
+          "cheapestCount": 2,
+          "winRatePct": 75
+        },
+        {
+          "shop": "tunisianet",
+          "totalProducts": 1,
+          "cheapestCount": 1,
+          "winRatePct": 100
+        },
+        {
+          "shop": "wiki",
+          "totalProducts": 1,
+          "cheapestCount": 1,
+          "winRatePct": 100
+        },
+        {
+          "shop": "electrochaabani",
+          "totalProducts": 2,
+          "cheapestCount": 1,
+          "winRatePct": 50
+        },
+        {
+          "shop": "krichen",
+          "totalProducts": 1,
+          "cheapestCount": 1,
+          "winRatePct": 100
+        },
+        {
+          "shop": "graiet",
+          "totalProducts": 1,
+          "cheapestCount": 1,
+          "winRatePct": 50
+        },
+        {
+          "shop": "spacenet",
+          "totalProducts": 1,
+          "cheapestCount": 0,
+          "winRatePct": 0
+        },
+        {
+          "shop": "technopro",
+          "totalProducts": 1,
+          "cheapestCount": 0,
+          "winRatePct": 0
+        }
+      ],
+      "leader": "try_and_buy"
     }
   ]
 }
