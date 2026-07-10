@@ -5,6 +5,9 @@ export type TopParaShopRow = {
   rank: number;
   shop: string;
   products: number;
+  comparedProducts?: number;
+  catalogProducts?: number | null;
+  catalogTotal?: number | null;
   cheapestCount: number;
   cheapestCountExact?: number;
   avgPrice: number;
@@ -59,6 +62,9 @@ export function getTopParaShopsForApi() {
     shop: s.shop,
     displayName: prettyName(s.shop),
     products: s.products,
+    comparedProducts: s.comparedProducts ?? s.products,
+    catalogProducts: s.catalogProducts ?? null,
+    catalogTotal: s.catalogTotal ?? null,
     avgPrice: s.avgPrice,
     cheapestCount: s.cheapestCount,
     promoCount: s.promoCount,

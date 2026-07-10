@@ -202,6 +202,9 @@ function loadPromoUrls(dataDir) {
 
 const { inStock: inStockUrls, meta: scrapeMeta } = loadLatestStockIndex(STOCK_DIR);
 const promoUrls = loadPromoUrls(STOCK_DIR);
+const catalogByShop = new Map(
+  scrapeMeta.map((m) => [m.shop, { total: m.count, inStock: m.inStock }]),
+);
 
 const shopProducts = new Map();
 const fractionalWins = new Map();
@@ -310,6 +313,9 @@ const shops = ranked.map((r, i) => {
     rank: i + 1,
     shop: r.shop,
     products: r.totalProducts,
+    comparedProducts: r.totalProducts,
+    catalogProducts: catalogByShop.get(r.shop)?.inStock ?? null,
+    catalogTotal: catalogByShop.get(r.shop)?.total ?? null,
     cheapestCount: r.cheapestCount,
     cheapestCountExact: r.cheapestCountExact,
     avgPrice: r.avgPrice,

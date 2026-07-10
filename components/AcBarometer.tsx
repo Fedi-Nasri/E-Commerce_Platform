@@ -7,6 +7,9 @@ type ShopStat = {
   shop: string;
   displayName: string;
   products: number;
+  comparedProducts?: number;
+  catalogProducts?: number | null;
+  catalogTotal?: number | null;
   avgPrice: number;
   cheapestCount: number;
   promoCount: number;
@@ -59,7 +62,7 @@ export function AcBarometer() {
       rankBg: RANK_BG[Math.min(idx, RANK_BG.length - 1)],
       positionColor,
       cheapestStr: fmtNumber(s.cheapestCount),
-      productsStr: fmtNumber(s.products),
+      catalogStr: fmtNumber(s.catalogProducts ?? s.catalogTotal ?? s.products),
     };
   });
   return (
@@ -85,7 +88,7 @@ export function AcBarometer() {
                   <th className="pb-3 text-left font-medium">Site</th>
                   <th className="pb-3 text-center font-medium">Meilleurs prix</th>
                   <th className="pb-3 text-center font-medium">Prix moyen</th>
-                  <th className="pb-3 text-center font-medium">Nombre de produits</th>
+                  <th className="pb-3 text-center font-medium">Produits en catalogue</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -135,7 +138,7 @@ export function AcBarometer() {
                     </td>
                     <td className="py-3 text-center font-semibold tabular-nums text-slate-900 dark:text-white">{s.cheapestStr} produits</td>
                     <td className="py-3 text-center font-semibold tabular-nums text-slate-900 dark:text-white">{fmtPrice(s.avgPrice)}</td>
-                    <td className="py-3 text-center font-bold tabular-nums text-slate-900 dark:text-white">{s.productsStr}</td>
+                    <td className="py-3 text-center font-bold tabular-nums text-slate-900 dark:text-white">{s.catalogStr}</td>
                   </tr>
                 ))}
               </tbody>
