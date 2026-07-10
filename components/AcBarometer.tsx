@@ -58,8 +58,8 @@ export function AcBarometer() {
       ...s,
       rankBg: RANK_BG[Math.min(idx, RANK_BG.length - 1)],
       positionColor,
-      visitorsStr: fmtNumber(s.visitors),
       cheapestStr: fmtNumber(s.cheapestCount),
+      productsStr: fmtNumber(s.products),
     };
   });
   return (
@@ -85,7 +85,7 @@ export function AcBarometer() {
                   <th className="pb-3 text-left font-medium">Site</th>
                   <th className="pb-3 text-center font-medium">Meilleurs prix</th>
                   <th className="pb-3 text-center font-medium">Prix moyen</th>
-                  <th className="pb-3 text-center font-medium">Visiteurs estimés</th>
+                  <th className="pb-3 text-center font-medium">Nombre de produits</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -130,13 +130,12 @@ export function AcBarometer() {
                         )}
                         <div className="leading-tight">
                           <div className="font-semibold text-slate-900 dark:text-white">{s.displayName}</div>
-                          <div className="text-[10px] text-slate-400 dark:text-white/40">{fmtNumber(s.products)} produits</div>
                         </div>
                       </div>
                     </td>
                     <td className="py-3 text-center font-semibold tabular-nums text-slate-900 dark:text-white">{s.cheapestStr} produits</td>
                     <td className="py-3 text-center font-semibold tabular-nums text-slate-900 dark:text-white">{fmtPrice(s.avgPrice)}</td>
-                    <td className="py-3 text-center font-bold tabular-nums text-slate-900 dark:text-white">{s.visitorsStr}</td>
+                    <td className="py-3 text-center font-bold tabular-nums text-slate-900 dark:text-white">{s.productsStr}</td>
                   </tr>
                 ))}
               </tbody>
