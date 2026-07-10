@@ -116,7 +116,7 @@ function WinRateTooltip({
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
   return (
-    <div className="rounded-lg border border-slate-200 bg-white/95 px-3 py-2 text-xs shadow-lg backdrop-blur-sm dark:border-white/10 dark:bg-bg-800/95">
+    <div className="rounded-lg border border-slate-200 bg-white/95 px-3 py-2 text-xs shadow-lg backdrop-blur-sm dark:border-white/10 dark:bg-bg-800">
       <div className="font-bold text-slate-900 dark:text-white">{d.name}</div>
       <div className="mt-1 text-slate-600 dark:text-white/70">
         Meilleurs prix : <strong>{d.wins.toLocaleString("fr-FR")}</strong>
@@ -140,7 +140,7 @@ function ScatterTooltip({
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
   return (
-    <div className="rounded-lg border border-slate-200 bg-white/95 px-3 py-2 text-xs shadow-lg backdrop-blur-sm dark:border-white/10 dark:bg-bg-800/95">
+    <div className="rounded-lg border border-slate-200 bg-white/95 px-3 py-2 text-xs shadow-lg backdrop-blur-sm dark:border-white/10 dark:bg-bg-800">
       <div className="font-bold text-slate-900 dark:text-white">{d.name}</div>
       <div className="mt-1 text-slate-600 dark:text-white/70">
         {d.wins.toLocaleString("fr-FR")} victoires · {d.total.toLocaleString("fr-FR")} produits
@@ -159,7 +159,6 @@ export function RetailRankingDetail({
   minProductsList,
   inStockOnly,
   shops,
-  top5,
   categories,
 }: RetailRankingDetailProps) {
   const updated = fmtDate(generatedAt);
@@ -364,7 +363,7 @@ export function RetailRankingDetail({
                   if (!active || !payload?.length) return null;
                   const d = payload[0].payload as (typeof categoryChart)[0];
                   return (
-                    <div className="rounded-lg border border-slate-200 bg-white/95 px-3 py-2 text-xs shadow-lg dark:border-white/10 dark:bg-bg-800/95">
+                    <div className="rounded-lg border border-slate-200 bg-white/95 px-3 py-2 text-xs shadow-lg dark:border-white/10 dark:bg-bg-800">
                       <div className="font-bold text-slate-900 dark:text-white">{d.fullLabel}</div>
                       <div className="mt-1 text-slate-600 dark:text-white/70">
                         {d.clusterCount.toLocaleString("fr-FR")} produits comparés
@@ -380,53 +379,6 @@ export function RetailRankingDetail({
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
-      </div>
-
-      <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-b from-emerald-50/60 to-white p-5 dark:from-emerald-950/30 dark:to-bg-800 dark:border-emerald-500/15">
-        <h3 className="text-sm font-bold text-slate-900 dark:text-white">Podium — Top 5 (accueil)</h3>
-        <p className="mt-1 text-xs text-slate-500 dark:text-white/50">
-          Même classement que la carte d&apos;accueil, détaillé ici avec barres animées.
-        </p>
-        <ul className="mt-4 space-y-2">
-          {top5.map((s, i) => (
-            <li
-              key={s.shop}
-              className={`retail-row-enter rounded-xl border border-slate-200/90 bg-white/90 p-3 dark:border-white/5 dark:bg-bg-800/90 ${
-                i === 0 ? "retail-champion-glow border-emerald-400/30" : ""
-              }`}
-              style={{ animationDelay: `${i * 60}ms` }}
-            >
-              <div className="flex items-center gap-3">
-                <span className="w-6 shrink-0 text-center text-sm font-black tabular-nums text-slate-400">{i + 1}</span>
-                {s.logo ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={s.logo} alt="" className="h-10 w-10 shrink-0 object-contain" />
-                ) : (
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-sm font-bold dark:bg-white/10">
-                    {s.displayName.slice(0, 1)}
-                  </span>
-                )}
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm font-semibold text-slate-900 dark:text-white">{s.displayName}</div>
-                  <div className="text-[11px] tabular-nums text-slate-500 dark:text-white/50">
-                    {s.cheapestCount.toLocaleString("fr-FR")} / {s.totalProducts.toLocaleString("fr-FR")} produits
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-lg font-black tabular-nums text-emerald-600 dark:text-emerald-400">
-                    {s.winRatePct}%
-                  </div>
-                </div>
-              </div>
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-white/10">
-                <div
-                  className="retail-win-bar h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-600"
-                  style={{ width: `${s.winRatePct}%`, animationDelay: `${i * 70 + 100}ms` }}
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-white dark:border-white/[0.08] dark:bg-bg-800">
@@ -447,11 +399,10 @@ export function RetailRankingDetail({
                 <th className="px-3 py-3 font-semibold text-right">Produits</th>
                 <th className="px-3 py-3 font-semibold text-right">Meilleurs prix</th>
                 <th className="px-3 py-3 font-semibold text-right">Taux</th>
-                <th className="px-3 py-3 font-semibold w-32">Part</th>
               </tr>
             </thead>
             <tbody>
-              {shops.map((s, i) => (
+              {shops.map((s) => (
                 <tr key={s.shop} className="border-b border-slate-50 last:border-0 dark:border-white/[0.04]">
                   <td className="px-5 py-3 font-bold tabular-nums text-slate-400">{s.rank}</td>
                   <td className="px-3 py-3">
@@ -473,24 +424,8 @@ export function RetailRankingDetail({
                   <td className="px-3 py-3 text-right tabular-nums font-semibold text-slate-800 dark:text-white/90">
                     {s.cheapestCount.toLocaleString("fr-FR")}
                   </td>
-                  <td className="px-3 py-3 text-right">
-                    <span
-                      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-bold tabular-nums ${
-                        i === 0
-                          ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300"
-                          : "bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-white/60"
-                      }`}
-                    >
-                      {s.winRatePct}%
-                    </span>
-                  </td>
-                  <td className="px-3 py-3">
-                    <div className="h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
-                      <div
-                        className="h-full rounded-full bg-emerald-500/80"
-                        style={{ width: `${s.winRatePct}%` }}
-                      />
-                    </div>
+                  <td className="px-3 py-3 text-right tabular-nums font-semibold text-slate-700 dark:text-white/75">
+                    {s.winRatePct}%
                   </td>
                 </tr>
               ))}
