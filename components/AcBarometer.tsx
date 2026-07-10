@@ -3,6 +3,22 @@ import { useEffect, useState } from "react";
 import { Sparkles, Sun } from "lucide-react";
 import Link from "next/link";
 
+type SunscreenOffer = {
+  rank: number;
+  name: string;
+  url: string;
+  price: number;
+  regular: number | null;
+};
+
+type SunscreenData = {
+  product: { label: string; subtitle: string; image: string };
+  shopsTracked: number;
+  offers: SunscreenOffer[];
+  maxSavings: number;
+  leaderShop: string | null;
+};
+
 type ShopStat = {
   shop: string;
   displayName: string;
@@ -40,7 +56,9 @@ function fmtNumber(n: number): string {
 
 export function AcBarometer() {
   const [shops, setShops] = useState<ShopStat[]>([]);
+  const [sunscreen, setSunscreen] = useState<SunscreenData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sunscreenLoading, setSunscreenLoading] = useState(true);
 
   useEffect(() => {
     fetch("/api/para-shops-stats")
@@ -48,6 +66,14 @@ export function AcBarometer() {
       .then((d) => setShops((d.shops ?? []).slice(0, 5)))
       .catch(() => setShops([]))
       .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/para-sunscreen-offers")
+      .then((r) => r.json())
+      .then((d) => setSunscreen(d))
+      .catch(() => setSunscreen(null))
+      .finally(() => setSunscreenLoading(false));
   }, []);
 
   const topRows = shops.map((s, idx) => {
@@ -184,31 +210,46 @@ export function AcBarometer() {
           <div className="relative mt-4 flex items-center gap-3 rounded-xl border border-amber-400/20 bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-transparent p-3">
             <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-white shadow-md ring-1 ring-amber-300/40">
               <img
-                src="https://www.maparatunisie.tn/wp-content/uploads/2021/02/avene-creme-solaire-peaux-sensibles-spf-50-avene-solaires9-1716474405.jpg.webp"
+                src={sunscreen?.product.image ?? "https://www.maparatunisie.tn/wp-content/uploads/2021/02/avene-creme-solaire-peaux-sensibles-spf-50-avene-solaires9-1716474405.jpg.webp"}
                 alt="Avène SPF 50+"
                 className="absolute inset-0 h-full w-full object-cover"
               />
             </div>
             <div className="min-w-0 flex-1">
-              <div className="text-sm font-bold text-slate-900 dark:text-white">AVÈNE Soin Solaire SPF 50+</div>
-              <div className="text-[11px] text-slate-500 dark:text-white/55">Crème peaux sensibles sèches · 50ml</div>
+              <div className="text-sm font-bold text-slate-900 dark:text-white">
+                {sunscreen?.product.label ?? "AVÈNE Soin Solaire SPF 50+"}
+              </div>
+              <div className="text-[11px] text-slate-500 dark:text-white/55">
+                {sunscreen?.product.subtitle ?? "Crème peaux sensibles sèches · 50ml"}
+              </div>
               <div className="mt-1 flex items-center gap-2 text-[10px]">
                 <span className="rounded-md bg-emerald-500/20 px-1.5 py-0.5 font-bold text-emerald-600 dark:text-emerald-300">En stock</span>
                 <span className="text-slate-300 dark:text-white/40">·</span>
-                <span className="text-slate-500 dark:text-white/60">3 parapharmacies suivies</span>
+                <span className="text-slate-500 dark:text-white/60">
+                  {sunscreenLoading
+                    ? "…"
+                    : `${sunscreen?.shopsTracked ?? 3} parapharmacie${(sunscreen?.shopsTracked ?? 3) > 1 ? "s" : ""} suivie${(sunscreen?.shopsTracked ?? 3) > 1 ? "s" : ""}`}
+                </span>
               </div>
             </div>
           </div>
 
-          {/* Offers list — real prices from DB */}
+          {/* Offers list — prices from latest scrapes */}
           <ul className="relative mt-3 flex-1 space-y-2">
-            {[
-              { rank: 1, name: "Parafendri", url: "https://parafendri.tn/beaute/721-avene-fluide-spf-50-peau-sensible-normales-a-mixtes-50ml-beaute-avene.html", price: 42.000, regular: null },
-              { rank: 2, name: "Parashop",   url: "https://www.parashop.tn/solaire/protection-visage/ecran-peaux-seches/avene-creme-spf-50-50ml",               price: 52.814, regular: 62.133 },
-              { rank: 3, name: "El Farabi",  url: "https://www.paraelfarabi.com/produit/avene-creme-solaire-spf50-fini-invisible-50-ml",                       price: 56.530, regular: 68.140 },
-            ].map((o) => {
+            {sunscreenLoading &&
+              Array.from({ length: 3 }).map((_, i) => (
+                <li key={`sun-skel-${i}`} className="animate-pulse rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2 dark:border-white/[0.05] dark:bg-bg-800">
+                  <div className="h-8 rounded bg-slate-200 dark:bg-white/10" />
+                </li>
+              ))}
+            {!sunscreenLoading && (sunscreen?.offers ?? []).length === 0 && (
+              <li className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-4 text-center text-xs text-slate-400 dark:border-white/[0.05] dark:bg-bg-800 dark:text-white/40">
+                Aucune offre en stock pour ce produit.
+              </li>
+            )}
+            {!sunscreenLoading && (sunscreen?.offers ?? []).map((o) => {
               const best = o.rank === 1;
-              const maxPrice = 56.530;
+              const maxPrice = Math.max(...(sunscreen?.offers ?? []).map((x) => x.price));
               const deltaPct = Math.round(((o.price - maxPrice) / maxPrice) * 100);
               const deltaStr = deltaPct === 0 ? "prix référence" : `${deltaPct}% vs + cher`;
               const deltaColor = deltaPct < 0 ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400 dark:text-white/40";
@@ -235,10 +276,10 @@ export function AcBarometer() {
                   </div>
                   <div className="text-right leading-tight">
                     <div className={`text-sm font-bold tabular-nums ${best ? "text-brand-gold" : "text-slate-900 dark:text-white"}`}>
-                      {o.price.toFixed(3)} DT
+                      {fmtPrice(o.price)}
                     </div>
-                    {o.regular && (
-                      <div className="text-[10px] tabular-nums text-slate-400 line-through">{o.regular.toFixed(3)}</div>
+                    {o.regular != null && (
+                      <div className="text-[10px] tabular-nums text-slate-400 line-through">{fmtPrice(o.regular)}</div>
                     )}
                   </div>
                   <a
@@ -259,15 +300,17 @@ export function AcBarometer() {
           </ul>
 
           {/* Savings footer */}
-          <div className="relative mt-3 flex items-center justify-between gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2">
-            <div className="flex items-center gap-1.5 text-[11px] text-slate-600 dark:text-white/75">
-              <Sparkles className="h-3 w-3 text-emerald-500 dark:text-emerald-300" />
-              Économie max en choisissant Parafendri
+          {(sunscreen?.maxSavings ?? 0) > 0 && sunscreen?.leaderShop && (
+            <div className="relative mt-3 flex items-center justify-between gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2">
+              <div className="flex items-center gap-1.5 text-[11px] text-slate-600 dark:text-white/75">
+                <Sparkles className="h-3 w-3 text-emerald-500 dark:text-emerald-300" />
+                Économie max en choisissant {sunscreen.leaderShop}
+              </div>
+              <div className="text-sm font-extrabold tabular-nums text-emerald-600 dark:text-emerald-300">
+                −{fmtPrice(sunscreen.maxSavings)}
+              </div>
             </div>
-            <div className="text-sm font-extrabold tabular-nums text-emerald-600 dark:text-emerald-300">
-              −14.530 DT
-            </div>
-          </div>
+          )}
 
           {/* Bottom button */}
           <div className="mt-3 flex justify-center">

@@ -1,0 +1,47 @@
+{
+  "generated_at": "2026-07-10T14:10:19.358Z",
+  "stock_dir": "C:/Users/stage.td/Desktop/current_scrapping/data",
+  "product": {
+    "label": "AVÈNE Soin Solaire SPF 50+",
+    "subtitle": "Crème peaux sensibles sèches · 50ml",
+    "image": "https://www.maparatunisie.tn/wp-content/uploads/2021/02/avene-creme-solaire-peaux-sensibles-spf-50-avene-solaires9-1716474405.jpg.webp"
+  },
+  "shopsTracked": 3,
+  "offers": [
+    {
+      "rank": 1,
+      "shop": "parafendri",
+      "displayName": "Parafendri",
+      "name": "Parafendri",
+      "url": "https://parafendri.tn/nos-promotions/10755-avene-soin-solaire-peaux-peaux-sensibles-seches-spf-50-50ml-xeracalm-huile-lavante-100ml-offerte.html",
+      "price": 52,
+      "regular": null,
+      "title": "AVENE - SOIN SOLAIRE PEAUX PEAUX SENSIBLES SECHES SPF 50+ 50ML + XERACALM HUILE LAVANTE 100ML OFFERTE",
+      "inStock": true
+    },
+    {
+      "rank": 2,
+      "shop": "parashop",
+      "displayName": "ParaShop",
+      "name": "ParaShop",
+      "url": "https://www.parashop.tn/solaire/protection-visage/ecran-peaux-seches/avene-creme-spf-50-50ml",
+      "price": 52.814,
+      "regular": 62.133,
+      "title": "AVENE CREME SPF50+ 50ML",
+      "inStock": true
+    },
+    {
+      "rank": 3,
+      "shop": "el_farabi",
+      "displayName": "El Farabi",
+      "name": "El Farabi",
+      "url": "https://www.paraelfarabi.com/produit/avene-creme-solaire-spf50-fini-invisible-50-ml",
+      "price": 56.53,
+      "regular": 68.14,
+      "title": "Avène Crème solaire SPF50+ Fini Invisible 50 ml",
+      "inStock": true
+    }
+  ],
+  "maxSavings": 4.53,
+  "leaderShop": "Parafendri"
+}
