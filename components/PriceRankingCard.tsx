@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Medal } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { ShopLogo } from "@/components/shop/ShopLogo";
 import {
   formatEcartPct,
@@ -101,8 +101,9 @@ export function PriceRankingCard({
           </p>
         ) : (
           <ul className="flex flex-col gap-2">
-            {top3.map((shop) => {
-              const medal = medalStyle(shop.rank);
+            {top3.map((shop, i) => {
+              const position = i + 1;
+              const medal = medalStyle(position);
               return (
                 <li
                   key={shop.shop_key}
@@ -112,11 +113,7 @@ export function PriceRankingCard({
                     className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-black tabular-nums ${medal.badge}`}
                     title={medal.name}
                   >
-                    {shop.rank === 1 ? (
-                      <Medal className="h-4 w-4" strokeWidth={2.25} />
-                    ) : (
-                      shop.rank
-                    )}
+                    {position}
                   </span>
 
                   <ShopLogo shopKey={shop.shop_key} size={32} className="shrink-0" />
