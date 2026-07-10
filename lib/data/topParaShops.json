@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-10T12:38:54.663Z",
+  "generated_at": "2026-07-10T13:02:05.989Z",
   "source": "C:\\Users\\stage.td\\Downloads\\ynqqn w\\my_run_117\\product_clusters.json",
   "stock_dir": "C:/Users/stage.td/Desktop/current_scrapping/data",
   "scrapes_used": 12,
@@ -13,7 +13,7 @@
       "shop": "parafendri",
       "products": 2391,
       "cheapestCount": 1355,
-      "cheapestCountExact": 1355.3,
+      "cheapestCountExact": 1354.8,
       "avgPrice": 48.63,
       "promoCount": 153,
       "promoPct": 6,
@@ -109,16 +109,16 @@
     {
       "rank": 8,
       "shop": "parahouse",
-      "products": 227,
-      "cheapestCount": 88,
-      "cheapestCountExact": 88.3,
-      "avgPrice": 71.644,
+      "products": 228,
+      "cheapestCount": 89,
+      "cheapestCountExact": 88.8,
+      "avgPrice": 71.457,
       "promoCount": 81,
       "promoPct": 36,
       "availability": 5,
       "winRatePct": 39,
       "score": 5,
-      "visitors": 16305
+      "visitors": 16435
     },
     {
       "rank": 9,
