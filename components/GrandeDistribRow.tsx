@@ -204,7 +204,9 @@ export function GrandeDistribRow() {
 
           {/* Sub-header */}
           <div className="relative mt-2 text-[11px] leading-relaxed text-slate-500 dark:text-white/55">
-            Grandes enseignes retail classées sur produits comparables en stock (dernier scrape par boutique). Score = victoires au meilleur prix, pondéré par le nombre de concurrents.
+            Classement par{" "}
+            <span className="font-semibold text-slate-700 dark:text-white/80">nombre de meilleurs prix</span>
+            {" "}sur des produits identiques en stock, vendus par au moins 2 boutiques.
           </div>
 
           {/* Rows */}
@@ -216,9 +218,6 @@ export function GrandeDistribRow() {
               totalProducts: 0,
               similarProducts: 0,
               cheapestCount: 0,
-              competitionScore: 0,
-              competitiveCount: 0,
-              competitivePct: 0,
               winRatePct: 0,
             }))).slice(0, 5).map((s, i) => {
               const rankBg =
@@ -227,7 +226,7 @@ export function GrandeDistribRow() {
                 i === 2 ? "bg-gradient-to-br from-yellow-400 to-amber-500 text-white ring-1 ring-yellow-400" :
                 i === 3 ? "bg-gradient-to-br from-orange-400 to-orange-600 text-white ring-1 ring-orange-400" :
                           "bg-gradient-to-br from-red-500 to-red-700 text-white ring-1 ring-red-500";
-              const competitivePct = s.competitivePct ?? 0;
+              const winPct = s.winRatePct ?? (s.totalProducts > 0 ? Math.round((s.cheapestCount / s.totalProducts) * 100) : 0);
               return (
                 <li key={s.shop} className="rounded-xl border border-slate-200 bg-slate-50 p-2 dark:border-white/5 dark:bg-bg-800">
                   <div className="flex items-center gap-2.5">
@@ -252,27 +251,23 @@ export function GrandeDistribRow() {
                       </div>
                     </div>
                     <div className="text-right leading-tight">
-                      <div className="text-base font-black tabular-nums text-emerald-600 dark:text-emerald-400">{(s.competitionScore ?? 0).toLocaleString("fr-FR")}</div>
-                      <div className="text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-white/50">Score</div>
+                      <div className="text-base font-black tabular-nums text-emerald-600 dark:text-emerald-400">{s.cheapestCount.toLocaleString("fr-FR")}</div>
+                      <div className="text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-white/50">Meilleurs prix</div>
                     </div>
                   </div>
                   <div className="mt-2 flex items-center justify-between text-[10px]">
-                    <span className="text-slate-500 dark:text-white/50">Meilleurs prix (partagés si ex æquo)</span>
-                    <span className="font-semibold tabular-nums text-slate-700 dark:text-white/75">{s.cheapestCount.toLocaleString("fr-FR")}</span>
-                  </div>
-                  <div className="mt-2 flex items-center justify-between text-[10px]">
-                    <span className="text-slate-500 dark:text-white/50">Prix compétitifs (≤5% du meilleur)</span>
-                    <span className="font-black tabular-nums text-emerald-600 dark:text-emerald-400">{competitivePct}%</span>
+                    <span className="text-slate-500 dark:text-white/50">Taux meilleur prix</span>
+                    <span className="font-black tabular-nums text-emerald-600 dark:text-emerald-400">{winPct}%</span>
                   </div>
                   <div className="mt-1 flex items-center gap-2">
                     <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200 dark:bg-white/10">
                       <div
                         className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-600 transition-all duration-700"
-                        style={{ width: `${competitivePct}%` }}
+                        style={{ width: `${winPct}%` }}
                       />
                     </div>
                     <span className="w-9 shrink-0 text-right text-[10px] font-black tabular-nums text-emerald-600 dark:text-emerald-400">
-                      {competitivePct}%
+                      {winPct}%
                     </span>
                   </div>
                 </li>

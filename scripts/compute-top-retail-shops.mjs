@@ -254,7 +254,6 @@ for (const [shop, products] of shopProducts) {
 
 allShops.sort(
   (a, b) =>
-    b.competitionScore - a.competitionScore ||
     b.fractionalWins - a.fractionalWins ||
     b.totalProducts - a.totalProducts,
 );
@@ -299,7 +298,7 @@ const payload = {
   stock_dir: STOCK_DIR,
   scrapes_used: scrapeMeta.length,
   method:
-    "Produits comparables en stock (dernier scrape par enseigne, ≥2 boutiques, catalogue ≥1 000 refs). Score = victoires au meilleur prix (ex æquo partagé) × nb de concurrents.",
+    "Produits comparables en stock (dernier scrape par enseigne, ≥2 boutiques, catalogue ≥1 000 refs). Classement par nombre de meilleurs prix (ex æquo partagé).",
   clusters_used: clustersUsed,
   min_products: MIN_PRODUCTS,
   in_stock_only: Boolean(STOCK_DIR),
@@ -314,6 +313,6 @@ if (STOCK_DIR) {
 }
 for (const s of shops) {
   console.log(
-    `  ${s.rank}. ${s.shop.padEnd(16)} score=${String(s.competitionScore).padStart(5)} best=${String(s.cheapestCount).padStart(5)} competitive=${s.competitivePct}%`,
+    `  ${s.rank}. ${s.shop.padEnd(16)} best=${String(s.cheapestCount).padStart(5)} / total=${String(s.totalProducts).padStart(5)} win=${s.winRatePct}%`,
   );
 }

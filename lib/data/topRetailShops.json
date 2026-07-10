@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-10T08:19:36.059Z",
+  "generated_at": "2026-07-10T10:42:16.409Z",
   "source": "C:\\Users\\stage.td\\Downloads\\ynqqn w\\my_run_117\\product_clusters.json",
   "stock_dir": "C:/Users/stage.td/Desktop/current_scrapping/data",
   "scrapes_used": 55,
-  "method": "Produits comparables en stock (dernier scrape par enseigne, ≥2 boutiques, catalogue ≥1 000 refs). Score = victoires au meilleur prix (ex æquo partagé) × nb de concurrents.",
+  "method": "Produits comparables en stock (dernier scrape par enseigne, ≥2 boutiques, catalogue ≥1 000 refs). Classement par nombre de meilleurs prix (ex æquo partagé).",
   "clusters_used": 13213,
   "min_products": 1000,
   "in_stock_only": true,
@@ -46,18 +46,6 @@
     },
     {
       "rank": 4,
-      "shop": "affariyet",
-      "totalProducts": 3477,
-      "cheapestCount": 1036,
-      "competitionScore": 3247,
-      "competitiveCount": 2043,
-      "competitivePct": 59,
-      "similarProducts": 2656,
-      "overlapPct": 76,
-      "winRatePct": 30
-    },
-    {
-      "rank": 5,
       "shop": "carthagoinformatique",
       "totalProducts": 3581,
       "cheapestCount": 1247,
@@ -67,6 +55,18 @@
       "similarProducts": 1314,
       "overlapPct": 37,
       "winRatePct": 35
+    },
+    {
+      "rank": 5,
+      "shop": "affariyet",
+      "totalProducts": 3477,
+      "cheapestCount": 1036,
+      "competitionScore": 3247,
+      "competitiveCount": 2043,
+      "competitivePct": 59,
+      "similarProducts": 2656,
+      "overlapPct": 76,
+      "winRatePct": 30
     }
   ]
 }
