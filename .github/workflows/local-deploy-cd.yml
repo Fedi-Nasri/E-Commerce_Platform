@@ -1,0 +1,96 @@
+name: CD - Local Network Deploy
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    name: Deploy to Local Network Server
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_PREFIX: ${{ secrets.IMAGE_PREFIX }}
+      APP_DIR: ${{ secrets.APP_DIR }}
+      DEPLOY_SHA: ${{ github.sha }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate required secrets
+        env:
+          LOCAL_SERVER_HOST: ${{ secrets.LOCAL_SERVER_HOST }}
+          LOCAL_SERVER_PORT: ${{ secrets.LOCAL_SERVER_PORT }}
+          DEPLOY_USER: ${{ secrets.LOCAL_SERVER_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.LOCAL_SERVER_SSH_KEY }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          IMAGE_PREFIX: ${{ secrets.IMAGE_PREFIX }}
+          APP_DIR: ${{ secrets.APP_DIR }}
+          LOCAL_ENV_FILE: ${{ secrets.LOCAL_ENV_FILE }}
+        run: |
+          test -n "$LOCAL_SERVER_HOST"
+          test -n "$LOCAL_SERVER_PORT"
+          test -n "$DEPLOY_USER"
+          test -n "$SSH_PRIVATE_KEY"
+          test -n "$GHCR_TOKEN"
+          test -n "$IMAGE_PREFIX"
+          test -n "$APP_DIR"
+          test -n "$LOCAL_ENV_FILE"
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.LOCAL_SERVER_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p "${{ secrets.LOCAL_SERVER_PORT }}" -H "${{ secrets.LOCAL_SERVER_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Prepare env file
+        env:
+          LOCAL_ENV_FILE: ${{ secrets.LOCAL_ENV_FILE }}
+        run: |
+          umask 077
+          echo "$LOCAL_ENV_FILE" > ./.env
+
+      - name: Flatten deploy scripts
+        run: |
+          cp deploy/scripts/deploy-ghcr.sh ./deploy-ghcr.sh
+          cp deploy/scripts/check-containers.sh ./check-containers.sh
+          cp deploy/nginx/staging.1111.tn.conf ./staging.1111.tn.conf
+
+      - name: Upload files to local server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.LOCAL_SERVER_HOST }}
+          port: ${{ secrets.LOCAL_SERVER_PORT }}
+          username: ${{ secrets.LOCAL_SERVER_USER }}
+          key: ${{ secrets.LOCAL_SERVER_SSH_KEY }}
+          source: ".env,deploy-ghcr.sh,check-containers.sh,docker-compose.staging.yml,docker-compose.monitoring.yml,staging.1111.tn.conf,deploy/monitoring"
+          target: "/tmp/"
+
+      - name: Deploy on remote server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.LOCAL_SERVER_HOST }}
+          port: ${{ secrets.LOCAL_SERVER_PORT }}
+          username: ${{ secrets.LOCAL_SERVER_USER }}
+          key: ${{ secrets.LOCAL_SERVER_SSH_KEY }}
+          script: |
+            set -euo pipefail
+
+            sudo mkdir -p "${{ secrets.APP_DIR }}/current"
+            sudo mkdir -p "${{ secrets.APP_DIR }}/shared"
+            sudo chown -R "${{ secrets.LOCAL_SERVER_USER }}:${{ secrets.LOCAL_SERVER_USER }}" "${{ secrets.APP_DIR }}"
+
+            install -m 600 /tmp/.env "${{ secrets.APP_DIR }}/current/.env"
+            rm -f /tmp/.env
+
+            APP_DIR="${{ secrets.APP_DIR }}" \
+            GITHUB_SHA="${{ env.DEPLOY_SHA }}" \
+            IMAGE_PREFIX="${{ secrets.IMAGE_PREFIX }}" \
+            GHCR_PAT="${{ secrets.GHCR_TOKEN }}" \
+            COMPOSE_FILE="docker-compose.staging.yml" \
+            NGINX_CONFIG_FILE="staging.1111.tn.conf" \
+            NGINX_SITE_NAME="staging.1111.tn" \
+            bash /tmp/deploy-ghcr.sh
+
+            rm -f /tmp/deploy-ghcr.sh /tmp/check-containers.sh

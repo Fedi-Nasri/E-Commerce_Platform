@@ -1,0 +1,289 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - develop
+      - monitoring
+  pull_request: 
+    branches:
+      - develop
+     
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "20.14.0"
+  REGISTRY: ghcr.io
+ 
+  IMAGE_PREFIX: ghcr.io/galylioai/1111
+
+# ─────────────────────────────────────────────
+# JOB 1 — DETECT CHANGES
+# Only run checks for services that actually changed.
+# This prevents a frontend edit from triggering all backend checks.
+# ─────────────────────────────────────────────
+jobs:
+  detect-changes:
+    name: Detect Changed Services
+    runs-on: ubuntu-latest
+    outputs:
+      gateway: ${{ steps.filter.outputs.gateway }}
+      auth: ${{ steps.filter.outputs.auth }}
+      user: ${{ steps.filter.outputs.user }}
+      para: ${{ steps.filter.outputs.para }}
+      retail: ${{ steps.filter.outputs.retail }}
+      mailer: ${{ steps.filter.outputs.mailer }}
+      web: ${{ steps.filter.outputs.web }}
+      # shared = anything in backend root (shared libs, tsconfig, etc.)
+      shared: ${{ steps.filter.outputs.shared }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Filter changed paths
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            gateway:
+              - 'backend/gateway/**'
+            auth:
+              - 'backend/services/auth/**'
+            user:
+              - 'backend/services/user/**'
+            para:
+              - 'backend/services/para/**'
+            retail:
+              - 'backend/services/retail/**'
+            mailer:
+              - 'backend/services/mailer/**'
+            web:
+              - 'front-office/**'
+            shared:
+              - 'backend/package.json'
+              - 'backend/package-lock.json'
+              - 'backend/tests/**'
+              - 'backend/**/tsconfig*.json'
+              - 'backend/shared/**'
+
+# ─────────────────────────────────────────────
+# JOB 2 — BACKEND TESTS (single job for the whole monorepo)
+# All Vitest suites live in backend/tests/ and cover every service.
+# Install once from backend/ (workspaces root) so vitest is available.
+# ─────────────────────────────────────────────
+  backend-tests:
+    name: Backend · tests & typecheck
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: |
+      needs.detect-changes.outputs.gateway == 'true' ||
+      needs.detect-changes.outputs.auth == 'true' ||
+      needs.detect-changes.outputs.user == 'true' ||
+      needs.detect-changes.outputs.para == 'true' ||
+      needs.detect-changes.outputs.retail == 'true' ||
+      needs.detect-changes.outputs.mailer == 'true' ||
+      needs.detect-changes.outputs.shared == 'true'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Type check (all workspaces)
+        working-directory: backend
+        run: npm run typecheck
+
+      - name: Run tests
+        working-directory: backend
+        run: npm test -- --passWithNoTests
+        env:
+          NODE_ENV: test
+
+      - name: Security audit
+        working-directory: backend
+        run: npm audit --audit-level=high || true
+
+# ─────────────────────────────────────────────
+# JOB 3 — MAILER QUALITY (Python service only)
+# Node services are covered by backend-tests above.
+# ─────────────────────────────────────────────
+  backend-quality:
+    name: "Quality · mailer"
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.mailer == 'true'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        working-directory: backend/services/mailer
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi
+
+      - name: Lint + Tests
+        working-directory: backend/services/mailer
+        run: |
+          if command -v flake8 >/dev/null 2>&1; then flake8 || true; fi
+          if command -v pytest >/dev/null 2>&1; then pytest -q || true; fi
+
+# ─────────────────────────────────────────────
+# JOB 4 — FRONTEND QUALITY
+# Separate job for Next.js — different checks than backend.
+# ─────────────────────────────────────────────
+  frontend-quality:
+    name: "Quality · web"
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.web == 'true'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: front-office/package-lock.json
+
+      - name: Install dependencies
+        working-directory: front-office
+        run: npm ci
+
+      - name: Lint
+        working-directory: front-office
+        run: npm run lint
+
+      - name: Type check
+        working-directory: front-office
+        run: npm run typecheck
+
+      - name: Build
+        working-directory: front-office
+       
+        env:
+          NEXT_PUBLIC_API_BASE_URL: http://localhost:3000
+          NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID_CI }}
+        run: npm run build
+
+      - name: Security audit
+        working-directory: front-office
+        run: npm audit --audit-level=high || true
+
+# ─────────────────────────────────────────────
+# JOB 5 — DOCKER BUILD & PUSH (matrix across all services)
+# Only runs after quality checks pass.
+# Builds Docker images and pushes to GHCR with two tags:
+#   - :develop (always updated on every merge)
+#   - :sha-<commit> (immutable, used by CD for traceability)
+# ─────────────────────────────────────────────
+  docker-build:
+    name: "Docker · ${{ matrix.service }}"
+    runs-on: ubuntu-latest
+    needs:
+      - detect-changes
+      - backend-tests
+      - backend-quality
+      - frontend-quality
+
+    # Don't fail the whole matrix if one job was skipped (e.g. frontend-quality skipped)
+    if: always() && !failure() && !cancelled()
+
+    permissions:
+      contents: read
+      packages: write  # required to push to GHCR
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: gateway
+            context: ./backend
+            dockerfile: backend/gateway/Dockerfile
+            changed: ${{ needs.detect-changes.outputs.gateway }}
+          - service: auth
+            context: ./backend
+            dockerfile: backend/services/auth/Dockerfile
+            changed: ${{ needs.detect-changes.outputs.auth }}
+          - service: user
+            context: ./backend
+            dockerfile: backend/services/user/Dockerfile
+            changed: ${{ needs.detect-changes.outputs.user }}
+          - service: para
+            context: ./backend
+            dockerfile: backend/services/para/Dockerfile
+            changed: ${{ needs.detect-changes.outputs.para }}
+          - service: retail
+            context: ./backend
+            dockerfile: backend/services/retail/Dockerfile
+            changed: ${{ needs.detect-changes.outputs.retail }}
+          - service: mailer
+            context: ./backend/services/mailer
+            dockerfile: backend/services/mailer/Dockerfile
+            changed: ${{ needs.detect-changes.outputs.mailer }}
+          - service: web
+            context: ./front-office
+            dockerfile: front-office/Dockerfile
+            changed: ${{ needs.detect-changes.outputs.web }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Enables BuildKit layer caching — critical for speed
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push · ${{ matrix.service }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          # Two tags per image:
+          # 1. branch tag — for staging CD to always pull latest develop build
+          # 2. sha tag   — immutable, used by CD pipelines for exact version
+          tags: |
+            ${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:latest
+            ${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('sha-{0}', github.sha) }}
+          # Pass web build args only for the web service
+          build-args: |
+            ${{ matrix.service == 'web' && format('NEXT_PUBLIC_API_BASE_URL={0}', 'http://localhost:3000') || '' }}
+          # Cache layers in GitHub Actions cache — 60-70% faster rebuilds
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,scope=${{ matrix.service }},mode=max
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ github.event.pull_request.updated_at || github.event.head_commit.timestamp || github.event.repository.pushed_at }}

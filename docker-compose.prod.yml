@@ -1,0 +1,57 @@
+# Production overrides — use with docker-compose.staging.yml:
+#   docker compose -f docker-compose.staging.yml -f docker-compose.prod.yml up -d
+
+services:
+  gateway:
+    environment:
+      NODE_ENV: production
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-https://1111.tn}
+
+  auth:
+    environment:
+      NODE_ENV: production
+
+  user:
+    environment:
+      NODE_ENV: production
+
+  retail:
+    environment:
+      NODE_ENV: production
+
+  para:
+    environment:
+      NODE_ENV: production
+
+  alimentation:
+    environment:
+      NODE_ENV: production
+
+  fashion:
+    environment:
+      NODE_ENV: production
+
+  mailer-api:
+    environment:
+      NODE_ENV: production
+
+  engagement:
+    environment:
+      NODE_ENV: production
+
+  web-control:
+    environment:
+      NODE_ENV: production
+
+  mailer:
+    environment:
+      NODE_ENV: production
+
+  frontend:
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-https://backend.1111.tn}
+
+  token-cleanup:
+    environment:
+      NODE_ENV: production

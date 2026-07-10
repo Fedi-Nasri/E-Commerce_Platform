@@ -1,0 +1,206 @@
+# Monitoring stack — joins external "1111" network to scrape app containers.
+# Start after the app stack:
+#   docker compose -f docker-compose.monitoring.yml --env-file .env up -d
+
+name: "1111-monitoring"
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    container_name: 1111-prometheus
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+    volumes:
+      - ./deploy/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./deploy/monitoring/alert-rules.yml:/etc/prometheus/alert-rules.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "127.0.0.1:9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - stack
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9090/-/healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    container_name: 1111-grafana
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SERVER_ROOT_URL: "%(protocol)s://%(domain)s:%(http_port)s/"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./deploy/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    ports:
+      - "127.0.0.1:3030:3000"
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    networks:
+      - stack
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 90s
+
+  node_exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: 1111-node-exporter
+    restart: unless-stopped
+    network_mode: host
+    pid: host
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --path.rootfs=/rootfs
+      - --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: 1111-cadvisor
+    restart: unless-stopped
+    privileged: true
+    cgroup: host
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    networks:
+      - stack
+
+  postgres_exporter:
+    image: prometheuscommunity/postgres-exporter:v0.15.0
+    container_name: 1111-postgres-exporter
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      DATA_SOURCE_NAME: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}?sslmode=disable
+    networks:
+      - stack
+
+  retail_postgres_exporter:
+    image: prometheuscommunity/postgres-exporter:v0.15.0
+    container_name: 1111-retail-postgres-exporter
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      DATA_SOURCE_NAME: postgresql://${RETAIL_DB_USER}:${RETAIL_DB_PASSWORD}@retail-postgres:5432/${RETAIL_DB_NAME}?sslmode=disable
+    networks:
+      - stack
+
+  para_postgres_exporter:
+    image: prometheuscommunity/postgres-exporter:v0.15.0
+    container_name: 1111-para-postgres-exporter
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      DATA_SOURCE_NAME: postgresql://${PARA_DB_USER}:${PARA_DB_PASSWORD}@para-postgres:5432/${PARA_DB_NAME}?sslmode=disable
+    networks:
+      - stack
+
+  alimentation_postgres_exporter:
+    image: prometheuscommunity/postgres-exporter:v0.15.0
+    container_name: 1111-alimentation-postgres-exporter
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      DATA_SOURCE_NAME: postgresql://${ALIMENTATION_DB_USER}:${ALIMENTATION_DB_PASSWORD}@alimentation-postgres:5432/${ALIMENTATION_DB_NAME}?sslmode=disable
+    networks:
+      - stack
+
+  fashion_postgres_exporter:
+    image: prometheuscommunity/postgres-exporter:v0.15.0
+    container_name: 1111-fashion-postgres-exporter
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      DATA_SOURCE_NAME: postgresql://${FASHION_DB_USER}:${FASHION_DB_PASSWORD}@fashion-postgres:5432/${FASHION_DB_NAME}?sslmode=disable
+    networks:
+      - stack
+
+  catalog_postgres_exporter:
+    image: prometheuscommunity/postgres-exporter:v0.15.0
+    container_name: 1111-catalog-postgres-exporter
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      DATA_SOURCE_NAME: postgresql://${CATALOG_DB_USER}:${CATALOG_DB_PASSWORD}@catalog-postgres:5432/${CATALOG_DB_NAME}?sslmode=disable
+    networks:
+      - stack
+
+  blackbox_exporter:
+    image: prom/blackbox-exporter:v0.25.0
+    container_name: 1111-blackbox-exporter
+    restart: unless-stopped
+    volumes:
+      - ./deploy/monitoring/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
+    command:
+      - --config.file=/etc/blackbox_exporter/config.yml
+    networks:
+      - stack
+
+  loki:
+    image: grafana/loki:2.9.1
+    container_name: 1111-loki
+    restart: unless-stopped
+    command:
+      - -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./deploy/monitoring/loki.yml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+    ports:
+      - "127.0.0.1:3100:3100"
+    networks:
+      - stack
+
+  promtail:
+    image: grafana/promtail:2.9.1
+    container_name: 1111-promtail
+    restart: unless-stopped
+    command:
+      - -config.file=/etc/promtail/promtail.yml
+    volumes:
+      - ./deploy/monitoring/promtail.yml:/etc/promtail/promtail.yml:ro
+      - ./deploy/monitoring/promtail-positions.yaml:/tmp/positions.yaml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/log:/var/log:ro
+    depends_on:
+      - loki
+    networks:
+      - stack
+
+volumes:
+  prometheus_data:
+    name: 1111_prometheus_data
+  grafana_data:
+    name: 1111_grafana_data
+  loki_data:
+    name: 1111_loki_data
+
+networks:
+  stack:
+    name: "1111_summer_internship_backend"
+    external: true

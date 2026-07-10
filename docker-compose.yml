@@ -149,10 +149,6 @@ services:
       CATALOG_DB_NAME: ${CATALOG_DB_NAME}
       CATALOG_DB_USER: ${CATALOG_DB_USER}
       CATALOG_DB_PASSWORD: ${CATALOG_DB_PASSWORD}
-      CATALOG_DB_URL: postgres://catalog_user:galylio-ai@catalog-postgres:5432/catalog_db
-      ALIMENTATION_DB_URL: postgresql://alimentation_user:galylio-ai@alimentation-postgres:5432/alimentation_db
-      PARA_DB_URL: postgresql://para_user:galylio-ai@para-postgres:5432/para_db
-      RETAIL_DB_URL: postgresql://retail_user:galylio-ai@retail-postgres:5432/retail_db
       GATEWAY_INTERNAL_URL: http://gateway:3000
     depends_on:
       catalog-postgres:
@@ -215,6 +211,9 @@ services:
     env_file:
       - path: .env
         required: false
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
     depends_on:
       postgres:
         condition: service_healthy
@@ -238,6 +237,9 @@ services:
     env_file:
       - path: .env
         required: false
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
     volumes:
       - uploads:/app/uploads
     depends_on:
@@ -261,6 +263,9 @@ services:
     env_file:
       - path: .env
         required: false
+    environment:
+      RETAIL_DB_HOST: retail-postgres
+      RETAIL_DB_PORT: 5432
     depends_on:
       retail-postgres:
         condition: service_healthy
@@ -282,6 +287,9 @@ services:
     env_file:
       - path: .env
         required: false
+    environment:
+      PARA_DB_HOST: para-postgres
+      PARA_DB_PORT: 5432
     depends_on:
       para-postgres:
         condition: service_healthy
@@ -303,6 +311,9 @@ services:
     env_file:
       - path: .env
         required: false
+    environment:
+      ALIMENTATION_DB_HOST: alimentation-postgres
+      ALIMENTATION_DB_PORT: 5432
     depends_on:
       alimentation-postgres:
         condition: service_healthy
@@ -324,6 +335,9 @@ services:
     env_file:
       - path: .env
         required: false
+    environment:
+      FASHION_DB_HOST: fashion-postgres
+      FASHION_DB_PORT: 5432
     depends_on:
       fashion-postgres:
         condition: service_healthy
@@ -345,6 +359,9 @@ services:
     env_file:
       - path: .env
         required: false
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
     depends_on:
       postgres:
         condition: service_healthy
@@ -368,6 +385,9 @@ services:
     env_file:
       - path: .env
         required: false
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
     depends_on:
       postgres:
         condition: service_healthy
@@ -389,6 +409,9 @@ services:
     env_file:
       - path: .env
         required: false
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
     volumes:
       - uploads:/app/uploads
     depends_on:

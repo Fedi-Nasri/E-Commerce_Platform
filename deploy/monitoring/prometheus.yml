@@ -1,0 +1,84 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - /etc/prometheus/alert-rules.yml
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: node
+    static_configs:
+      - targets: ["host.docker.internal:9100"]
+
+  - job_name: cadvisor
+    static_configs:
+      - targets: ["cadvisor:8080"]
+
+  - job_name: postgres
+    static_configs:
+      - targets: ["postgres_exporter:9187"]
+        labels:
+          database: main
+
+  - job_name: postgres_retail
+    static_configs:
+      - targets: ["retail_postgres_exporter:9187"]
+        labels:
+          database: retail
+
+  - job_name: postgres_para
+    static_configs:
+      - targets: ["para_postgres_exporter:9187"]
+        labels:
+          database: para
+
+  - job_name: postgres_alimentation
+    static_configs:
+      - targets: ["alimentation_postgres_exporter:9187"]
+        labels:
+          database: alimentation
+
+  - job_name: postgres_fashion
+    static_configs:
+      - targets: ["fashion_postgres_exporter:9187"]
+        labels:
+          database: fashion
+
+  - job_name: postgres_catalog
+    static_configs:
+      - targets: ["catalog_postgres_exporter:9187"]
+        labels:
+          database: catalog
+
+  - job_name: rabbitmq
+    static_configs:
+      - targets: ["rabbitmq:15692"]
+
+  - job_name: blackbox
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+          - http://gateway:3000/health
+          - http://auth:3001/health
+          - http://user:3002/health
+          - http://retail:3003/health
+          - http://para:3004/health
+          - http://alimentation:3005/health
+          - http://mailer-api:3006/health
+          - http://fashion:3007/health
+          - http://engagement:3008/health
+          - http://web-control:3009/health
+          - http://frontend:3001/
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox_exporter:9115

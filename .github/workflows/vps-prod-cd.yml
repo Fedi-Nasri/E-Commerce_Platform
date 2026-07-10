@@ -1,0 +1,101 @@
+name: CD - VPS Production Deploy
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_PREFIX: ${{ secrets.IMAGE_PREFIX }}
+      APP_DIR: ${{ secrets.APP_DIR }}
+      DEPLOY_SHA: ${{ github.sha }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate required secrets
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          IMAGE_PREFIX: ${{ secrets.IMAGE_PREFIX }}
+          APP_DIR: ${{ secrets.APP_DIR }}
+          PROD_ENV_FILE: ${{ secrets.PROD_ENV_FILE }}
+        run: |
+          test -n "$VPS_HOST"
+          test -n "$VPS_PORT"
+          test -n "$VPS_USER"
+          test -n "$VPS_SSH_PRIVATE_KEY"
+          test -n "$GHCR_TOKEN"
+          test -n "$IMAGE_PREFIX"
+          test -n "$APP_DIR"
+          test -n "$PROD_ENV_FILE"
+
+      - name: Configure SSH
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+          VPS_SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$VPS_SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p "$VPS_PORT" -H "$VPS_HOST" >> ~/.ssh/known_hosts
+
+      - name: Prepare production env file
+        env:
+          PROD_ENV_FILE: ${{ secrets.PROD_ENV_FILE }}
+        run: |
+          umask 077
+          printf '%s\n' "$PROD_ENV_FILE" > ./.env
+
+      - name: Flatten deploy scripts
+        run: |
+          cp deploy/scripts/deploy-ghcr.sh ./deploy-ghcr.sh
+          cp deploy/scripts/check-containers.sh ./check-containers.sh
+          cp deploy/nginx/1111.tn.conf ./1111.tn.conf
+
+      - name: Upload release assets
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          port: ${{ secrets.VPS_PORT }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          source: ".env,deploy-ghcr.sh,check-containers.sh,docker-compose.prod.yml,docker-compose.monitoring.yml,1111.tn.conf,deploy/monitoring"
+          target: "/tmp/"
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          port: ${{ secrets.VPS_PORT }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script: |
+            set -euo pipefail
+
+            sudo mkdir -p "${{ secrets.APP_DIR }}/current"
+            sudo mkdir -p "${{ secrets.APP_DIR }}/shared"
+            sudo chown -R "${{ secrets.VPS_USER }}:${{ secrets.VPS_USER }}" "${{ secrets.APP_DIR }}"
+
+            install -m 600 /tmp/.env "${{ secrets.APP_DIR }}/current/.env"
+            rm -f /tmp/.env
+
+            APP_DIR="${{ secrets.APP_DIR }}" \
+            GITHUB_SHA="${{ env.DEPLOY_SHA }}" \
+            IMAGE_PREFIX="${{ secrets.IMAGE_PREFIX }}" \
+            GHCR_PAT="${{ secrets.GHCR_TOKEN }}" \
+            COMPOSE_FILE="docker-compose.prod.yml" \
+            NGINX_CONFIG_FILE="1111.tn.conf" \
+            NGINX_SITE_NAME="1111.tn" \
+            bash /tmp/deploy-ghcr.sh
+
+            rm -f /tmp/deploy-ghcr.sh /tmp/check-containers.sh

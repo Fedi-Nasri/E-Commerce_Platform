@@ -1,0 +1,122 @@
+name: CD - Tailscale Network
+
+on:
+  # workflow_run:
+  #   workflows:
+  #     - CI
+  #   types:
+  #     - completed
+  #   branches:
+  #     - develop
+  workflow_dispatch: {}
+
+jobs:
+  
+  deploy:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    
+
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_PREFIX: ${{ secrets.IMAGE_PREFIX }}
+      APP_DIR: ${{ secrets.APP_DIR }}
+      DEPLOY_SHA: ${{ github.sha }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # --- 1. Validate required secrets ---
+      - name: Validate required secrets
+        env:
+          TAILSCALE_CLIENT_ID: ${{ secrets.TAILSCALE_CLIENT_ID }}
+          TAILSCALE_CLIENT_SECRET: ${{ secrets.TAILSCALE_CLIENT_SECRET }}
+          TS_SERVER_IP: ${{ secrets.TS_SERVER_IP }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          IMAGE_PREFIX: ${{ secrets.IMAGE_PREFIX }}
+          APP_DIR: ${{ secrets.APP_DIR }}
+          STAGING_ENV_FILE: ${{ secrets.STAGING_ENV_FILE }} # Renamed from PROD_ENV_FILE
+        run: |
+          test -n "$TAILSCALE_CLIENT_ID"
+          test -n "$TAILSCALE_CLIENT_SECRET"
+          test -n "$TS_SERVER_IP"
+          test -n "$DEPLOY_USER"
+          test -n "$SSH_PRIVATE_KEY"
+          test -n "$GHCR_TOKEN"
+          test -n "$IMAGE_PREFIX"
+          test -n "$APP_DIR"
+          test -n "$STAGING_ENV_FILE"
+
+      # --- 2. Connect to Tailscale Network ---
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TAILSCALE_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TAILSCALE_CLIENT_SECRET }}
+          tags: tag:githubactions # Ensure this tag is configured in your Tailscale ACLs
+     
+          # --- 2. Set up SSH key ---
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.TS_SERVER_IP }} >> ~/.ssh/known_hosts
+
+      # --- 3. Prepare staging env file locally ---
+      - name: Prepare staging env file
+        env:
+          STAGING_ENV_FILE: ${{ secrets.STAGING_ENV_FILE }}
+        run: |
+          umask 077
+          echo "$STAGING_ENV_FILE" > ./.env
+          
+      - name: Flatten deploy script path
+        run: |
+          cp deploy/scripts/deploy-ghcr.sh ./deploy-ghcr.sh
+          cp deploy/scripts/check-containers.sh ./check-containers.sh
+          cp deploy/nginx/staging.1111.tn.conf ./staging.1111.tn.conf
+
+      # --- 4. Upload env file and deploy script to the target server via Tailscale SSH ---
+      - name: Upload env file and deploy script
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.TS_SERVER_IP }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: ".env,deploy-ghcr.sh,check-containers.sh,docker-compose.staging.yml,docker-compose.monitoring.yml,staging.1111.tn.conf,deploy/monitoring"
+          target: "/tmp/"
+
+      # --- 5. Activate release and deploy on the target server ---
+      - name: Activate release and deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.TS_SERVER_IP }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -euo pipefail
+  
+            # Create app directory with sudo if needed
+            sudo mkdir -p "${{ secrets.APP_DIR }}/current"
+            sudo mkdir -p "${{ secrets.APP_DIR }}/shared"
+            
+            # Ensure proper permissions for the deploy user
+            sudo chown -R "${{ secrets.DEPLOY_USER }}:${{ secrets.DEPLOY_USER }}" "${{ secrets.APP_DIR }}"
+            sudo chown -R "${{ secrets.DEPLOY_USER }}:${{ secrets.DEPLOY_USER }}" "${{ secrets.APP_DIR }}/shared"
+            
+            # Move env file to current location
+            install -m 600 /tmp/.env "${{ secrets.APP_DIR }}/current/.env"
+            rm -f /tmp/.env
+            
+            # Execute the deployment script
+            APP_DIR="${{ secrets.APP_DIR }}" \
+            GITHUB_SHA="${{ env.DEPLOY_SHA }}" \
+            IMAGE_PREFIX="${{ secrets.IMAGE_PREFIX }}" \
+            GHCR_PAT="${{ secrets.GHCR_TOKEN }}" \
+            bash /tmp/deploy-ghcr.sh
+            rm -f /tmp/deploy-ghcr.sh /tmp/check-containers.sh
+
