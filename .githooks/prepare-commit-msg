@@ -1,0 +1,4 @@
+#!/bin/sh
+# Strip Cursor co-author trailers added by the IDE
+ROOT="$(git rev-parse --show-toplevel)"
+node "$ROOT/scripts/strip-cursor-coauthor-from-msg.mjs" "$1"

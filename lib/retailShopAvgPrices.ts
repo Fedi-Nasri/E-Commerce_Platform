@@ -1,46 +1,21 @@
+import "server-only";
 import raw from "@/lib/data/retailShopAvgPrices.json";
+import type { RetailShopAvgPrices } from "@/lib/shopAvgPriceUtils";
 
-export type ShopAvgPriceRow = {
-  rank: number;
-  shop_key: string;
-  product_count: number;
-  price_sum: number;
-  avg_price: number;
-  adj_avg_price: number;
-  price_index?: number;
-  adj_index?: number;
-  vs_market_pct: number;
-  volume_tier?: string;
-  by_segment: Record<string, number>;
-};
-
-export type RetailShopAvgPrices = {
-  generated_at: string;
-  method: string;
-  segments: string[];
-  market_avg_by_segment?: Record<string, number>;
-  market_avg_price: number;
-  shop_count: number;
-  total_products: number;
-  shops: ShopAvgPriceRow[];
-};
+export type { ShopAvgPriceRow, RetailShopAvgPrices } from "@/lib/shopAvgPriceUtils";
+export { displayPrice, fmtTickerPrice, shopTickerSymbol } from "@/lib/shopAvgPriceUtils";
 
 const data = raw as unknown as RetailShopAvgPrices;
 
+/** JSON fallback (build / offline). */
 export function getRetailShopAvgPrices(): RetailShopAvgPrices {
   return data;
 }
 
-/** Primary display price (mix-adjusted + shrinkage). */
-export function displayPrice(shop: ShopAvgPriceRow): number {
-  return shop.adj_avg_price ?? shop.avg_price;
-}
-
-export function fmtTickerPrice(n: number): string {
-  return n.toLocaleString("fr-FR", { maximumFractionDigits: 0 });
-}
-
-export function shopTickerSymbol(key: string): string {
-  const clean = key.replace(/[^a-z0-9]/gi, "").toUpperCase();
-  return clean.length <= 5 ? clean : clean.slice(0, 5);
+/** PostgreSQL first, then JSON fallback. */
+export async function getRetailShopAvgPricesForApi(): Promise<RetailShopAvgPrices> {
+  const { getRetailShopAvgPricesFromDb } = await import("@/lib/homepageStatsDb");
+  const fromDb = await getRetailShopAvgPricesFromDb();
+  if (fromDb) return fromDb;
+  return data;
 }

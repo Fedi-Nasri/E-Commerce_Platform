@@ -49,6 +49,12 @@ export function getTopRetailShopsData(): TopRetailShopsData {
   return data;
 }
 
+export async function getTopRetailShopsDataForApi(): Promise<TopRetailShopsData> {
+  const { getTopRetailStatsFromDb } = await import("@/lib/homepageStatsDb");
+  const fromDb = await getTopRetailStatsFromDb();
+  return fromDb ?? data;
+}
+
 function enrichShop(s: TopRetailShopRow) {
   return {
     shop: s.shop,
@@ -69,6 +75,13 @@ export function getTopRetailShopsForApi() {
   return data.shops.map(enrichShop);
 }
 
+export async function getTopRetailShopsForApiAsync() {
+  const { getTopRetailStatsFromDb, enrichTopRetailShopForApi } = await import("@/lib/homepageStatsDb");
+  const bundle = await getTopRetailStatsFromDb();
+  const shops = bundle?.shops ?? data.shops;
+  return shops.map((s) => enrichTopRetailShopForApi(s));
+}
+
 export function getTopRetailRankingForApi() {
   const all = data.allShops ?? data.shops;
   return {
@@ -83,6 +96,34 @@ export function getTopRetailRankingForApi() {
     shops: all.map(enrichShop),
     top5: data.shops.map(enrichShop),
     categories: (data.categories ?? []).map((c) => ({
+      ...c,
+      leaderName: c.leader ? shopDisplayName(c.leader) : null,
+      shops: c.shops.map((s) => ({
+        ...s,
+        displayName: shopDisplayName(s.shop),
+        logo: localShopLogo(s.shop),
+      })),
+    })),
+  };
+}
+
+export async function getTopRetailRankingForApiAsync() {
+  const { getTopRetailStatsFromDb, enrichTopRetailShopForApi } = await import("@/lib/homepageStatsDb");
+  const bundle = await getTopRetailStatsFromDb();
+  const source = bundle ?? data;
+  const all = source.allShops ?? source.shops;
+  return {
+    generatedAt: source.generated_at,
+    method: source.method,
+    clustersUsed: source.clusters_used,
+    scrapesUsed: source.scrapes_used ?? null,
+    stockDir: source.stock_dir ?? null,
+    minProducts: source.min_products,
+    minProductsList: source.min_products_list ?? 50,
+    inStockOnly: source.in_stock_only ?? true,
+    shops: all.map((s) => enrichTopRetailShopForApi(s)),
+    top5: source.shops.map((s) => enrichTopRetailShopForApi(s)),
+    categories: (source.categories ?? []).map((c) => ({
       ...c,
       leaderName: c.leader ? shopDisplayName(c.leader) : null,
       shops: c.shops.map((s) => ({

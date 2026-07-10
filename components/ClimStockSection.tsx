@@ -1,28 +1,19 @@
-import {
-  climBrandLabel,
-  climBrandLogo,
-  climBrandTotals,
-  climBtuComparisonWithUrls,
-  climBtuTiers,
-  climCheapestOffers,
-  climGeneratedAt,
-  climShopName,
-  climTotals,
-} from "@/lib/climStats";
+import { getClimStatsAsync } from "@/lib/climStats";
 import { ClimStockSlider, type ClimSliderData } from "@/components/ClimStockSlider";
 
-// Server component: reads the (large) snapshot JSON on the server and passes a
-// small computed summary to the client slider.
-export function ClimStockSection() {
-  const btuCards = climBtuTiers.map((btu) => {
-    const rows = climBtuComparisonWithUrls(btu);
+// Server component: PostgreSQL first, JSON fallback.
+export async function ClimStockSection() {
+  const clim = await getClimStatsAsync();
+
+  const btuCards = clim.btuTiers.map((btu) => {
+    const rows = clim.btuComparisonWithUrls(btu);
     return {
       btu,
       totalOffers: rows.reduce((a, r) => a + r.nb_annonces, 0),
       rows: rows.slice(0, 3).map((r, i) => ({
         rank: i + 1,
         shop: r.shop,
-        shopName: climShopName(r.shop),
+        shopName: clim.shopName(r.shop),
         prixMin: r.prix_min,
         prixMoyen: r.prix_moyen,
         nbAnnonces: r.nb_annonces,
@@ -33,20 +24,20 @@ export function ClimStockSection() {
     };
   });
 
-  const cheapestOffer = climCheapestOffers(1)[0] ?? null;
+  const cheapestOffer = clim.cheapestOffers(1)[0] ?? null;
 
   const data: ClimSliderData = {
-    totals: climTotals,
-    generatedAt: climGeneratedAt,
+    totals: clim.totals,
+    generatedAt: clim.generatedAt,
     cheapest: cheapestOffer
-      ? { price: cheapestOffer.price, shopName: climShopName(cheapestOffer.shop), btu: cheapestOffer.btu }
+      ? { price: cheapestOffer.price, shopName: clim.shopName(cheapestOffer.shop), btu: cheapestOffer.btu }
       : null,
     btuCards,
-    topBrands: climBrandTotals.slice(0, 8).map((b) => ({
+    topBrands: clim.brandTotals.slice(0, 8).map((b) => ({
       brand: b.brand,
-      label: climBrandLabel(b.brand),
+      label: clim.brandLabel(b.brand),
       count: b.count,
-      logo: climBrandLogo(b.brand),
+      logo: clim.brandLogo(b.brand),
     })),
   };
 

@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
-import { getTopRetailShopsData, getTopRetailShopsForApi } from "@/lib/topRetailShops";
+import { getTopRetailShopsDataForApi, getTopRetailShopsForApiAsync } from "@/lib/topRetailShops";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const data = getTopRetailShopsData();
+  const data = await getTopRetailShopsDataForApi();
+  const shops = await getTopRetailShopsForApiAsync();
   return NextResponse.json({
-    shops: getTopRetailShopsForApi(),
+    shops,
     meta: {
       clustersUsed: data.clusters_used,
       scrapesUsed: data.scrapes_used ?? null,

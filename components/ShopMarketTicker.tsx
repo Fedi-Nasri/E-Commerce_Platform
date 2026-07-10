@@ -1,58 +1,26 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
-import { BarChart3, ChevronLeft, ChevronRight, Store, TrendingDown, TrendingUp } from "lucide-react";
+import { ChevronLeft, ChevronRight, Store, TrendingDown } from "lucide-react";
 import { ShopLogo } from "@/components/shop/ShopLogo";
+import { ShopCatalogStatsPanel } from "@/components/ShopCatalogStatsPanel";
 import { shopDisplayName } from "@/lib/priceRankings";
 import {
   displayPrice,
   fmtTickerPrice,
   type RetailShopAvgPrices,
   type ShopAvgPriceRow,
-} from "@/lib/retailShopAvgPrices";
+} from "@/lib/shopAvgPriceUtils";
 
-function fmtPct(p: number) {
-  const sign = p > 0 ? "+" : "";
-  return `${sign}${p.toFixed(1)}%`;
-}
-
-function MiniSpark({ shop, up }: { shop: ShopAvgPriceRow; up: boolean }) {
-  const seed = shop.shop_key.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-  const pts = Array.from({ length: 10 }, (_, i) => {
-    const wobble = Math.sin(seed * 0.17 + i * 0.9) * 5;
-    const trend = up ? i * 1.1 : -i * 1;
-    return 20 + trend + wobble;
-  });
-  const d = pts.map((y, i) => `${i === 0 ? "M" : "L"}${i * 11} ${y}`).join(" ");
-
-  return (
-    <svg viewBox="0 0 99 40" className="h-8 w-[4.25rem] shrink-0 opacity-90" aria-hidden>
-      <path
-        d={d}
-        fill="none"
-        stroke={up ? "#ef4444" : "#10b981"}
-        strokeWidth="1.75"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function ShopCard({ shop }: { shop: ShopAvgPriceRow }) {
-  const up = shop.vs_market_pct >= 0;
+function ShopCard({ shop, onOpen }: { shop: ShopAvgPriceRow; onOpen: (key: string) => void }) {
   const price = displayPrice(shop);
   const name = shopDisplayName(shop.shop_key);
 
   return (
-    <Link
-      href={`/boutiques/${shop.shop_key}`}
-      className={`group relative flex w-[min(88vw,14.5rem)] shrink-0 flex-col overflow-hidden rounded-xl border font-mono shadow-sm transition sm:w-[14.5rem] ${
-        up
-          ? "border-bg-border bg-bg-card hover:border-red-400/30 hover:shadow-md hover:shadow-red-500/[0.06] dark:hover:border-red-400/25"
-          : "border-bg-border bg-bg-card hover:border-emerald-400/30 hover:shadow-md hover:shadow-emerald-500/[0.06] dark:hover:border-emerald-400/25"
-      }`}
+    <button
+      type="button"
+      onClick={() => onOpen(shop.shop_key)}
+      className="group relative flex w-[min(88vw,14.5rem)] shrink-0 cursor-pointer flex-col overflow-hidden rounded-xl border border-bg-border bg-bg-card text-left font-mono shadow-sm transition hover:border-brand-gold/35 hover:shadow-md hover:shadow-brand-gold/[0.06] sm:w-[14.5rem]"
     >
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.035] dark:opacity-[0.055]"
@@ -63,10 +31,7 @@ function ShopCard({ shop }: { shop: ShopAvgPriceRow }) {
         }}
         aria-hidden
       />
-      <div
-        className={`absolute inset-y-0 left-0 w-0.5 ${up ? "bg-red-500" : "bg-emerald-500"}`}
-        aria-hidden
-      />
+      <div className="absolute inset-y-0 left-0 w-0.5 bg-brand-gold/60" aria-hidden />
 
       <div className="relative flex items-center gap-2 border-b border-bg-border bg-slate-50/90 px-3 py-2 dark:border-white/[0.06] dark:bg-white/[0.03]">
         <ShopLogo shopKey={shop.shop_key} size={32} className="shrink-0 ring-1 ring-black/5 dark:ring-white/10" />
@@ -75,7 +40,7 @@ function ShopCard({ shop }: { shop: ShopAvgPriceRow }) {
             {name}
           </p>
           <p className="truncate text-[9px] text-slate-500 dark:text-white/45">
-            {shop.product_count.toLocaleString("fr-FR")} produits
+            {shop.product_count.toLocaleString("fr-FR")} en stock
           </p>
         </div>
         {shop.volume_tier && (
@@ -86,51 +51,48 @@ function ShopCard({ shop }: { shop: ShopAvgPriceRow }) {
       </div>
 
       <div className="relative flex flex-1 flex-col gap-2 px-3 py-2.5">
-        <div className="flex items-end justify-between gap-1">
-          <div>
-            <p className="text-[8px] font-semibold uppercase tracking-[0.2em] text-slate-400 dark:text-white/35">
-              Last
-            </p>
-            <p
-              className={`text-xl font-black leading-none tabular-nums ${
-                up ? "text-red-600 dark:text-red-400" : "text-emerald-700 dark:text-emerald-300"
-              }`}
-            >
-              {fmtTickerPrice(price)}
-              <span className="ml-0.5 text-[10px] font-bold text-slate-400 dark:text-white/35">DT</span>
-            </p>
-          </div>
-          <MiniSpark shop={shop} up={up} />
+        <div>
+          <p className="text-[8px] font-semibold uppercase tracking-[0.2em] text-slate-400 dark:text-white/35">
+            Prix moy.
+          </p>
+          <p className="text-xl font-black leading-none tabular-nums text-slate-900 dark:text-white">
+            {fmtTickerPrice(price)}
+            <span className="ml-0.5 text-[10px] font-bold text-slate-400 dark:text-white/35">DT</span>
+          </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-md border border-bg-border bg-bg-border text-[9px] dark:border-white/[0.06] dark:bg-white/[0.06]">
-          <div className="bg-slate-50/80 px-2 py-1.5 dark:bg-white/[0.02]">
-            <p className="text-[7px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/30">Vol.</p>
-            <p className="font-black tabular-nums text-slate-800 dark:text-white/90">
-              {shop.product_count.toLocaleString("fr-FR")}
-            </p>
-          </div>
-          <div className="bg-slate-50/80 px-2 py-1.5 text-right dark:bg-white/[0.02]">
-            <p className="text-[7px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/30">Chg.</p>
-            <p
-              className={`inline-flex items-center justify-end gap-0.5 font-black tabular-nums ${
-                up ? "text-red-600 dark:text-red-400" : "text-emerald-700 dark:text-emerald-300"
-              }`}
-            >
-              {up ? <TrendingUp className="h-2.5 w-2.5" /> : <TrendingDown className="h-2.5 w-2.5" />}
-              {fmtPct(shop.vs_market_pct)}
-            </p>
-          </div>
+        <div className="rounded-md border border-bg-border bg-slate-50/80 px-2 py-1.5 text-[9px] dark:border-white/[0.06] dark:bg-white/[0.02]">
+          <p className="text-[7px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/30">
+            Catalogue en stock
+          </p>
+          <p className="font-black tabular-nums text-slate-800 dark:text-white/90">
+            {shop.product_count.toLocaleString("fr-FR")} produits
+          </p>
         </div>
       </div>
-    </Link>
+    </button>
   );
 }
 
 export function ShopMarketTicker({ initial }: { initial?: RetailShopAvgPrices }) {
   const [data, setData] = useState<RetailShopAvgPrices | null>(initial ?? null);
+  const [selectedShop, setSelectedShop] = useState<string | null>(null);
+  const [panelOpen, setPanelOpen] = useState(false);
   const rowRef = useRef<HTMLDivElement>(null);
   const isPaused = useRef(false);
+
+  const openShopPanel = (shopKey: string) => {
+    isPaused.current = true;
+    setSelectedShop(shopKey);
+    setPanelOpen(true);
+  };
+
+  const closeShopPanel = () => {
+    setPanelOpen(false);
+    setTimeout(() => {
+      isPaused.current = false;
+    }, 400);
+  };
 
   useEffect(() => {
     if (initial) return;
@@ -143,6 +105,16 @@ export function ShopMarketTicker({ initial }: { initial?: RetailShopAvgPrices })
   const shops = useMemo(
     () => [...(data?.shops ?? [])].sort((a, b) => b.product_count - a.product_count),
     [data],
+  );
+
+  const featuredMinProducts = data?.featured_min_products ?? 1000;
+  const featuredAccessible = useMemo(
+    () =>
+      [...(data?.shops ?? [])]
+        .filter((s) => s.product_count >= featuredMinProducts)
+        .sort((a, b) => a.avg_price - b.avg_price)
+        .slice(0, 3),
+    [data, featuredMinProducts],
   );
 
   useEffect(() => {
@@ -205,14 +177,10 @@ export function ShopMarketTicker({ initial }: { initial?: RetailShopAvgPrices })
     );
   }
 
-  const featuredAccessible = ["spacenet", "mytek", "wiki"]
-    .map((key) => data.shops.find((s) => s.shop_key === key))
-    .filter(Boolean) as ShopAvgPriceRow[];
-
   const renderCards = (keySuffix: string, ariaHidden = false) =>
     shops.map((s) => (
       <div key={`${s.shop_key}${keySuffix}`} className="shrink-0" aria-hidden={ariaHidden || undefined}>
-        <ShopCard shop={s} />
+        <ShopCard shop={s} onOpen={openShopPanel} />
       </div>
     ));
 
@@ -227,13 +195,15 @@ export function ShopMarketTicker({ initial }: { initial?: RetailShopAvgPrices })
             Indice prix catalogue retail
           </h2>
           <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-slate-500 dark:text-white/55">
-            Prix moyen ajusté par mix de catégories (électro, info, gaming, smartphones) —{" "}
+            Prix moyen du catalogue par enseigne, calculé uniquement sur les produits{" "}
+            <span className="font-semibold text-slate-700 dark:text-white/75">en stock</span>{" "}
+            (somme des prix ÷ nombre de références disponibles) —{" "}
             <span className="font-bold text-slate-800 dark:text-white">
-              {fmtTickerPrice(data.market_avg_price)} DT
-            </span>{" "}
-            de moyenne marché sur{" "}
+              {data.shop_count} enseignes
+            </span>
+            ,{" "}
             <span className="font-bold text-slate-800 dark:text-white">
-              {data.total_products.toLocaleString("fr-FR")} références
+              {data.total_products.toLocaleString("fr-FR")} références en stock
             </span>
             .
           </p>
@@ -241,19 +211,13 @@ export function ShopMarketTicker({ initial }: { initial?: RetailShopAvgPrices })
 
         <div className="flex items-center gap-2">
           <div className="hidden items-center gap-3 sm:flex">
-            {[
-              { icon: BarChart3, label: "Moyenne", value: `${fmtTickerPrice(data.market_avg_price)} DT` },
-              { icon: Store, label: "Enseignes", value: String(data.shop_count) },
-            ].map((s) => (
-              <div
-                key={s.label}
-                className="rounded-xl border border-bg-border bg-bg-card px-4 py-2.5 text-center dark:border-white/[0.08]"
-              >
-                <s.icon className="mx-auto h-3.5 w-3.5 text-brand-gold" />
-                <div className="mt-0.5 text-sm font-black tabular-nums text-slate-900 dark:text-white">{s.value}</div>
-                <div className="text-[9px] uppercase tracking-wider text-slate-400 dark:text-white/40">{s.label}</div>
+            <div className="rounded-xl border border-bg-border bg-bg-card px-4 py-2.5 text-center dark:border-white/[0.08]">
+              <Store className="mx-auto h-3.5 w-3.5 text-brand-gold" />
+              <div className="mt-0.5 text-sm font-black tabular-nums text-slate-900 dark:text-white">
+                {data.shop_count}
               </div>
-            ))}
+              <div className="text-[9px] uppercase tracking-wider text-slate-400 dark:text-white/40">Enseignes</div>
+            </div>
           </div>
           <button
             type="button"
@@ -297,6 +261,8 @@ export function ShopMarketTicker({ initial }: { initial?: RetailShopAvgPrices })
           {renderCards("-dup", true)}
         </div>
       </div>
+
+      <ShopCatalogStatsPanel shopKey={selectedShop} open={panelOpen} onClose={closeShopPanel} />
     </section>
   );
 }
