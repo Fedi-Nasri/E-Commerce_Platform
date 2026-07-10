@@ -1,12 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   ArrowLeft,
   BarChart3,
-  ChevronDown,
-  ChevronUp,
   GitCompareArrows,
   Info,
   Layers,
@@ -164,7 +162,6 @@ export function RetailRankingDetail({
   top5,
   categories,
 }: RetailRankingDetailProps) {
-  const [expandedCat, setExpandedCat] = useState<string | null>(null);
   const updated = fmtDate(generatedAt);
   const leader = shops[0];
 
@@ -213,7 +210,7 @@ export function RetailRankingDetail({
     return cats;
   }, [categories]);
 
-  const visibleCategories = categories.filter((c) => c.clusterCount >= 30);
+  const categoryCount = categories.filter((c) => c.clusterCount >= 30).length;
 
   return (
     <div className="min-w-0 space-y-5 sm:space-y-6">
@@ -247,7 +244,7 @@ export function RetailRankingDetail({
           { icon: GitCompareArrows, label: "Produits comparés", value: clustersUsed.toLocaleString("fr-FR") },
           { icon: Store, label: "Boutiques classées", value: String(shops.length) },
           { icon: BarChart3, label: "Scrapes utilisés", value: scrapesUsed ? String(scrapesUsed) : "—" },
-          { icon: Layers, label: "Catégories analysées", value: String(visibleCategories.length) },
+          { icon: Layers, label: "Catégories analysées", value: String(categoryCount) },
         ].map((s) => (
           <div
             key={s.label}
@@ -499,87 +496,6 @@ export function RetailRankingDetail({
               ))}
             </tbody>
           </table>
-        </div>
-      </div>
-
-      <div className="rounded-2xl border border-slate-200 bg-white dark:border-white/[0.08] dark:bg-bg-800">
-        <div className="border-b border-slate-200 px-5 py-4 dark:border-white/[0.06]">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-white">Détail par catégorie</h3>
-          <p className="mt-0.5 text-xs text-slate-500 dark:text-white/50">
-            Classement interne par famille de produits (smartphones, PC, TV, climatiseurs, etc.).
-          </p>
-        </div>
-        <div className="divide-y divide-slate-100 dark:divide-white/[0.06]">
-          {visibleCategories.map((cat) => {
-            const open = expandedCat === cat.slug;
-            const catLeader = cat.shops[0];
-            return (
-              <div key={cat.slug}>
-                <button
-                  type="button"
-                  onClick={() => setExpandedCat(open ? null : cat.slug)}
-                  className="flex w-full items-center gap-3 px-5 py-3.5 text-left transition hover:bg-slate-50 dark:hover:bg-white/[0.03]"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-sm font-semibold text-slate-900 dark:text-white">{cat.label}</span>
-                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] tabular-nums text-slate-500 dark:bg-white/5 dark:text-white/50">
-                        {cat.clusterCount.toLocaleString("fr-FR")} produits
-                      </span>
-                    </div>
-                    {catLeader ? (
-                      <p className="mt-0.5 text-xs text-emerald-600 dark:text-emerald-400">
-                        Leader : {catLeader.displayName} — {catLeader.winRatePct}% ({catLeader.cheapestCount.toLocaleString("fr-FR")} victoires)
-                      </p>
-                    ) : null}
-                  </div>
-                  {open ? (
-                    <ChevronUp className="h-4 w-4 shrink-0 text-slate-400" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4 shrink-0 text-slate-400" />
-                  )}
-                </button>
-                {open ? (
-                  <div className="border-t border-slate-100 bg-slate-50/50 px-5 py-3 dark:border-white/[0.04] dark:bg-white/[0.02]">
-                    <div className="overflow-x-auto">
-                      <table className="w-full min-w-[480px] text-left text-xs">
-                        <thead>
-                          <tr className="text-[10px] uppercase tracking-wide text-slate-400">
-                            <th className="pb-2 pr-3 font-semibold">#</th>
-                            <th className="pb-2 pr-3 font-semibold">Boutique</th>
-                            <th className="pb-2 pr-3 font-semibold text-right">Produits</th>
-                            <th className="pb-2 pr-3 font-semibold text-right">Victoires</th>
-                            <th className="pb-2 font-semibold text-right">Taux</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {cat.shops.map((s, i) => (
-                            <tr key={s.shop} className="border-t border-slate-200/60 dark:border-white/[0.04]">
-                              <td className="py-2 pr-3 tabular-nums text-slate-400">{i + 1}</td>
-                              <td className="py-2 pr-3">
-                                <div className="flex items-center gap-2">
-                                  {s.logo ? (
-                                    // eslint-disable-next-line @next/next/no-img-element
-                                    <img src={s.logo} alt="" className="h-5 w-5 object-contain" />
-                                  ) : null}
-                                  <span className="font-medium text-slate-800 dark:text-white/85">{s.displayName}</span>
-                                </div>
-                              </td>
-                              <td className="py-2 pr-3 text-right tabular-nums">{s.totalProducts.toLocaleString("fr-FR")}</td>
-                              <td className="py-2 pr-3 text-right tabular-nums font-semibold">{s.cheapestCount.toLocaleString("fr-FR")}</td>
-                              <td className="py-2 text-right">
-                                <span className="font-bold text-emerald-600 dark:text-emerald-400">{s.winRatePct}%</span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-            );
-          })}
         </div>
       </div>
 
