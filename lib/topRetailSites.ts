@@ -16,7 +16,7 @@ export const retailSitesMonth = "Mai 2026";
 /** Traffic data source — Semrush Trending Websites, Tunisia retail sector */
 export const retailSitesSource = {
   label: "Semrush",
-  href: "https://fr.semrush.com/trending-websites/tn/retail",
+  href: "https://semrush.com",
   title: "Sites les plus consultés — Vente au détail · Tunisie",
 } as const;
 

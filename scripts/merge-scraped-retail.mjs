@@ -10,7 +10,7 @@
  * Usage:
  *   node scripts/merge-scraped-retail.mjs <data_dir> <out.jsonl> [--min=50]
  */
-import { readdirSync, statSync, createWriteStream, readFileSync } from "node:fs";
+import { readdirSync, statSync, existsSync, createWriteStream, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const [dataDir, outPath, ...flags] = process.argv.slice(2);
@@ -28,25 +28,45 @@ const RETAIL_SHOPS = ("spacenet mytek tunisianet gamershop technopro tunewtec ca
 // reliable than file mtime (mtime = when copied to disk). Rank by that date
 // desc; among the newest date, prefer the file with the most products (avoids
 // picking an empty/failed run that happens to share the latest timestamp).
+function parseScrapeTimestamp(folderName) {
+  const m = /^(\d{4}-\d{2}-\d{2})_(\d{2}-\d{2}-\d{2})$/.exec(folderName);
+  if (!m) return 0;
+  const [, date, time] = m;
+  const [y, mo, d] = date.split("-").map(Number);
+  const [h, mi, s] = time.split("-").map(Number);
+  return new Date(y, mo - 1, d, h, mi, s).getTime();
+}
+
+// Find the most recent products_detailed.json under a shop folder.
 function findDetailed(shopDir) {
+  /** @type {{ p: string, ts: number, count: number }[]} */
   const candidates = [];
+  const add = (file, folder) => {
+    const ts = parseScrapeTimestamp(folder) || statSync(file).mtimeMs;
+    let count = 0;
+    try {
+      const a = JSON.parse(readFileSync(file, "utf-8"));
+      count = Array.isArray(a) ? a.length : 0;
+    } catch {}
+    candidates.push({ p: file, ts, count });
+  };
   const walk = (dir) => {
     let entries;
     try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return; }
     for (const e of entries) {
       const p = join(dir, e.name);
-      if (e.isDirectory()) walk(p);
-      else if (e.name === "products_detailed.json") {
-        const m = /(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})/.exec(dir);
-        let count = 0;
-        try { const a = JSON.parse(readFileSync(p, "utf-8")); count = Array.isArray(a) ? a.length : 0; } catch {}
-        candidates.push({ p, date: m ? m[1] : "", count });
+      if (e.isDirectory()) {
+        const detailed = join(p, "products_detailed.json");
+        if (existsSync(detailed)) add(detailed, e.name);
+        walk(p);
+      } else if (e.name === "products_detailed.json") {
+        add(p, dir !== shopDir ? dir.split(/[/\\]/).pop() || "" : "root");
       }
     }
   };
   walk(shopDir);
   if (!candidates.length) return null;
-  candidates.sort((a, b) => (b.date < a.date ? -1 : b.date > a.date ? 1 : b.count - a.count));
+  candidates.sort((a, b) => b.ts - a.ts || b.count - a.count);
   return candidates[0].p;
 }
 

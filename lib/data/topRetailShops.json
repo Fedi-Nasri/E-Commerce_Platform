@@ -1,0 +1,72 @@
+{
+  "generated_at": "2026-07-10T08:19:36.059Z",
+  "source": "C:\\Users\\stage.td\\Downloads\\ynqqn w\\my_run_117\\product_clusters.json",
+  "stock_dir": "C:/Users/stage.td/Desktop/current_scrapping/data",
+  "scrapes_used": 55,
+  "method": "Produits comparables en stock (dernier scrape par enseigne, ≥2 boutiques, catalogue ≥1 000 refs). Score = victoires au meilleur prix (ex æquo partagé) × nb de concurrents.",
+  "clusters_used": 13213,
+  "min_products": 1000,
+  "in_stock_only": true,
+  "shops": [
+    {
+      "rank": 1,
+      "shop": "mytek",
+      "totalProducts": 5100,
+      "cheapestCount": 1870,
+      "competitionScore": 5155,
+      "competitiveCount": 3779,
+      "competitivePct": 74,
+      "similarProducts": 3938,
+      "overlapPct": 77,
+      "winRatePct": 37
+    },
+    {
+      "rank": 2,
+      "shop": "spacenet",
+      "totalProducts": 4013,
+      "cheapestCount": 1448,
+      "competitionScore": 4110,
+      "competitiveCount": 2963,
+      "competitivePct": 74,
+      "similarProducts": 3218,
+      "overlapPct": 80,
+      "winRatePct": 36
+    },
+    {
+      "rank": 3,
+      "shop": "tunisianet",
+      "totalProducts": 3979,
+      "cheapestCount": 1305,
+      "competitionScore": 3796,
+      "competitiveCount": 2856,
+      "competitivePct": 72,
+      "similarProducts": 3059,
+      "overlapPct": 77,
+      "winRatePct": 33
+    },
+    {
+      "rank": 4,
+      "shop": "affariyet",
+      "totalProducts": 3477,
+      "cheapestCount": 1036,
+      "competitionScore": 3247,
+      "competitiveCount": 2043,
+      "competitivePct": 59,
+      "similarProducts": 2656,
+      "overlapPct": 76,
+      "winRatePct": 30
+    },
+    {
+      "rank": 5,
+      "shop": "carthagoinformatique",
+      "totalProducts": 3581,
+      "cheapestCount": 1247,
+      "competitionScore": 2902,
+      "competitiveCount": 2700,
+      "competitivePct": 75,
+      "similarProducts": 1314,
+      "overlapPct": 37,
+      "winRatePct": 35
+    }
+  ]
+}
