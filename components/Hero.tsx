@@ -33,7 +33,7 @@ type GroceryCrossingPayload = {
 };
 
 const FALLBACK_GROCERY: GroceryCrossingPayload = {
-  summary: { crossed_products: 7940, shops: 7, products: 59907 },
+  summary: { crossed_products: 23820, shops: 7, products: 75787 },
   featured_shops: [],
 };
 

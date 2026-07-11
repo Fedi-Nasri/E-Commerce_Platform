@@ -1,333 +1,295 @@
 {
-  "generated_at": "2026-06-26T12:25:34.229Z",
+  "generated_at": "2026-07-11T09:19:08.455Z",
+  "method": "per_product_cheapest",
   "summary": {
-    "products": 59907,
-    "offers": 73269,
+    "products": 75787,
+    "offers": 115873,
     "shops": 7,
-    "crossed_products": 7940,
+    "crossed_products": 23820,
     "not_crossed_products": 51967,
     "crossingDepth": {
       "1": 51967,
-      "2": 4356,
-      "3": 2135,
-      "4": 1170,
-      "5": 179,
-      "6": 90,
-      "7": 10
+      "2": 13068,
+      "3": 6405,
+      "4": 3510,
+      "5": 537,
+      "6": 270,
+      "7": 30
     }
   },
   "featured_shops": [
     {
-      "shop_name": "Aziza",
-      "total_products": 12195,
-      "crossed_products": 450,
-      "unique_products": 11745,
-      "crossing_rate_pct": 3.69,
-      "unique_rate_pct": 96.31,
-      "cheapest_wins": 901,
-      "price_comparisons": 1006,
-      "cheapest_rate_pct": 89.56,
-      "best_overlap_shop": "Geant",
-      "best_overlap_products": 287,
-      "weakest_overlap_shop": "Carrefour Express",
-      "weakest_overlap_products": 82,
-      "matched_with_each_shop": {
-        "Carrefour": 281,
-        "Geant": 287,
-        "Monoprix": 97,
-        "Carrefour Market": 122,
-        "Carrefour Express": 82,
-        "Monoprix Glovo": 137
-      },
-      "shop_key": "aziza",
-      "rank": 1
-    },
-    {
-      "shop_name": "Carrefour",
-      "total_products": 19367,
-      "crossed_products": 6245,
-      "unique_products": 13122,
-      "crossing_rate_pct": 32.25,
-      "unique_rate_pct": 67.75,
-      "cheapest_wins": 6613,
-      "price_comparisons": 11424,
-      "cheapest_rate_pct": 57.89,
-      "best_overlap_shop": "Carrefour Market",
-      "best_overlap_products": 3958,
-      "weakest_overlap_shop": "Aziza",
-      "weakest_overlap_products": 281,
-      "matched_with_each_shop": {
-        "Aziza": 281,
-        "Geant": 1179,
-        "Monoprix": 317,
-        "Carrefour Market": 3958,
-        "Carrefour Express": 2320,
-        "Monoprix Glovo": 3369
-      },
       "shop_key": "carrefour",
-      "rank": 2
+      "shop_name": "Carrefour",
+      "total_products": 31857,
+      "crossed_products": 18735,
+      "unique_products": 13122,
+      "cheapest_wins": 11166.8,
+      "price_comparisons": 18735,
+      "crossing_rate_pct": 58.81,
+      "unique_rate_pct": 41.19,
+      "cheapest_rate_pct": 59.6,
+      "best_overlap_shop": "Carrefour Market",
+      "best_overlap_products": 11874,
+      "weakest_overlap_shop": "Aziza",
+      "weakest_overlap_products": 843,
+      "rank": 1,
+      "sample_tier": "fiable"
     },
     {
-      "shop_name": "Geant",
-      "total_products": 21307,
-      "crossed_products": 2247,
-      "unique_products": 19060,
-      "crossing_rate_pct": 10.55,
-      "unique_rate_pct": 89.45,
-      "cheapest_wins": 1851,
-      "price_comparisons": 3904,
-      "cheapest_rate_pct": 47.41,
-      "best_overlap_shop": "Monoprix",
-      "best_overlap_products": 1197,
-      "weakest_overlap_shop": "Carrefour Express",
-      "weakest_overlap_products": 277,
-      "matched_with_each_shop": {
-        "Aziza": 287,
-        "Carrefour": 1179,
-        "Monoprix": 1197,
-        "Carrefour Market": 455,
-        "Carrefour Express": 277,
-        "Monoprix Glovo": 509
-      },
       "shop_key": "geant",
-      "rank": 3
+      "shop_name": "Geant",
+      "total_products": 25801,
+      "crossed_products": 6741,
+      "unique_products": 19060,
+      "cheapest_wins": 3457,
+      "price_comparisons": 6741,
+      "crossing_rate_pct": 26.13,
+      "unique_rate_pct": 73.87,
+      "cheapest_rate_pct": 51.28,
+      "best_overlap_shop": "Monoprix",
+      "best_overlap_products": 3591,
+      "weakest_overlap_shop": "Carrefour Express",
+      "weakest_overlap_products": 831,
+      "rank": 2,
+      "sample_tier": "fiable"
     },
     {
+      "shop_key": "carrefour_market",
       "shop_name": "Carrefour Market",
-      "total_products": 5028,
-      "crossed_products": 4536,
+      "total_products": 14100,
+      "crossed_products": 13608,
       "unique_products": 492,
-      "crossing_rate_pct": 90.21,
-      "unique_rate_pct": 9.79,
-      "cheapest_wins": 2694,
-      "price_comparisons": 9209,
-      "cheapest_rate_pct": 29.25,
+      "cheapest_wins": 3109.8,
+      "price_comparisons": 13608,
+      "crossing_rate_pct": 96.51,
+      "unique_rate_pct": 3.49,
+      "cheapest_rate_pct": 22.85,
       "best_overlap_shop": "Carrefour",
-      "best_overlap_products": 3958,
+      "best_overlap_products": 11874,
       "weakest_overlap_shop": "Aziza",
-      "weakest_overlap_products": 122,
-      "matched_with_each_shop": {
-        "Aziza": 122,
-        "Carrefour": 3958,
-        "Geant": 455,
-        "Monoprix": 143,
-        "Carrefour Express": 2199,
-        "Monoprix Glovo": 2332
-      },
-      "shop_key": "carrefour market",
-      "rank": 4
+      "weakest_overlap_products": 366,
+      "rank": 3,
+      "sample_tier": "fiable"
     },
     {
-      "shop_name": "Carrefour Express",
-      "total_products": 2820,
-      "crossed_products": 2744,
-      "unique_products": 76,
-      "crossing_rate_pct": 97.3,
-      "unique_rate_pct": 2.7,
-      "cheapest_wins": 1318,
-      "price_comparisons": 6543,
-      "cheapest_rate_pct": 20.14,
-      "best_overlap_shop": "Carrefour",
-      "best_overlap_products": 2320,
-      "weakest_overlap_shop": "Aziza",
-      "weakest_overlap_products": 82,
-      "matched_with_each_shop": {
-        "Aziza": 82,
-        "Carrefour": 2320,
-        "Geant": 277,
-        "Monoprix": 105,
-        "Carrefour Market": 2199,
-        "Monoprix Glovo": 1560
-      },
-      "shop_key": "carrefour express",
-      "rank": 5
-    },
-    {
-      "shop_name": "Monoprix",
-      "total_products": 6835,
-      "crossed_products": 1282,
-      "unique_products": 5553,
-      "crossing_rate_pct": 18.76,
-      "unique_rate_pct": 81.24,
-      "cheapest_wins": 325,
-      "price_comparisons": 2064,
-      "cheapest_rate_pct": 15.75,
-      "best_overlap_shop": "Geant",
-      "best_overlap_products": 1197,
-      "weakest_overlap_shop": "Aziza",
-      "weakest_overlap_products": 97,
-      "matched_with_each_shop": {
-        "Aziza": 97,
-        "Carrefour": 317,
-        "Geant": 1197,
-        "Carrefour Market": 143,
-        "Carrefour Express": 105,
-        "Monoprix Glovo": 205
-      },
       "shop_key": "monoprix",
-      "rank": 6
+      "shop_name": "Monoprix",
+      "total_products": 9399,
+      "crossed_products": 3846,
+      "unique_products": 5553,
+      "cheapest_wins": 844.5,
+      "price_comparisons": 3846,
+      "crossing_rate_pct": 40.92,
+      "unique_rate_pct": 59.08,
+      "cheapest_rate_pct": 21.96,
+      "best_overlap_shop": "Geant",
+      "best_overlap_products": 3591,
+      "weakest_overlap_shop": "Aziza",
+      "weakest_overlap_products": 291,
+      "rank": 4,
+      "sample_tier": "fiable"
+    },
+    {
+      "shop_key": "carrefour_express",
+      "shop_name": "Carrefour Express",
+      "total_products": 8308,
+      "crossed_products": 8232,
+      "unique_products": 76,
+      "cheapest_wins": 1358.4,
+      "price_comparisons": 8232,
+      "crossing_rate_pct": 99.09,
+      "unique_rate_pct": 0.91,
+      "cheapest_rate_pct": 16.5,
+      "best_overlap_shop": "Carrefour",
+      "best_overlap_products": 6960,
+      "weakest_overlap_shop": "Aziza",
+      "weakest_overlap_products": 246,
+      "rank": 5,
+      "sample_tier": "fiable"
     }
   ],
   "shop_health": [
     {
+      "shop_key": "aziza",
       "shop_name": "Aziza",
-      "total_products": 12195,
-      "crossed_products": 450,
+      "total_products": 13095,
+      "crossed_products": 1350,
       "unique_products": 11745,
-      "crossing_rate_pct": 3.69,
-      "unique_rate_pct": 96.31,
-      "cheapest_wins": 901,
-      "price_comparisons": 1006,
-      "cheapest_rate_pct": 89.56,
+      "cheapest_wins": 1169.9,
+      "price_comparisons": 1350,
+      "crossing_rate_pct": 10.31,
+      "unique_rate_pct": 89.69,
+      "cheapest_rate_pct": 86.66,
       "best_overlap_shop": "Geant",
-      "best_overlap_products": 287,
+      "best_overlap_products": 861,
       "weakest_overlap_shop": "Carrefour Express",
-      "weakest_overlap_products": 82,
+      "weakest_overlap_products": 246,
+      "rank": 7,
+      "sample_tier": "limité",
       "matched_with_each_shop": {
-        "Carrefour": 281,
-        "Geant": 287,
-        "Monoprix": 97,
-        "Carrefour Market": 122,
-        "Carrefour Express": 82,
-        "Monoprix Glovo": 137
+        "Carrefour": 843,
+        "Carrefour Express": 246,
+        "Carrefour Market": 366,
+        "Geant": 861,
+        "Monoprix": 291,
+        "Monoprix Glovo": 411
       }
     },
     {
+      "shop_key": "carrefour",
       "shop_name": "Carrefour",
-      "total_products": 19367,
-      "crossed_products": 6245,
+      "total_products": 31857,
+      "crossed_products": 18735,
       "unique_products": 13122,
-      "crossing_rate_pct": 32.25,
-      "unique_rate_pct": 67.75,
-      "cheapest_wins": 6613,
-      "price_comparisons": 11424,
-      "cheapest_rate_pct": 57.89,
+      "cheapest_wins": 11166.8,
+      "price_comparisons": 18735,
+      "crossing_rate_pct": 58.81,
+      "unique_rate_pct": 41.19,
+      "cheapest_rate_pct": 59.6,
       "best_overlap_shop": "Carrefour Market",
-      "best_overlap_products": 3958,
+      "best_overlap_products": 11874,
       "weakest_overlap_shop": "Aziza",
-      "weakest_overlap_products": 281,
+      "weakest_overlap_products": 843,
+      "rank": 1,
+      "sample_tier": "fiable",
       "matched_with_each_shop": {
-        "Aziza": 281,
-        "Geant": 1179,
-        "Monoprix": 317,
-        "Carrefour Market": 3958,
-        "Carrefour Express": 2320,
-        "Monoprix Glovo": 3369
+        "Aziza": 843,
+        "Carrefour Express": 6960,
+        "Carrefour Market": 11874,
+        "Geant": 3537,
+        "Monoprix": 951,
+        "Monoprix Glovo": 10107
       }
     },
     {
+      "shop_key": "geant",
       "shop_name": "Geant",
-      "total_products": 21307,
-      "crossed_products": 2247,
+      "total_products": 25801,
+      "crossed_products": 6741,
       "unique_products": 19060,
-      "crossing_rate_pct": 10.55,
-      "unique_rate_pct": 89.45,
-      "cheapest_wins": 1851,
-      "price_comparisons": 3904,
-      "cheapest_rate_pct": 47.41,
+      "cheapest_wins": 3457,
+      "price_comparisons": 6741,
+      "crossing_rate_pct": 26.13,
+      "unique_rate_pct": 73.87,
+      "cheapest_rate_pct": 51.28,
       "best_overlap_shop": "Monoprix",
-      "best_overlap_products": 1197,
+      "best_overlap_products": 3591,
       "weakest_overlap_shop": "Carrefour Express",
-      "weakest_overlap_products": 277,
+      "weakest_overlap_products": 831,
+      "rank": 2,
+      "sample_tier": "fiable",
       "matched_with_each_shop": {
-        "Aziza": 287,
-        "Carrefour": 1179,
-        "Monoprix": 1197,
-        "Carrefour Market": 455,
-        "Carrefour Express": 277,
-        "Monoprix Glovo": 509
+        "Aziza": 861,
+        "Carrefour": 3537,
+        "Carrefour Express": 831,
+        "Carrefour Market": 1365,
+        "Monoprix": 3591,
+        "Monoprix Glovo": 1527
       }
     },
     {
-      "shop_name": "Carrefour Market",
-      "total_products": 5028,
-      "crossed_products": 4536,
-      "unique_products": 492,
-      "crossing_rate_pct": 90.21,
-      "unique_rate_pct": 9.79,
-      "cheapest_wins": 2694,
-      "price_comparisons": 9209,
-      "cheapest_rate_pct": 29.25,
-      "best_overlap_shop": "Carrefour",
-      "best_overlap_products": 3958,
-      "weakest_overlap_shop": "Aziza",
-      "weakest_overlap_products": 122,
-      "matched_with_each_shop": {
-        "Aziza": 122,
-        "Carrefour": 3958,
-        "Geant": 455,
-        "Monoprix": 143,
-        "Carrefour Express": 2199,
-        "Monoprix Glovo": 2332
-      }
-    },
-    {
+      "shop_key": "monoprix_glovo",
       "shop_name": "Monoprix Glovo",
-      "total_products": 5717,
-      "crossed_products": 3798,
+      "total_products": 13313,
+      "crossed_products": 11394,
       "unique_products": 1919,
-      "crossing_rate_pct": 66.43,
-      "unique_rate_pct": 33.57,
-      "cheapest_wins": 2309,
-      "price_comparisons": 8112,
-      "cheapest_rate_pct": 28.46,
+      "cheapest_wins": 2713.7,
+      "price_comparisons": 11394,
+      "crossing_rate_pct": 85.59,
+      "unique_rate_pct": 14.41,
+      "cheapest_rate_pct": 23.82,
       "best_overlap_shop": "Carrefour",
-      "best_overlap_products": 3369,
+      "best_overlap_products": 10107,
       "weakest_overlap_shop": "Aziza",
-      "weakest_overlap_products": 137,
+      "weakest_overlap_products": 411,
+      "rank": 3,
+      "sample_tier": "fiable",
       "matched_with_each_shop": {
-        "Aziza": 137,
-        "Carrefour": 3369,
-        "Geant": 509,
-        "Monoprix": 205,
-        "Carrefour Market": 2332,
-        "Carrefour Express": 1560
+        "Aziza": 411,
+        "Carrefour": 10107,
+        "Carrefour Express": 4680,
+        "Carrefour Market": 6996,
+        "Geant": 1527,
+        "Monoprix": 615
       }
     },
     {
-      "shop_name": "Carrefour Express",
-      "total_products": 2820,
-      "crossed_products": 2744,
-      "unique_products": 76,
-      "crossing_rate_pct": 97.3,
-      "unique_rate_pct": 2.7,
-      "cheapest_wins": 1318,
-      "price_comparisons": 6543,
-      "cheapest_rate_pct": 20.14,
+      "shop_key": "carrefour_market",
+      "shop_name": "Carrefour Market",
+      "total_products": 14100,
+      "crossed_products": 13608,
+      "unique_products": 492,
+      "cheapest_wins": 3109.8,
+      "price_comparisons": 13608,
+      "crossing_rate_pct": 96.51,
+      "unique_rate_pct": 3.49,
+      "cheapest_rate_pct": 22.85,
       "best_overlap_shop": "Carrefour",
-      "best_overlap_products": 2320,
+      "best_overlap_products": 11874,
       "weakest_overlap_shop": "Aziza",
-      "weakest_overlap_products": 82,
+      "weakest_overlap_products": 366,
+      "rank": 3,
+      "sample_tier": "fiable",
       "matched_with_each_shop": {
-        "Aziza": 82,
-        "Carrefour": 2320,
-        "Geant": 277,
-        "Monoprix": 105,
-        "Carrefour Market": 2199,
-        "Monoprix Glovo": 1560
+        "Aziza": 366,
+        "Carrefour": 11874,
+        "Carrefour Express": 6597,
+        "Geant": 1365,
+        "Monoprix": 429,
+        "Monoprix Glovo": 6996
       }
     },
     {
+      "shop_key": "monoprix",
       "shop_name": "Monoprix",
-      "total_products": 6835,
-      "crossed_products": 1282,
+      "total_products": 9399,
+      "crossed_products": 3846,
       "unique_products": 5553,
-      "crossing_rate_pct": 18.76,
-      "unique_rate_pct": 81.24,
-      "cheapest_wins": 325,
-      "price_comparisons": 2064,
-      "cheapest_rate_pct": 15.75,
+      "cheapest_wins": 844.5,
+      "price_comparisons": 3846,
+      "crossing_rate_pct": 40.92,
+      "unique_rate_pct": 59.08,
+      "cheapest_rate_pct": 21.96,
       "best_overlap_shop": "Geant",
-      "best_overlap_products": 1197,
+      "best_overlap_products": 3591,
       "weakest_overlap_shop": "Aziza",
-      "weakest_overlap_products": 97,
+      "weakest_overlap_products": 291,
+      "rank": 4,
+      "sample_tier": "fiable",
       "matched_with_each_shop": {
-        "Aziza": 97,
-        "Carrefour": 317,
-        "Geant": 1197,
-        "Carrefour Market": 143,
-        "Carrefour Express": 105,
-        "Monoprix Glovo": 205
+        "Aziza": 291,
+        "Carrefour": 951,
+        "Carrefour Express": 315,
+        "Carrefour Market": 429,
+        "Geant": 3591,
+        "Monoprix Glovo": 615
+      }
+    },
+    {
+      "shop_key": "carrefour_express",
+      "shop_name": "Carrefour Express",
+      "total_products": 8308,
+      "crossed_products": 8232,
+      "unique_products": 76,
+      "cheapest_wins": 1358.4,
+      "price_comparisons": 8232,
+      "crossing_rate_pct": 99.09,
+      "unique_rate_pct": 0.91,
+      "cheapest_rate_pct": 16.5,
+      "best_overlap_shop": "Carrefour",
+      "best_overlap_products": 6960,
+      "weakest_overlap_shop": "Aziza",
+      "weakest_overlap_products": 246,
+      "rank": 5,
+      "sample_tier": "fiable",
+      "matched_with_each_shop": {
+        "Aziza": 246,
+        "Carrefour": 6960,
+        "Carrefour Market": 6597,
+        "Geant": 831,
+        "Monoprix": 315,
+        "Monoprix Glovo": 4680
       }
     }
   ],
@@ -335,200 +297,68 @@
     {
       "shop_count": 3,
       "shops": "Carrefour + Carrefour Market + Carrefour Express",
-      "products": 1809,
-      "price_compared": 1809,
-      "same_lowest_price": 672,
-      "same_highest_price": 676,
+      "products": 5427,
+      "price_compared": 5427,
       "cheapest_wins": {
-        "Carrefour": 1002,
-        "Carrefour Market": 51,
-        "Carrefour Express": 84
+        "Carrefour": 3663.5000000000778,
+        "Carrefour Market": 908.0000000000159,
+        "Carrefour Express": 855.500000000013
       },
       "most_expensive_wins": {
-        "Carrefour": 102,
-        "Carrefour Market": 208,
-        "Carrefour Express": 823
+        "Carrefour": 815.0000000000122,
+        "Carrefour Market": 1392.4999999999873,
+        "Carrefour Express": 3219.500000000047
       },
-      "avg_min_price": 6.09,
-      "avg_max_price": 6.63,
-      "avg_price_gap": 0.54,
-      "avg_spread_pct": 8.3,
-      "max_spread_pct": 490.3,
-      "sample_products": [
-        {
-          "id": "p_38f013cb3a4413d6f89e",
-          "name": "125Gr Miel Naturel"
-        },
-        {
-          "id": "p_8edf277159628ed15c85",
-          "name": "1Kg Sucre Gros Morceau.L'Aigle"
-        },
-        {
-          "id": "p_9c2770f1492878f2ac9f",
-          "name": "1Kg Sucre Gros Morceaux Sucrem"
-        },
-        {
-          "id": "p_48eb7535e289aa38a280",
-          "name": "1L Net.Carrelage Lustrant Judy"
-        },
-        {
-          "id": "p_8ba24889217df8694f59",
-          "name": "2.5L Gel Machine Fraich Enzy-M"
-        }
-      ],
-      "exact_products": 1809,
-      "missing_from": {
-        "Carrefour": 0,
-        "Carrefour Market": 0,
-        "Carrefour Express": 0
-      }
+      "avg_spread_pct": 6.54,
+      "exact_products": 5427
     },
     {
       "shop_count": 2,
       "shops": "Carrefour + Carrefour Market",
-      "products": 3958,
-      "price_compared": 3958,
-      "same_lowest_price": 1177,
-      "same_highest_price": 1177,
+      "products": 11874,
+      "price_compared": 11874,
       "cheapest_wins": {
-        "Carrefour": 2379,
-        "Carrefour Market": 402
+        "Carrefour": 8902.5,
+        "Carrefour Market": 2971.5
       },
       "most_expensive_wins": {
-        "Carrefour": 402,
-        "Carrefour Market": 2379
+        "Carrefour": 2971.5,
+        "Carrefour Market": 8902.5
       },
-      "avg_min_price": 10.048,
-      "avg_max_price": 10.728,
-      "avg_price_gap": 0.68,
-      "avg_spread_pct": 7.23,
-      "max_spread_pct": 490.3,
-      "sample_products": [
-        {
-          "id": "p_e3627861a6481ccf1f0e",
-          "name": "1000Ml Nihel Gel Lavant Olive"
-        },
-        {
-          "id": "p_ad6e8c49ebf0476471a3",
-          "name": "1000Ml Nihel Gel Lavant Rose"
-        },
-        {
-          "id": "p_38f013cb3a4413d6f89e",
-          "name": "125Gr Miel Naturel"
-        },
-        {
-          "id": "p_8e7358ad7a81b12c2aaa",
-          "name": "12P Fomage Carre Street Co - 791"
-        },
-        {
-          "id": "p_8edf277159628ed15c85",
-          "name": "1Kg Sucre Gros Morceau.L'Aigle"
-        }
-      ],
-      "exact_products": 2149,
-      "missing_from": {
-        "Carrefour": 0,
-        "Carrefour Market": 0,
-        "Carrefour Express": 2149
-      }
+      "avg_spread_pct": 5.61,
+      "exact_products": 11874
     },
     {
       "shop_count": 2,
       "shops": "Carrefour + Carrefour Express",
-      "products": 2320,
-      "price_compared": 2320,
-      "same_lowest_price": 584,
-      "same_highest_price": 584,
+      "products": 6960,
+      "price_compared": 6960,
       "cheapest_wins": {
-        "Carrefour": 1513,
-        "Carrefour Express": 223
+        "Carrefour": 5415,
+        "Carrefour Express": 1545
       },
       "most_expensive_wins": {
-        "Carrefour": 223,
-        "Carrefour Express": 1513
+        "Carrefour": 1545,
+        "Carrefour Express": 5415
       },
-      "avg_min_price": 6.605,
-      "avg_max_price": 7.115,
-      "avg_price_gap": 0.51,
-      "avg_spread_pct": 7.21,
-      "max_spread_pct": 409.28,
-      "sample_products": [
-        {
-          "id": "p_38f013cb3a4413d6f89e",
-          "name": "125Gr Miel Naturel"
-        },
-        {
-          "id": "p_8edf277159628ed15c85",
-          "name": "1Kg Sucre Gros Morceau.L'Aigle"
-        },
-        {
-          "id": "p_9c2770f1492878f2ac9f",
-          "name": "1Kg Sucre Gros Morceaux Sucrem"
-        },
-        {
-          "id": "p_48eb7535e289aa38a280",
-          "name": "1L Net.Carrelage Lustrant Judy"
-        },
-        {
-          "id": "p_8ba24889217df8694f59",
-          "name": "2.5L Gel Machine Fraich Enzy-M"
-        }
-      ],
-      "exact_products": 511,
-      "missing_from": {
-        "Carrefour": 0,
-        "Carrefour Market": 511,
-        "Carrefour Express": 0
-      }
+      "avg_spread_pct": 5.78,
+      "exact_products": 6960
     },
     {
       "shop_count": 2,
       "shops": "Carrefour Market + Carrefour Express",
-      "products": 2199,
-      "price_compared": 2199,
-      "same_lowest_price": 858,
-      "same_highest_price": 858,
+      "products": 6597,
+      "price_compared": 6597,
       "cheapest_wins": {
-        "Carrefour Market": 1041,
-        "Carrefour Express": 300
+        "Carrefour Market": 4410,
+        "Carrefour Express": 2187
       },
       "most_expensive_wins": {
-        "Carrefour Market": 300,
-        "Carrefour Express": 1041
+        "Carrefour Market": 2187,
+        "Carrefour Express": 4410
       },
-      "avg_min_price": 6.171,
-      "avg_max_price": 6.318,
-      "avg_price_gap": 0.147,
-      "avg_spread_pct": 2.5,
-      "max_spread_pct": 62.48,
-      "sample_products": [
-        {
-          "id": "p_38f013cb3a4413d6f89e",
-          "name": "125Gr Miel Naturel"
-        },
-        {
-          "id": "p_b11837c6e2bbcd8641ba",
-          "name": "150Ml Cr.Net.Exfoliante Daily"
-        },
-        {
-          "id": "p_e0a347660f9a5eac1464",
-          "name": "150Ml Oxydant.Parf.Creme40Vol"
-        },
-        {
-          "id": "p_8edf277159628ed15c85",
-          "name": "1Kg Sucre Gros Morceau.L'Aigle"
-        },
-        {
-          "id": "p_9c2770f1492878f2ac9f",
-          "name": "1Kg Sucre Gros Morceaux Sucrem"
-        }
-      ],
-      "exact_products": 390,
-      "missing_from": {
-        "Carrefour": 390,
-        "Carrefour Market": 0,
-        "Carrefour Express": 0
-      }
+      "avg_spread_pct": 2.17,
+      "exact_products": 6597
     }
   ]
 }
