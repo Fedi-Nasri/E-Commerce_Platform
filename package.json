@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
     "stats:import": "node scripts/import-homepage-stats-db.mjs",
     "stats:refresh": "node scripts/refresh-homepage-stats.mjs",
     "stats:refresh:db-only": "node scripts/refresh-homepage-stats.mjs --skip-compute",
