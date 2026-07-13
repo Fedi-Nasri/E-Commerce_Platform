@@ -36,6 +36,8 @@
     "docker:logs": "docker-compose logs -f"
   },
   "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^14.2.5",
     "vite": "^8.0.16",
     "vitest": "^4.1.8"
   }
