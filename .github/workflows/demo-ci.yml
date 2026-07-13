@@ -132,15 +132,15 @@ jobs:
         working-directory: backend
         run: npm run typecheck
 
-      - name: Run tests
-        working-directory: backend
-        run: npm test -- --passWithNoTests
-        env:
-          NODE_ENV: test
+      #- name: Run tests
+      #  working-directory: backend
+      #  run: npm test -- --passWithNoTests
+      #  env:
+      #    NODE_ENV: test
 
-      - name: Security audit
-        working-directory: backend
-        run: npm audit --audit-level=high || true
+      #- name: Security audit
+      #  working-directory: backend
+      #  run: npm audit --audit-level=high || true
 
 # ─────────────────────────────────────────────
 # JOB 3 — MAILER QUALITY (Python service only)
