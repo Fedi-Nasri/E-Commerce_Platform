@@ -114,7 +114,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
           cache-dependency-path: backend/package-lock.json
-
+      - name: Clear npm cache
+        run: npm cache clean --force
       - name: Install dependencies
         working-directory: backend
         run: npm ci
