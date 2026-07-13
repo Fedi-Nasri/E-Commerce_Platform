@@ -16,7 +16,7 @@ export function generateStaticParams() {
 
 /** Always render from DB at request time — avoids stale 404 pages when build ran without rankings data. */
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
+//export const revalidate = 0;
 
 export async function generateMetadata({
   params,
