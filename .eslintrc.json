@@ -2,18 +2,8 @@
   "extends": "next/core-web-vitals",
   "rules": {
     "react/no-unescaped-entities": "off",
-    "@typescript-eslint/no-empty-function": "off"
-  
-}
-  ,
-  "overrides": [
-    {
-      "files": ["*.ts", "*.tsx"],
-      "parser": "@typescript-eslint/parser",
-      "extends": [
-        "next/core-web-vitals",
-        "plugin:@typescript-eslint/recommended"
-      ]
-    }
-  ]
+    "@typescript-eslint/no-empty-function": "off",
+    "prefer-const": "off",
+    "no-var": "off"
+  }
 }
