@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { catalogBySlug, catalogByScopeId } from "@/lib/priceRankings";
+import { catalogBySlug, catalogByScopeId, isInsufficientSample } from "@/lib/priceRankings";
 
 const pool = new Pool({ connectionString: process.env.RETAIL_DB_URL, max: 2 });
 
@@ -59,6 +59,46 @@ function num(v: unknown): number | undefined {
   return Number.isFinite(n) ? n : undefined;
 }
 
+/** Shops with too few comparable products — excluded from ranking display. */
+export { isInsufficientSample } from "@/lib/priceRankings";
+
+function rerankShops(shops: RankedShopRow[]): RankedShopRow[] {
+  const eligible = shops.filter((s) => !isInsufficientSample(s));
+  let nextFeatured = 0;
+  return eligible.map((s, i) => {
+    const isFeatured = Boolean(s.is_featured) && !isInsufficientSample(s);
+    const featured_rank = isFeatured ? ++nextFeatured : undefined;
+    return {
+      ...s,
+      rank: i + 1,
+      is_featured: isFeatured,
+      featured_rank,
+    };
+  });
+}
+
+function sanitizePaliers(paliers: TierLeader[]): TierLeader[] {
+  return paliers
+    .map((p) => ({
+      ...p,
+      classement: (p.classement ?? []).filter(
+        (c) => c.statut !== "INSUFFISANT" && c.fiabilite !== "Insuffisant",
+      ),
+    }))
+    .filter((p) => p.classement.length > 0);
+}
+
+function sanitizeScope(scope: ScopeRanking, shopLimit?: number): ScopeRanking {
+  const shops = rerankShops(scope.shops);
+  const limited = shopLimit != null ? shops.slice(0, shopLimit) : shops;
+  return {
+    ...scope,
+    shops: limited,
+    distinct_shops: shops.length,
+    paliers: sanitizePaliers(scope.paliers ?? []),
+  };
+}
+
 function mapShopRow(row: Record<string, unknown>): RankedShopRow {
   const fairWin = num(row.fair_win_rate) ?? 0;
   const avgIndex = num(row.avg_price_index);
@@ -109,19 +149,19 @@ async function queryScope(scopeId: string, shopLimit = 50): Promise<ScopeRanking
       `SELECT ${SHOP_COLS}
        FROM price_ranking_shops
        WHERE scope_id = $1
-       ORDER BY rank ASC
-       LIMIT $2`,
-      [scopeId, shopLimit]
+       ORDER BY rank ASC`,
+      [scopeId]
     );
 
     const meta = scopeRes.rows[0].meta_json;
     const paliers = typeof meta === "object" && meta?.paliers ? meta.paliers : [];
 
-    return {
+    const scope: ScopeRanking = {
       ...scopeRes.rows[0],
       paliers,
       shops: shopsRes.rows.map(mapShopRow),
     };
+    return sanitizeScope(scope, shopLimit);
   } finally {
     client.release();
   }
@@ -173,20 +213,35 @@ export async function getFeaturedRankings(shopLimit = 3) {
       }
     }
 
-    return scopesRes.rows.map((s) => ({
-      scope_id: s.scope_id,
-      scope_name: s.scope_name,
-      matched_products: num(s.matched_products) ?? 0,
-      distinct_shops: num(s.distinct_shops) ?? 0,
-      shops: (byScope.get(s.scope_id) ?? []).map((shop) => ({
+    return scopesRes.rows.map((s) => {
+      const rawShops = (byScope.get(s.scope_id) ?? []).map((shop) => ({
         ...shop,
         rank: num(shop.rank) ?? shop.rank,
         fair_win_rate: num(shop.fair_win_rate) ?? shop.fair_win_rate,
         products_compared: num(shop.products_compared) ?? shop.products_compared,
         ecart_pct: num(shop.ecart_pct) ?? shop.ecart_pct,
         featured_rank: num(shop.featured_rank) ?? shop.featured_rank,
-      })),
-    }));
+      }));
+      const scope: ScopeRanking = {
+        scope_id: s.scope_id,
+        scope_name: s.scope_name,
+        level1_id: s.level1_id ?? null,
+        level2_id: s.level2_id ?? null,
+        matched_products: num(s.matched_products) ?? 0,
+        distinct_shops: num(s.distinct_shops) ?? 0,
+        generated_at: null,
+        method: s.method ?? null,
+        shops: rawShops,
+      };
+      const sanitized = sanitizeScope(scope, shopLimit);
+      return {
+        scope_id: sanitized.scope_id,
+        scope_name: sanitized.scope_name,
+        matched_products: sanitized.matched_products,
+        distinct_shops: sanitized.distinct_shops,
+        shops: sanitized.shops,
+      };
+    });
   } finally {
     client.release();
   }
@@ -199,13 +254,12 @@ export function attachCatalog<T extends { scope_id: string }>(scopes: T[]) {
 }
 
 export function featuredShops(scope: ScopeRanking) {
-  const featured = scope.shops
+  const eligible = scope.shops.filter((s) => !isInsufficientSample(s));
+  const featured = eligible
     .filter((s) => s.is_featured && s.featured_rank)
     .sort((a, b) => (a.featured_rank ?? 99) - (b.featured_rank ?? 99));
   if (featured.length >= 3) return featured.slice(0, 3);
-  return scope.shops
-    .filter((s) => s.fiabilite !== "Insuffisant")
-    .slice(0, 3);
+  return eligible.slice(0, 3);
 }
 
 export function scopeLeader(scope: ScopeRanking) {

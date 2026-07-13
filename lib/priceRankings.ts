@@ -137,3 +137,11 @@ export function fiabiliteLabel(f: string | null | undefined) {
 export function confidenceLabel(c: string) {
   return c === "enough_data" ? "Données solides" : "Échantillon limité";
 }
+
+/** Shops with too few comparable products — excluded from ranking display. */
+export function isInsufficientSample(shop: {
+  statut?: string | null;
+  fiabilite?: string | null;
+}): boolean {
+  return shop.statut === "INSUFFISANT" || shop.fiabilite === "Insuffisant";
+}

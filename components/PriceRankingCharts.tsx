@@ -15,7 +15,7 @@ import {
   YAxis,
   ZAxis,
 } from "recharts";
-import { shopDisplayName } from "@/lib/priceRankings";
+import { isInsufficientSample, shopDisplayName } from "@/lib/priceRankings";
 import type { RankedShopRow } from "@/lib/priceRankingsServer";
 
 type TierPoint = {
@@ -82,7 +82,7 @@ export function PriceRankingCharts({
   }>;
 }) {
   const reliable = shops
-    .filter((s) => s.fiabilite !== "Insuffisant" && (s.products_compared ?? 0) >= 20)
+    .filter((s) => !isInsufficientSample(s) && (s.products_compared ?? 0) >= 20)
     .slice(0, 12);
 
   const ecartData = reliable.map((s) => ({

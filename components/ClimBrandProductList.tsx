@@ -4,7 +4,7 @@ import { useEffect, useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { ShopLogo } from "@/components/shop/ShopLogo";
-import { climShopName, type ClimOffer } from "@/lib/climStats";
+import { climShopName, type ClimOffer } from "@/lib/climDisplay";
 
 const PAGE_SIZE = 10;
 const fmt = (n: number) => n.toLocaleString("fr-FR");

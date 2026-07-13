@@ -17,13 +17,8 @@ import { ClimBrandBtuCharts } from "@/components/ClimBrandBtuCharts";
 import { ClimBrandProductList } from "@/components/ClimBrandProductList";
 import { ShopLogo } from "@/components/shop/ShopLogo";
 import {
-  climBrandDetail,
-  climBrandFromSlug,
-  climBrandHref,
   climBrandSlugs,
-  climGeneratedAt,
-  climShopName,
-  formatDT,
+  getClimStatsAsync,
 } from "@/lib/climStats";
 import { pageMetadata } from "@/lib/seo";
 
@@ -44,22 +39,24 @@ export async function generateMetadata({
 }: {
   params: { brand: string };
 }): Promise<Metadata> {
-  const key = climBrandFromSlug(params.brand);
+  const clim = await getClimStatsAsync();
+  const key = clim.brandFromSlug(params.brand);
   if (!key) return { title: "Marque introuvable" };
-  const detail = climBrandDetail(key);
+  const detail = clim.brandDetail(key);
   const label = detail?.label ?? key;
   return pageMetadata({
     title: `Climatiseurs ${label} en stock — prix Tunisie`,
     description: `${detail?.count ?? 0} climatiseurs ${label} disponibles chez ${detail?.shopCount ?? 0} enseignes en Tunisie. Comparez les prix par capacité BTU.`,
-    path: climBrandHref(key),
+    path: clim.brandHref(key),
   });
 }
 
-export default function ClimBrandPage({ params }: { params: { brand: string } }) {
-  const brandKey = climBrandFromSlug(params.brand);
+export default async function ClimBrandPage({ params }: { params: { brand: string } }) {
+  const clim = await getClimStatsAsync();
+  const brandKey = clim.brandFromSlug(params.brand);
   if (!brandKey) notFound();
 
-  const detail = climBrandDetail(brandKey);
+  const detail = clim.brandDetail(brandKey);
   if (!detail) notFound();
 
   return (
@@ -98,11 +95,11 @@ export default function ClimBrandPage({ params }: { params: { brand: string } })
                     <span className="font-bold text-slate-900 dark:text-white">{detail.count} modèles</span> en stock
                     chez <span className="font-bold text-slate-900 dark:text-white">{detail.shopCount} enseignes</span>
                     {detail.minPrice != null && (
-                      <> — à partir de <span className="font-bold text-emerald-600 dark:text-emerald-400">{formatDT(detail.minPrice)}</span></>
+                      <> — à partir de <span className="font-bold text-emerald-600 dark:text-emerald-400">{clim.formatDT(detail.minPrice)}</span></>
                     )}
                   </p>
                   <p className="mt-2 text-[11px] text-slate-400 dark:text-white/35">
-                    Données du {formatGeneratedAt(climGeneratedAt)}
+                    Données du {formatGeneratedAt(clim.generatedAt)}
                   </p>
                 </div>
               </div>
@@ -166,7 +163,7 @@ export default function ClimBrandPage({ params }: { params: { brand: string } })
                 <div className="flex min-w-0 items-center gap-3">
                   <ShopLogo shopKey={row.shop} size={36} className="shrink-0" />
                   <div className="min-w-0">
-                    <div className="truncate font-bold text-slate-900 dark:text-white">{climShopName(row.shop)}</div>
+                    <div className="truncate font-bold text-slate-900 dark:text-white">{clim.shopName(row.shop)}</div>
                     <div className="text-[11px] text-slate-400 dark:text-white/40">
                       {row.count} modèle{row.count > 1 ? "s" : ""}
                     </div>

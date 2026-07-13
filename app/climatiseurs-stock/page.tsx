@@ -7,20 +7,8 @@ import { Footer } from "@/components/Footer";
 import { Reveal } from "@/components/site/Reveal";
 import { ShopLogo } from "@/components/shop/ShopLogo";
 import { ClimBrandBadge } from "@/components/ClimBrandBadge";
-import {
-  climBrandHref,
-  climBrandLabel,
-  climBrandLogo,
-  climBrandTotals,
-  climBtuComparisonWithUrls,
-  climBtuTiers,
-  climCheapestOffers,
-  climGeneratedAt,
-  climShopCheapest,
-  climShopName,
-  climShops,
-  climTotals,
-} from "@/lib/climStats";
+import { climBrandHref } from "@/lib/climBrandUtils";
+import { getClimStatsAsync } from "@/lib/climStats";
 
 export const metadata = {
   title: "Climatiseurs en stock en Tunisie — prix et disponibilité | 1111.tn",
@@ -47,8 +35,9 @@ function formatGeneratedAt(iso: string): string {
     " à " + d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
 }
 
-export default function ClimatiseursStockPage() {
-  const cheapest = climCheapestOffers(12);
+export default async function ClimatiseursStockPage() {
+  const clim = await getClimStatsAsync();
+  const cheapest = clim.cheapestOffers(12);
   const btuLabels: Record<string, string> = {
     "9000": "Petites pièces · ~15 m²",
     "12000": "Chambres · ~20 m²",
@@ -96,15 +85,15 @@ export default function ClimatiseursStockPage() {
                     comparés par capacité BTU, marque et prix.
                   </p>
                   <p className="mt-2 text-[11px] text-slate-400 dark:text-white/35">
-                    Données relevées le {formatGeneratedAt(climGeneratedAt)}
+                    Données relevées le {formatGeneratedAt(clim.generatedAt)}
                   </p>
                 </div>
               </div>
               <div className="flex shrink-0 flex-wrap gap-3">
                 {[
-                  { icon: Snowflake, label: "En stock", value: fmt(climTotals.climatiseurs), cls: "border-sky-500/25 bg-sky-500/10 text-sky-600 dark:text-sky-300" },
-                  { icon: Store, label: "Enseignes", value: String(climTotals.boutiques), cls: "border-brand-gold/25 bg-brand-gold/10 text-brand-gold" },
-                  { icon: Tag, label: "Marques", value: String(climTotals.marques), cls: "border-emerald-500/25 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300" },
+                  { icon: Snowflake, label: "En stock", value: fmt(clim.totals.climatiseurs), cls: "border-sky-500/25 bg-sky-500/10 text-sky-600 dark:text-sky-300" },
+                  { icon: Store, label: "Enseignes", value: String(clim.totals.boutiques), cls: "border-brand-gold/25 bg-brand-gold/10 text-brand-gold" },
+                  { icon: Tag, label: "Marques", value: String(clim.totals.marques), cls: "border-emerald-500/25 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300" },
                 ].map((c) => (
                   <div key={c.label} className={`rounded-2xl border px-5 py-3 text-center ${c.cls}`}>
                     <c.icon className="mx-auto h-4 w-4 opacity-80" />
@@ -129,8 +118,8 @@ export default function ClimatiseursStockPage() {
           </div>
         </Reveal>
         <div className="grid gap-5 lg:grid-cols-3">
-          {climBtuTiers.map((btu, ti) => {
-            const rows = climBtuComparisonWithUrls(btu);
+          {clim.btuTiers.map((btu, ti) => {
+            const rows = clim.btuComparisonWithUrls(btu);
             return (
               <Reveal key={btu} delay={ti * 0.05}>
                 <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-white/[0.07] dark:bg-[#0d1220]">
@@ -153,7 +142,7 @@ export default function ClimatiseursStockPage() {
                           <ShopLogo shopKey={r.shop} size={30} className="shrink-0" />
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-[12.5px] font-bold text-slate-900 dark:text-white">
-                              {climShopName(r.shop)}
+                              {clim.shopName(r.shop)}
                             </p>
                             <p className="truncate text-[10px] text-slate-400 dark:text-white/40">
                               <span className="capitalize">{r.marques_au_prix_min.slice(0, 2).join(", ")}</span>
@@ -228,7 +217,7 @@ export default function ClimatiseursStockPage() {
                     <td className="px-4 py-2.5">
                       <div className="flex items-center gap-2">
                         <ShopLogo shopKey={o.shop} size={26} className="shrink-0" />
-                        <span className="whitespace-nowrap text-[12px] font-bold text-slate-800 dark:text-white/85">{climShopName(o.shop)}</span>
+                        <span className="whitespace-nowrap text-[12px] font-bold text-slate-800 dark:text-white/85">{clim.shopName(o.shop)}</span>
                       </div>
                     </td>
                     <td className="max-w-[360px] px-4 py-2.5">
@@ -264,16 +253,16 @@ export default function ClimatiseursStockPage() {
               Marques <span className="gradient-text-gold">disponibles</span>
             </h2>
             <span className="rounded-full border border-sky-500/25 bg-sky-500/10 px-2 py-0.5 text-[10px] font-bold text-sky-600 dark:text-sky-300">
-              {climTotals.marques} marques
+              {clim.totals.marques} marques
             </span>
           </div>
         </Reveal>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
-          {climBrandTotals.map((b) => (
+          {clim.brandTotals.map((b) => (
             <ClimBrandBadge
               key={b.brand}
-              label={climBrandLabel(b.brand)}
-              logo={climBrandLogo(b.brand)}
+              label={clim.brandLabel(b.brand)}
+              logo={clim.brandLogo(b.brand)}
               count={b.count}
               href={climBrandHref(b.brand)}
             />
@@ -292,11 +281,11 @@ export default function ClimatiseursStockPage() {
           </div>
         </Reveal>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {climShops.map((shop, i) => {
+          {clim.shops.map((shop, i) => {
             const topBrands = Object.entries(shop.marques).sort((a, b) => b[1] - a[1]).slice(0, 5);
             const btuEntries = Object.entries(shop.par_btu).sort((a, b) => Number(a[0]) - Number(b[0]));
             const btuMax = Math.max(1, ...btuEntries.map(([, n]) => n));
-            const best = climShopCheapest(shop.shop);
+            const best = clim.shopCheapest(shop.shop);
             return (
               <Reveal key={shop.shop} delay={Math.min(i, 8) * 0.03}>
                 <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-white/[0.06] dark:bg-white/[0.025]">
@@ -304,7 +293,7 @@ export default function ClimatiseursStockPage() {
                     <div className="flex min-w-0 items-center gap-3">
                       <ShopLogo shopKey={shop.shop} size={38} className="shrink-0" />
                       <div className="min-w-0">
-                        <div className="truncate font-bold text-slate-900 dark:text-white">{climShopName(shop.shop)}</div>
+                        <div className="truncate font-bold text-slate-900 dark:text-white">{clim.shopName(shop.shop)}</div>
                         <div className="text-[10px] text-slate-400 dark:text-white/40">
                           relevé {shop.scrape.slice(0, 10)}
                         </div>

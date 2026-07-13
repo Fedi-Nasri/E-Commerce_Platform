@@ -53,6 +53,12 @@ export function getTopParaShopsData(): TopParaShopsData {
   return data;
 }
 
+export async function getTopParaShopsDataForApi(): Promise<TopParaShopsData> {
+  const { getTopParaStatsFromDb } = await import("@/lib/homepageStatsDb");
+  const fromDb = await getTopParaStatsFromDb();
+  return fromDb ?? data;
+}
+
 function prettyName(shop: string): string {
   return DISPLAY_NAMES[shop.toLowerCase()] ?? shop.charAt(0).toUpperCase() + shop.slice(1);
 }
@@ -76,4 +82,11 @@ export function getTopParaShopsForApi() {
     visitors: s.visitors,
     winRatePct: s.winRatePct,
   }));
+}
+
+export async function getTopParaShopsForApiAsync() {
+  const { getTopParaStatsFromDb, enrichTopParaShopForApi } = await import("@/lib/homepageStatsDb");
+  const bundle = await getTopParaStatsFromDb();
+  const shops = bundle?.shops ?? data.shops;
+  return shops.map((s) => enrichTopParaShopForApi(s));
 }

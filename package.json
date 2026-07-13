@@ -6,7 +6,12 @@
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "stats:import": "node scripts/import-homepage-stats-db.mjs",
+    "stats:refresh": "node scripts/refresh-homepage-stats.mjs",
+    "stats:refresh:db-only": "node scripts/refresh-homepage-stats.mjs --skip-compute",
+    "stats:grocery-crossing": "node scripts/compute-grocery-crossing.mjs",
+    "postinstall": "node scripts/setup-githooks.mjs"
   },
   "dependencies": {
     "@types/pg": "^8.20.0",
@@ -21,7 +26,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "recharts": "^2.12.7",
-    "sharp": "^0.33.5"
+    "sharp": "^0.33.5",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.10",

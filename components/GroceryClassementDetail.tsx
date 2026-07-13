@@ -55,7 +55,7 @@ export function GroceryClassementDetail() {
         {leader && (
           <p className="mt-3 text-sm font-semibold text-emerald-700 dark:text-emerald-300">
             {shopShortName(leader.shop_name)} en tête avec {leader.cheapest_rate_pct}% de victoires
-            sur {leader.price_comparisons.toLocaleString("fr-FR")} confrontations de prix.
+            sur {leader.crossed_products.toLocaleString("fr-FR")} produits croisés comparables.
           </p>
         )}
         {updated && (
@@ -111,12 +111,16 @@ export function GroceryClassementDetail() {
               </tr>
             </thead>
             <tbody>
-              {shop_health.map((shop, i) => (
+              {shop_health.map((shop) => {
+                const limited = (shop as { sample_tier?: string }).sample_tier === "limité";
+                return (
                 <tr
                   key={shop.shop_name}
-                  className="border-b border-slate-50 last:border-0 dark:border-white/[0.04]"
+                  className={`border-b border-slate-50 last:border-0 dark:border-white/[0.04] ${
+                    limited ? "opacity-75" : ""
+                  }`}
                 >
-                  <td className="px-5 py-3 font-bold tabular-nums text-slate-400">{i + 1}</td>
+                  <td className="px-5 py-3 font-bold tabular-nums text-slate-400">{shop.rank}</td>
                   <td className="px-3 py-3">
                     <div className="flex items-center gap-2">
                       <img
@@ -124,9 +128,14 @@ export function GroceryClassementDetail() {
                         alt=""
                         className="h-8 w-8 rounded-md bg-white object-contain p-0.5 ring-1 ring-slate-200 dark:ring-white/10"
                       />
-                      <span className="font-semibold text-slate-800 dark:text-white/90">
-                        {shop.shop_name}
-                      </span>
+                      <div>
+                        <span className="font-semibold text-slate-800 dark:text-white/90">
+                          {shop.shop_name}
+                        </span>
+                        {limited && (
+                          <div className="text-[10px] text-slate-400 dark:text-white/40">Échantillon limité</div>
+                        )}
+                      </div>
                     </div>
                   </td>
                   <td className="px-3 py-3 text-right tabular-nums text-slate-600 dark:text-white/70">
@@ -141,7 +150,7 @@ export function GroceryClassementDetail() {
                   <td className="px-3 py-3 text-right">
                     <span
                       className={`inline-flex rounded-full px-2 py-0.5 text-xs font-bold tabular-nums ${
-                        i === 0
+                        shop.rank === 1 && !limited
                           ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300"
                           : "bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-white/60"
                       }`}
@@ -150,7 +159,8 @@ export function GroceryClassementDetail() {
                     </span>
                   </td>
                 </tr>
-              ))}
+              );
+              })}
             </tbody>
           </table>
         </div>
@@ -170,17 +180,21 @@ export function GroceryClassementDetail() {
                 </li>
                 <li>
                   <strong className="text-slate-800 dark:text-white/85">Victoire prix</strong> — pour
-                  chaque confrontation, l&apos;enseigne avec le prix le plus bas remporte 1 point.
+                  chaque produit croisé, l&apos;enseigne au prix le plus bas remporte 1 point (ex æquo partagé).
                 </li>
                 <li>
                   <strong className="text-slate-800 dark:text-white/85">Taux de victoires</strong> —
-                  victoires ÷ confrontations de prix sur les produits où l&apos;enseigne est présente.
-                  C&apos;est ce critère qui détermine le classement affiché.
+                  victoires ÷ produits croisés où l&apos;enseigne est présente. C&apos;est ce critère qui
+                  détermine le classement affiché.
+                </li>
+                <li>
+                  <strong className="text-slate-800 dark:text-white/85">Podium</strong> — enseignes avec au
+                  moins 2&nbsp;000 produits croisés (échantillon fiable). Aziza et autres petits catalogues
+                  comparables restent dans le tableau complet.
                 </li>
                 <li>
                   <strong className="text-slate-800 dark:text-white/85">Profondeur de croisement</strong> —
-                  un produit présent dans 7 enseignes compte dans toutes les combinaisons pertinentes
-                  (paires, triplets, etc.).
+                  nombre de produits présents simultanément dans N enseignes.
                 </li>
               </ul>
             </div>

@@ -1,939 +1,417 @@
 {
-  "generated_at": "2026-07-09T14:43:46",
-  "method": "Indice mix-segments (électro/info/gaming/smartphone) + shrinkage catalogue n/(n+150). Compare chaque enseigne aux prix marché par catégorie, pas au panier brut.",
-  "segments": [
-    "electromenager",
-    "gaming",
-    "informatique",
-    "smartphone"
-  ],
-  "market_avg_by_segment": {
-    "electromenager": 3080.34,
-    "informatique": 6604.18,
-    "smartphone": 6102.04,
-    "gaming": 4370.86
-  },
-  "market_avg_price": 5162.29,
+  "generated_at": "2026-07-10T14:19:35.106Z",
+  "method": "Prix moyen catalogue = somme des prix ÷ nombre de produits en stock par enseigne (catalogue complet, hors rupture).",
   "shop_count": 51,
   "total_products": 74381,
+  "featured_min_products": 1000,
   "shops": [
     {
-      "rank": 1,
       "shop_key": "itechstore",
       "product_count": 423,
       "price_sum": 7147157.87,
       "avg_price": 16896.35,
-      "adj_avg_price": 11763.45,
-      "price_index": 2.7322,
-      "adj_index": 2.2787,
-      "vs_market_pct": 127.9,
-      "volume_tier": "S",
-      "by_segment": {
-        "informatique": 154,
-        "electromenager": 0,
-        "gaming": 0,
-        "smartphone": 269
-      }
+      "rank": 1,
+      "volume_tier": "S"
     },
     {
+      "shop_key": "sigshop",
+      "product_count": 20,
+      "price_sum": 320092,
+      "avg_price": 16004.6,
       "rank": 2,
-      "shop_key": "yatoo",
-      "product_count": 2289,
-      "price_sum": 18719930.73,
-      "avg_price": 8178.21,
-      "adj_avg_price": 10955.04,
-      "price_index": 2.1957,
-      "adj_index": 2.1221,
-      "vs_market_pct": 112.2,
-      "volume_tier": "L",
-      "by_segment": {
-        "informatique": 352,
-        "electromenager": 1753,
-        "gaming": 0,
-        "smartphone": 184
-      }
+      "volume_tier": "XS"
     },
     {
-      "rank": 3,
       "shop_key": "sbs",
       "product_count": 870,
       "price_sum": 9622486.59,
       "avg_price": 11060.33,
-      "adj_avg_price": 8580.62,
-      "price_index": 1.7763,
-      "adj_index": 1.6622,
-      "vs_market_pct": 66.2,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 744,
-        "electromenager": 40,
-        "gaming": 69,
-        "smartphone": 17
-      }
+      "rank": 3,
+      "volume_tier": "M"
     },
     {
-      "rank": 4,
-      "shop_key": "mytek",
-      "product_count": 7681,
-      "price_sum": 52416649.48,
-      "avg_price": 6824.2,
-      "adj_avg_price": 7402.2,
-      "price_index": 1.4424,
-      "adj_index": 1.4339,
-      "vs_market_pct": 43.4,
-      "volume_tier": "XL",
-      "by_segment": {
-        "informatique": 3932,
-        "electromenager": 2753,
-        "gaming": 157,
-        "smartphone": 839
-      }
-    },
-    {
-      "rank": 5,
       "shop_key": "batam",
       "product_count": 551,
       "price_sum": 4969390.19,
       "avg_price": 9018.86,
-      "adj_avg_price": 7021.18,
-      "price_index": 1.4581,
-      "adj_index": 1.3601,
-      "vs_market_pct": 36.0,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 309,
-        "electromenager": 149,
-        "gaming": 16,
-        "smartphone": 77
-      }
+      "rank": 4,
+      "volume_tier": "M"
     },
     {
-      "rank": 6,
       "shop_key": "agora",
       "product_count": 679,
-      "price_sum": 5705399.0,
+      "price_sum": 5705399,
       "avg_price": 8402.65,
-      "adj_avg_price": 6731.55,
-      "price_index": 1.3711,
-      "adj_index": 1.304,
-      "vs_market_pct": 30.4,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 436,
-        "electromenager": 175,
-        "gaming": 15,
-        "smartphone": 53
-      }
+      "rank": 5,
+      "volume_tier": "M"
     },
     {
-      "rank": 7,
+      "shop_key": "yatoo",
+      "product_count": 2289,
+      "price_sum": 18719930.73,
+      "avg_price": 8178.21,
+      "rank": 6,
+      "volume_tier": "L"
+    },
+    {
       "shop_key": "bstech",
       "product_count": 1068,
-      "price_sum": 8607992.0,
+      "price_sum": 8607992,
       "avg_price": 8059.92,
-      "adj_avg_price": 6283.59,
-      "price_index": 1.2477,
-      "adj_index": 1.2172,
-      "vs_market_pct": 21.7,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 832,
-        "electromenager": 53,
-        "gaming": 41,
-        "smartphone": 142
-      }
+      "rank": 7,
+      "volume_tier": "M"
     },
     {
-      "rank": 8,
-      "shop_key": "sigshop",
-      "product_count": 20,
-      "price_sum": 320092.0,
-      "avg_price": 16004.6,
-      "adj_avg_price": 6196.66,
-      "price_index": 2.7031,
-      "adj_index": 1.2004,
-      "vs_market_pct": 20.0,
-      "volume_tier": "XS",
-      "by_segment": {
-        "informatique": 9,
-        "electromenager": 1,
-        "gaming": 2,
-        "smartphone": 8
-      }
-    },
-    {
-      "rank": 9,
-      "shop_key": "spacenet",
-      "product_count": 10529,
-      "price_sum": 65317975.99,
-      "avg_price": 6203.63,
-      "adj_avg_price": 6101.96,
-      "price_index": 1.1846,
-      "adj_index": 1.182,
-      "vs_market_pct": 18.2,
-      "volume_tier": "XL",
-      "by_segment": {
-        "informatique": 5504,
-        "electromenager": 3372,
-        "gaming": 379,
-        "smartphone": 1274
-      }
-    },
-    {
-      "rank": 10,
-      "shop_key": "infotec",
-      "product_count": 965,
-      "price_sum": 6586173.8,
-      "avg_price": 6825.05,
-      "adj_avg_price": 5995.36,
-      "price_index": 1.1865,
-      "adj_index": 1.1614,
-      "vs_market_pct": 16.1,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 654,
-        "electromenager": 125,
-        "gaming": 88,
-        "smartphone": 98
-      }
-    },
-    {
-      "rank": 11,
-      "shop_key": "bestbuytunisie",
-      "product_count": 1832,
-      "price_sum": 12841030.4,
-      "avg_price": 7009.3,
-      "adj_avg_price": 5972.55,
-      "price_index": 1.1698,
-      "adj_index": 1.157,
-      "vs_market_pct": 15.7,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 1073,
-        "electromenager": 323,
-        "gaming": 210,
-        "smartphone": 226
-      }
-    },
-    {
-      "rank": 12,
       "shop_key": "techland",
       "product_count": 252,
       "price_sum": 1904529.71,
       "avg_price": 7557.66,
-      "adj_avg_price": 5845.09,
-      "price_index": 1.211,
-      "adj_index": 1.1323,
-      "vs_market_pct": 13.2,
-      "volume_tier": "S",
-      "by_segment": {
-        "informatique": 142,
-        "electromenager": 35,
-        "gaming": 36,
-        "smartphone": 39
-      }
+      "rank": 8,
+      "volume_tier": "S"
     },
     {
-      "rank": 13,
+      "shop_key": "bestbuytunisie",
+      "product_count": 1832,
+      "price_sum": 12841030.4,
+      "avg_price": 7009.3,
+      "rank": 9,
+      "volume_tier": "M"
+    },
+    {
+      "shop_key": "infotec",
+      "product_count": 965,
+      "price_sum": 6586173.8,
+      "avg_price": 6825.05,
+      "rank": 10,
+      "volume_tier": "M"
+    },
+    {
+      "shop_key": "mytek",
+      "product_count": 7681,
+      "price_sum": 52416649.48,
+      "avg_price": 6824.2,
+      "rank": 11,
+      "volume_tier": "XL"
+    },
+    {
       "shop_key": "jmb",
       "product_count": 1621,
       "price_sum": 10659737.17,
       "avg_price": 6576.03,
-      "adj_avg_price": 5658.24,
-      "price_index": 1.105,
-      "adj_index": 1.0961,
-      "vs_market_pct": 9.6,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 822,
-        "electromenager": 466,
-        "gaming": 82,
-        "smartphone": 251
-      }
+      "rank": 12,
+      "volume_tier": "M"
     },
     {
-      "rank": 14,
+      "shop_key": "spacenet",
+      "product_count": 10529,
+      "price_sum": 65317975.99,
+      "avg_price": 6203.63,
+      "rank": 13,
+      "volume_tier": "XL"
+    },
+    {
       "shop_key": "tokyo_store",
       "product_count": 1390,
-      "price_sum": 8492810.0,
+      "price_sum": 8492810,
       "avg_price": 6109.94,
-      "adj_avg_price": 5483.87,
-      "price_index": 1.069,
-      "adj_index": 1.0623,
-      "vs_market_pct": 6.2,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 180,
-        "electromenager": 1,
-        "gaming": 516,
-        "smartphone": 693
-      }
+      "rank": 14,
+      "volume_tier": "M"
     },
     {
-      "rank": 15,
-      "shop_key": "technopro",
-      "product_count": 3885,
-      "price_sum": 18166195.31,
-      "avg_price": 4675.98,
-      "adj_avg_price": 5473.52,
-      "price_index": 1.0626,
-      "adj_index": 1.0603,
-      "vs_market_pct": 6.0,
-      "volume_tier": "L",
-      "by_segment": {
-        "informatique": 1735,
-        "electromenager": 2026,
-        "gaming": 54,
-        "smartphone": 70
-      }
-    },
-    {
-      "rank": 16,
-      "shop_key": "graiet",
-      "product_count": 126,
-      "price_sum": 420249.0,
-      "avg_price": 3335.31,
-      "adj_avg_price": 5243.51,
-      "price_index": 1.0345,
-      "adj_index": 1.0157,
-      "vs_market_pct": 1.6,
-      "volume_tier": "S",
-      "by_segment": {
-        "informatique": 0,
-        "electromenager": 120,
-        "gaming": 0,
-        "smartphone": 6
-      }
-    },
-    {
-      "rank": 17,
-      "shop_key": "maalejaudio",
-      "product_count": 1053,
-      "price_sum": 3558481.75,
-      "avg_price": 3379.37,
-      "adj_avg_price": 5144.78,
-      "price_index": 0.9961,
-      "adj_index": 0.9966,
-      "vs_market_pct": -0.3,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 24,
-        "electromenager": 967,
-        "gaming": 0,
-        "smartphone": 62
-      }
-    },
-    {
-      "rank": 18,
       "shop_key": "megapc",
       "product_count": 82,
-      "price_sum": 476194.0,
+      "price_sum": 476194,
       "avg_price": 5807.24,
-      "adj_avg_price": 4943.99,
-      "price_index": 0.8804,
-      "adj_index": 0.9577,
-      "vs_market_pct": -4.2,
-      "volume_tier": "XS",
-      "by_segment": {
-        "informatique": 66,
-        "electromenager": 0,
-        "gaming": 0,
-        "smartphone": 16
-      }
+      "rank": 15,
+      "volume_tier": "XS"
     },
     {
-      "rank": 19,
-      "shop_key": "koktahome",
-      "product_count": 8,
-      "price_sum": 3921.0,
-      "avg_price": 490.12,
-      "adj_avg_price": 4942.5,
-      "price_index": 0.1591,
-      "adj_index": 0.9574,
-      "vs_market_pct": -4.3,
-      "volume_tier": "XS",
-      "by_segment": {
-        "informatique": 0,
-        "electromenager": 8,
-        "gaming": 0,
-        "smartphone": 0
-      }
-    },
-    {
-      "rank": 20,
-      "shop_key": "wiki",
-      "product_count": 2934,
-      "price_sum": 15403502.09,
-      "avg_price": 5250.0,
-      "adj_avg_price": 4931.04,
-      "price_index": 0.9529,
-      "adj_index": 0.9552,
-      "vs_market_pct": -4.5,
-      "volume_tier": "L",
-      "by_segment": {
-        "informatique": 1306,
-        "electromenager": 741,
-        "gaming": 295,
-        "smartphone": 592
-      }
-    },
-    {
-      "rank": 21,
-      "shop_key": "gamershop",
-      "product_count": 55,
-      "price_sum": 278609.0,
-      "avg_price": 5065.62,
-      "adj_avg_price": 4842.26,
-      "price_index": 0.7689,
-      "adj_index": 0.938,
-      "vs_market_pct": -6.2,
-      "volume_tier": "XS",
-      "by_segment": {
-        "informatique": 44,
-        "electromenager": 0,
-        "gaming": 11,
-        "smartphone": 0
-      }
-    },
-    {
-      "rank": 22,
-      "shop_key": "ispace",
-      "product_count": 15,
-      "price_sum": 4767.0,
-      "avg_price": 317.8,
-      "adj_avg_price": 4716.07,
-      "price_index": 0.0492,
-      "adj_index": 0.9136,
-      "vs_market_pct": -8.6,
-      "volume_tier": "XS",
-      "by_segment": {
-        "informatique": 10,
-        "electromenager": 0,
-        "gaming": 0,
-        "smartphone": 5
-      }
-    },
-    {
-      "rank": 23,
-      "shop_key": "dokani",
-      "product_count": 169,
-      "price_sum": 432398.8,
-      "avg_price": 2558.57,
-      "adj_avg_price": 4699.04,
-      "price_index": 0.8306,
-      "adj_index": 0.9103,
-      "vs_market_pct": -9.0,
-      "volume_tier": "S",
-      "by_segment": {
-        "informatique": 0,
-        "electromenager": 169,
-        "gaming": 0,
-        "smartphone": 0
-      }
-    },
-    {
-      "rank": 24,
-      "shop_key": "skymill",
-      "product_count": 21,
-      "price_sum": 9321.0,
-      "avg_price": 443.86,
-      "adj_avg_price": 4571.98,
-      "price_index": 0.0689,
-      "adj_index": 0.8856,
-      "vs_market_pct": -11.4,
-      "volume_tier": "XS",
-      "by_segment": {
-        "informatique": 19,
-        "electromenager": 0,
-        "gaming": 2,
-        "smartphone": 0
-      }
-    },
-    {
-      "rank": 25,
       "shop_key": "tunewtec",
       "product_count": 3680,
       "price_sum": 20561827.9,
       "avg_price": 5587.45,
-      "adj_avg_price": 4445.92,
-      "price_index": 0.8556,
-      "adj_index": 0.8612,
-      "vs_market_pct": -13.9,
-      "volume_tier": "L",
-      "by_segment": {
-        "informatique": 3271,
-        "electromenager": 4,
-        "gaming": 62,
-        "smartphone": 343
-      }
+      "rank": 16,
+      "volume_tier": "L"
     },
     {
-      "rank": 26,
-      "shop_key": "mbm",
-      "product_count": 152,
-      "price_sum": 706920.78,
-      "avg_price": 4650.79,
-      "adj_avg_price": 4423.36,
-      "price_index": 0.7156,
-      "adj_index": 0.8569,
-      "vs_market_pct": -14.3,
-      "volume_tier": "S",
-      "by_segment": {
-        "informatique": 139,
-        "electromenager": 4,
-        "gaming": 0,
-        "smartphone": 9
-      }
+      "shop_key": "wiki",
+      "product_count": 2934,
+      "price_sum": 15403502.09,
+      "avg_price": 5250,
+      "rank": 17,
+      "volume_tier": "L"
     },
     {
-      "rank": 27,
-      "shop_key": "informatica",
-      "product_count": 533,
-      "price_sum": 2536362.0,
-      "avg_price": 4758.65,
-      "adj_avg_price": 4287.89,
-      "price_index": 0.7829,
-      "adj_index": 0.8306,
-      "vs_market_pct": -16.9,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 310,
-        "electromenager": 130,
-        "gaming": 54,
-        "smartphone": 39
-      }
+      "shop_key": "gamershop",
+      "product_count": 55,
+      "price_sum": 278609,
+      "avg_price": 5065.62,
+      "rank": 18,
+      "volume_tier": "XS"
     },
     {
-      "rank": 28,
       "shop_key": "taktek",
       "product_count": 543,
       "price_sum": 2746965.9,
       "avg_price": 5058.87,
-      "adj_avg_price": 4267.85,
-      "price_index": 0.7789,
-      "adj_index": 0.8267,
-      "vs_market_pct": -17.3,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 201,
-        "electromenager": 16,
-        "gaming": 0,
-        "smartphone": 326
-      }
+      "rank": 19,
+      "volume_tier": "M"
     },
     {
-      "rank": 29,
+      "shop_key": "informatica",
+      "product_count": 533,
+      "price_sum": 2536362,
+      "avg_price": 4758.65,
+      "rank": 20,
+      "volume_tier": "M"
+    },
+    {
       "shop_key": "carthagoinformatique",
       "product_count": 2306,
       "price_sum": 10968456.02,
       "avg_price": 4756.49,
-      "adj_avg_price": 4205.65,
-      "price_index": 0.8026,
-      "adj_index": 0.8147,
-      "vs_market_pct": -18.5,
-      "volume_tier": "L",
-      "by_segment": {
-        "informatique": 1262,
-        "electromenager": 462,
-        "gaming": 349,
-        "smartphone": 233
-      }
+      "rank": 21,
+      "volume_tier": "L"
     },
     {
-      "rank": 30,
-      "shop_key": "emh",
-      "product_count": 576,
-      "price_sum": 1920913.0,
-      "avg_price": 3334.92,
-      "adj_avg_price": 4204.74,
-      "price_index": 0.7662,
-      "adj_index": 0.8145,
-      "vs_market_pct": -18.5,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 133,
-        "electromenager": 372,
-        "gaming": 0,
-        "smartphone": 71
-      }
+      "shop_key": "technopro",
+      "product_count": 3885,
+      "price_sum": 18166195.31,
+      "avg_price": 4675.98,
+      "rank": 22,
+      "volume_tier": "L"
     },
     {
-      "rank": 31,
-      "shop_key": "electrochaabani",
-      "product_count": 221,
-      "price_sum": 511659.9,
-      "avg_price": 2315.2,
-      "adj_avg_price": 4179.39,
-      "price_index": 0.6804,
-      "adj_index": 0.8096,
-      "vs_market_pct": -19.0,
-      "volume_tier": "S",
-      "by_segment": {
-        "informatique": 18,
-        "electromenager": 180,
-        "gaming": 4,
-        "smartphone": 19
-      }
+      "shop_key": "expert_gaming",
+      "product_count": 1647,
+      "price_sum": 7679990,
+      "avg_price": 4663.02,
+      "rank": 23,
+      "volume_tier": "M"
     },
     {
-      "rank": 32,
-      "shop_key": "kamounhome",
-      "product_count": 2026,
-      "price_sum": 6373691.0,
-      "avg_price": 3145.95,
-      "adj_avg_price": 4163.35,
-      "price_index": 0.7922,
-      "adj_index": 0.8065,
-      "vs_market_pct": -19.4,
-      "volume_tier": "L",
-      "by_segment": {
-        "informatique": 569,
-        "electromenager": 1241,
-        "gaming": 0,
-        "smartphone": 216
-      }
+      "shop_key": "mbm",
+      "product_count": 152,
+      "price_sum": 706920.78,
+      "avg_price": 4650.79,
+      "rank": 24,
+      "volume_tier": "S"
     },
     {
-      "rank": 33,
-      "shop_key": "imag",
-      "product_count": 186,
-      "price_sum": 354882.0,
-      "avg_price": 1907.97,
-      "adj_avg_price": 4074.66,
-      "price_index": 0.6194,
-      "adj_index": 0.7893,
-      "vs_market_pct": -21.1,
-      "volume_tier": "S",
-      "by_segment": {
-        "informatique": 0,
-        "electromenager": 186,
-        "gaming": 0,
-        "smartphone": 0
-      }
-    },
-    {
-      "rank": 34,
       "shop_key": "tunisianet",
       "product_count": 6394,
       "price_sum": 29007585.7,
       "avg_price": 4536.69,
-      "adj_avg_price": 3940.57,
-      "price_index": 0.7578,
-      "adj_index": 0.7633,
-      "vs_market_pct": -23.7,
-      "volume_tier": "XL",
-      "by_segment": {
-        "informatique": 4504,
-        "electromenager": 1355,
-        "gaming": 0,
-        "smartphone": 535
-      }
+      "rank": 25,
+      "volume_tier": "XL"
     },
     {
-      "rank": 35,
-      "shop_key": "zoom",
-      "product_count": 1842,
-      "price_sum": 6473849.83,
-      "avg_price": 3514.58,
-      "adj_avg_price": 3852.69,
-      "price_index": 0.7257,
-      "adj_index": 0.7463,
-      "vs_market_pct": -25.4,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 680,
-        "electromenager": 768,
-        "gaming": 0,
-        "smartphone": 394
-      }
-    },
-    {
-      "rank": 36,
-      "shop_key": "expert_gaming",
-      "product_count": 1647,
-      "price_sum": 7679990.0,
-      "avg_price": 4663.02,
-      "adj_avg_price": 3771.61,
-      "price_index": 0.7061,
-      "adj_index": 0.7306,
-      "vs_market_pct": -26.9,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 1646,
-        "electromenager": 0,
-        "gaming": 1,
-        "smartphone": 0
-      }
-    },
-    {
-      "rank": 37,
-      "shop_key": "scoop",
-      "product_count": 113,
-      "price_sum": 236140.35,
-      "avg_price": 2089.74,
-      "adj_avg_price": 3646.11,
-      "price_index": 0.3164,
-      "adj_index": 0.7063,
-      "vs_market_pct": -29.4,
-      "volume_tier": "S",
-      "by_segment": {
-        "informatique": 113,
-        "electromenager": 0,
-        "gaming": 0,
-        "smartphone": 0
-      }
-    },
-    {
-      "rank": 38,
       "shop_key": "qsnet",
       "product_count": 1116,
       "price_sum": 4093444.1,
       "avg_price": 3667.96,
-      "adj_avg_price": 3636.62,
-      "price_index": 0.6647,
-      "adj_index": 0.7045,
-      "vs_market_pct": -29.6,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 646,
-        "electromenager": 463,
-        "gaming": 0,
-        "smartphone": 7
-      }
+      "rank": 26,
+      "volume_tier": "M"
     },
     {
-      "rank": 39,
       "shop_key": "affariyet",
       "product_count": 4146,
       "price_sum": 14965849.49,
       "avg_price": 3609.71,
-      "adj_avg_price": 3601.02,
-      "price_index": 0.6866,
-      "adj_index": 0.6976,
-      "vs_market_pct": -30.2,
-      "volume_tier": "L",
-      "by_segment": {
-        "informatique": 1701,
-        "electromenager": 1915,
-        "gaming": 66,
-        "smartphone": 464
-      }
+      "rank": 27,
+      "volume_tier": "L"
     },
     {
-      "rank": 40,
-      "shop_key": "krichen",
-      "product_count": 632,
-      "price_sum": 1206590.55,
-      "avg_price": 1909.16,
-      "adj_avg_price": 3550.54,
-      "price_index": 0.6137,
-      "adj_index": 0.6878,
-      "vs_market_pct": -31.2,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 0,
-        "electromenager": 624,
-        "gaming": 0,
-        "smartphone": 8
-      }
-    },
-    {
-      "rank": 41,
       "shop_key": "psstore",
       "product_count": 412,
-      "price_sum": 1461355.0,
+      "price_sum": 1461355,
       "avg_price": 3546.98,
-      "adj_avg_price": 3511.72,
-      "price_index": 0.5639,
-      "adj_index": 0.6803,
-      "vs_market_pct": -32.0,
-      "volume_tier": "S",
-      "by_segment": {
-        "informatique": 91,
-        "electromenager": 4,
-        "gaming": 5,
-        "smartphone": 312
-      }
+      "rank": 28,
+      "volume_tier": "S"
     },
     {
-      "rank": 42,
-      "shop_key": "electrobennjima",
-      "product_count": 179,
-      "price_sum": 226232.0,
-      "avg_price": 1263.87,
-      "adj_avg_price": 3498.09,
-      "price_index": 0.4075,
-      "adj_index": 0.6776,
-      "vs_market_pct": -32.2,
-      "volume_tier": "S",
-      "by_segment": {
-        "informatique": 6,
-        "electromenager": 172,
-        "gaming": 0,
-        "smartphone": 1
-      }
+      "shop_key": "zoom",
+      "product_count": 1842,
+      "price_sum": 6473849.83,
+      "avg_price": 3514.58,
+      "rank": 29,
+      "volume_tier": "M"
     },
     {
-      "rank": 43,
-      "shop_key": "acspace",
-      "product_count": 721,
-      "price_sum": 1376909.0,
-      "avg_price": 1909.72,
-      "adj_avg_price": 3472.11,
-      "price_index": 0.6045,
-      "adj_index": 0.6726,
-      "vs_market_pct": -32.7,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 23,
-        "electromenager": 670,
-        "gaming": 0,
-        "smartphone": 28
-      }
+      "shop_key": "maalejaudio",
+      "product_count": 1053,
+      "price_sum": 3558481.75,
+      "avg_price": 3379.37,
+      "rank": 30,
+      "volume_tier": "M"
     },
     {
-      "rank": 44,
-      "shop_key": "darty",
-      "product_count": 1672,
-      "price_sum": 4083877.58,
-      "avg_price": 2442.51,
-      "adj_avg_price": 3444.89,
-      "price_index": 0.6375,
-      "adj_index": 0.6673,
-      "vs_market_pct": -33.3,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 189,
-        "electromenager": 1135,
-        "gaming": 0,
-        "smartphone": 348
-      }
+      "shop_key": "graiet",
+      "product_count": 126,
+      "price_sum": 420249,
+      "avg_price": 3335.31,
+      "rank": 31,
+      "volume_tier": "S"
     },
     {
-      "rank": 45,
-      "shop_key": "try_and_buy",
-      "product_count": 405,
-      "price_sum": 1110591.9,
-      "avg_price": 2742.2,
-      "adj_avg_price": 3375.71,
-      "price_index": 0.5257,
-      "adj_index": 0.6539,
-      "vs_market_pct": -34.6,
-      "volume_tier": "S",
-      "by_segment": {
-        "informatique": 97,
-        "electromenager": 207,
-        "gaming": 17,
-        "smartphone": 84
-      }
+      "shop_key": "emh",
+      "product_count": 576,
+      "price_sum": 1920913,
+      "avg_price": 3334.92,
+      "rank": 32,
+      "volume_tier": "M"
     },
     {
-      "rank": 46,
-      "shop_key": "allani",
-      "product_count": 501,
-      "price_sum": 843458.0,
-      "avg_price": 1683.55,
-      "adj_avg_price": 3360.53,
-      "price_index": 0.5465,
-      "adj_index": 0.651,
-      "vs_market_pct": -34.9,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 0,
-        "electromenager": 499,
-        "gaming": 0,
-        "smartphone": 2
-      }
+      "shop_key": "kamounhome",
+      "product_count": 2026,
+      "price_sum": 6373691,
+      "avg_price": 3145.95,
+      "rank": 33,
+      "volume_tier": "L"
     },
     {
-      "rank": 47,
-      "shop_key": "chaktech",
-      "product_count": 926,
-      "price_sum": 1892227.0,
-      "avg_price": 2043.44,
-      "adj_avg_price": 3289.17,
-      "price_index": 0.5784,
-      "adj_index": 0.6372,
-      "vs_market_pct": -36.3,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 72,
-        "electromenager": 492,
-        "gaming": 0,
-        "smartphone": 362
-      }
-    },
-    {
-      "rank": 48,
       "shop_key": "jumbo",
       "product_count": 2283,
       "price_sum": 6591548.95,
       "avg_price": 2887.23,
-      "adj_avg_price": 3000.66,
-      "price_index": 0.5538,
-      "adj_index": 0.5813,
-      "vs_market_pct": -41.9,
-      "volume_tier": "L",
-      "by_segment": {
-        "informatique": 798,
-        "electromenager": 1349,
-        "gaming": 7,
-        "smartphone": 129
-      }
+      "rank": 34,
+      "volume_tier": "L"
     },
     {
-      "rank": 49,
-      "shop_key": "bill",
-      "product_count": 325,
-      "price_sum": 417733.0,
-      "avg_price": 1285.33,
-      "adj_avg_price": 2996.17,
-      "price_index": 0.3867,
-      "adj_index": 0.5804,
-      "vs_market_pct": -42.0,
-      "volume_tier": "S",
-      "by_segment": {
-        "informatique": 5,
-        "electromenager": 297,
-        "gaming": 6,
-        "smartphone": 17
-      }
+      "shop_key": "try_and_buy",
+      "product_count": 405,
+      "price_sum": 1110591.9,
+      "avg_price": 2742.2,
+      "rank": 35,
+      "volume_tier": "S"
     },
     {
-      "rank": 50,
-      "shop_key": "electrohadjkacem",
-      "product_count": 1092,
-      "price_sum": 1362986.0,
-      "avg_price": 1248.16,
-      "adj_avg_price": 2394.93,
-      "price_index": 0.3903,
-      "adj_index": 0.4639,
-      "vs_market_pct": -53.6,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 0,
-        "electromenager": 971,
-        "gaming": 0,
-        "smartphone": 121
-      }
+      "shop_key": "dokani",
+      "product_count": 169,
+      "price_sum": 432398.8,
+      "avg_price": 2558.57,
+      "rank": 36,
+      "volume_tier": "S"
     },
     {
-      "rank": 51,
+      "shop_key": "darty",
+      "product_count": 1672,
+      "price_sum": 4083877.58,
+      "avg_price": 2442.51,
+      "rank": 37,
+      "volume_tier": "M"
+    },
+    {
+      "shop_key": "electrochaabani",
+      "product_count": 221,
+      "price_sum": 511659.9,
+      "avg_price": 2315.2,
+      "rank": 38,
+      "volume_tier": "S"
+    },
+    {
+      "shop_key": "scoop",
+      "product_count": 113,
+      "price_sum": 236140.35,
+      "avg_price": 2089.74,
+      "rank": 39,
+      "volume_tier": "S"
+    },
+    {
+      "shop_key": "chaktech",
+      "product_count": 926,
+      "price_sum": 1892227,
+      "avg_price": 2043.44,
+      "rank": 40,
+      "volume_tier": "M"
+    },
+    {
+      "shop_key": "acspace",
+      "product_count": 721,
+      "price_sum": 1376909,
+      "avg_price": 1909.72,
+      "rank": 41,
+      "volume_tier": "M"
+    },
+    {
+      "shop_key": "krichen",
+      "product_count": 632,
+      "price_sum": 1206590.55,
+      "avg_price": 1909.16,
+      "rank": 42,
+      "volume_tier": "M"
+    },
+    {
+      "shop_key": "imag",
+      "product_count": 186,
+      "price_sum": 354882,
+      "avg_price": 1907.97,
+      "rank": 43,
+      "volume_tier": "S"
+    },
+    {
       "shop_key": "techgate",
       "product_count": 1234,
-      "price_sum": 2199215.0,
+      "price_sum": 2199215,
       "avg_price": 1782.18,
-      "adj_avg_price": 2375.03,
-      "price_index": 0.3944,
-      "adj_index": 0.4601,
-      "vs_market_pct": -54.0,
-      "volume_tier": "M",
-      "by_segment": {
-        "informatique": 129,
-        "electromenager": 690,
-        "gaming": 0,
-        "smartphone": 415
-      }
+      "rank": 44,
+      "volume_tier": "M"
+    },
+    {
+      "shop_key": "allani",
+      "product_count": 501,
+      "price_sum": 843458,
+      "avg_price": 1683.55,
+      "rank": 45,
+      "volume_tier": "M"
+    },
+    {
+      "shop_key": "bill",
+      "product_count": 325,
+      "price_sum": 417733,
+      "avg_price": 1285.33,
+      "rank": 46,
+      "volume_tier": "S"
+    },
+    {
+      "shop_key": "electrobennjima",
+      "product_count": 179,
+      "price_sum": 226232,
+      "avg_price": 1263.87,
+      "rank": 47,
+      "volume_tier": "S"
+    },
+    {
+      "shop_key": "electrohadjkacem",
+      "product_count": 1092,
+      "price_sum": 1362986,
+      "avg_price": 1248.16,
+      "rank": 48,
+      "volume_tier": "M"
+    },
+    {
+      "shop_key": "koktahome",
+      "product_count": 8,
+      "price_sum": 3921,
+      "avg_price": 490.12,
+      "rank": 49,
+      "volume_tier": "XS"
+    },
+    {
+      "shop_key": "skymill",
+      "product_count": 21,
+      "price_sum": 9321,
+      "avg_price": 443.86,
+      "rank": 50,
+      "volume_tier": "XS"
+    },
+    {
+      "shop_key": "ispace",
+      "product_count": 15,
+      "price_sum": 4767,
+      "avg_price": 317.8,
+      "rank": 51,
+      "volume_tier": "XS"
     }
   ],
   "skipped": [
@@ -953,5 +431,6 @@
       "shop": "benzarti-electromenager",
       "reason": "too-few:0"
     }
-  ]
+  ],
+  "in_stock_only": true
 }

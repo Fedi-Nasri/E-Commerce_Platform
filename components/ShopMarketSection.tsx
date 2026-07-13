@@ -1,7 +1,7 @@
 import { ShopMarketTicker } from "@/components/ShopMarketTicker";
-import { getRetailShopAvgPrices } from "@/lib/retailShopAvgPrices";
+import { getRetailShopAvgPricesForApi } from "@/lib/retailShopAvgPrices";
 
-export function ShopMarketSection() {
-  const data = getRetailShopAvgPrices();
+export async function ShopMarketSection() {
+  const data = await getRetailShopAvgPricesForApi();
   return <ShopMarketTicker initial={data} />;
 }
