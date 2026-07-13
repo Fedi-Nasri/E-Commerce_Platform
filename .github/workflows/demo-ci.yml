@@ -5,6 +5,7 @@ on:
     branches:
       - develop
       - monitoring
+      - containerization-new
   pull_request: 
     branches:
       - develop
