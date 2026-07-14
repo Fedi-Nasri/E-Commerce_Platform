@@ -93,6 +93,7 @@ jobs:
             GITHUB_SHA="${{ env.DEPLOY_SHA }}" \
             IMAGE_PREFIX="${{ secrets.IMAGE_PREFIX }}" \
             GHCR_PAT="${{ secrets.GHCR_TOKEN }}" \
+            GITHUB_ACTOR="${{ vars.ACTOR }}" \
             COMPOSE_FILE="docker-compose.prod.yml" \
             NGINX_CONFIG_FILE="1111.tn.conf" \
             NGINX_SITE_NAME="1111.tn" \

@@ -4,7 +4,7 @@ set -euo pipefail
 APP_DIR="${APP_DIR:-/opt/1111}"
 GITHUB_SHA="${GITHUB_SHA:?GITHUB_SHA is required}"
 GHCR_PAT="${GHCR_PAT:?GHCR_PAT is required}"
-GITHUB_ACTOR="${DEPLOY_USER:?DEPLOY_USER is required}"
+GITHUB_ACTOR="${GITHUB_ACTOR:?GITHUB_ACTOR is required}"
 IMAGE_PREFIX="${IMAGE_PREFIX:-ghcr.io/galylioai/1111}"
 COMPOSE_FILES=(-f docker-compose.yml)
 COMPOSE_MONITORING=(-f docker-compose.monitoring.yml)
