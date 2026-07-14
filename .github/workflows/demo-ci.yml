@@ -38,6 +38,9 @@ jobs:
       mailer: ${{ steps.filter.outputs.mailer }}
       alimentation: ${{ steps.filter.outputs.alimentation }}
       fashion: ${{ steps.filter.outputs.fashion }}
+      mailer-api: ${{ steps.filter.outputs.mailer-api }}
+      engagement: ${{ steps.filter.outputs.engagement }}
+      web-control: ${{ steps.filter.outputs.web-control }}
       frontend: ${{ steps.filter.outputs.frontend }}
       # shared = anything in backend root (shared libs, tsconfig, etc.)
       shared: ${{ steps.filter.outputs.shared }}
@@ -63,6 +66,16 @@ jobs:
               - 'backend/services/retail/**'
             mailer:
               - 'backend/services/mailer/**'
+            alimentation:
+              - 'backend/services/alimentation/**'
+            fashion:
+              - 'backend/services/fashion/**'
+            mailer-api:
+              - 'backend/services/mailer-api/**'
+            engagement:
+              - 'backend/services/engagement/**'
+            web-control:
+              - 'backend/services/web-control/**'
             frontend:
               - '**'
               - '!backend/**'
@@ -100,6 +113,9 @@ jobs:
       needs.detect-changes.outputs.mailer == 'true' ||
       needs.detect-changes.outputs.alimentation == 'true' ||
       needs.detect-changes.outputs.fashion == 'true' ||
+      needs.detect-changes.outputs.mailer-api == 'true' ||
+      needs.detect-changes.outputs.engagement == 'true' ||
+      needs.detect-changes.outputs.web-control == 'true' ||
       needs.detect-changes.outputs.shared == 'true'
 
     steps:
@@ -275,6 +291,18 @@ jobs:
             context: ./backend
             dockerfile: backend/services/fashion/Dockerfile
             changed: ${{ needs.detect-changes.outputs.fashion }}
+          - service: mailer-api
+            context: ./backend
+            dockerfile: backend/services/mailer-api/Dockerfile
+            changed: ${{ needs.detect-changes.outputs.mailer-api }}
+          - service: engagement
+            context: ./backend
+            dockerfile: backend/services/engagement/Dockerfile
+            changed: ${{ needs.detect-changes.outputs.engagement }}
+          - service: web-control
+            context: ./backend
+            dockerfile: backend/services/web-control/Dockerfile
+            changed: ${{ needs.detect-changes.outputs.web-control }}
           - service: frontend
             context: .
             dockerfile: Dockerfile
