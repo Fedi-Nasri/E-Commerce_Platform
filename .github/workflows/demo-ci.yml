@@ -81,6 +81,7 @@ jobs:
               - '!backend/**'
               - '!deploy/**'
               - '!scripts/**'
+              - '!.github/**'
               - '!docker-compose*.yml'
               - '!package*.json'
               - '!README.md'
