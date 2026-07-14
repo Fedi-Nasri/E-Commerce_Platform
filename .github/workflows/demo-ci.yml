@@ -53,6 +53,7 @@ jobs:
         uses: dorny/paths-filter@v3
         id: filter
         with:
+          base: ${{ github.event.before }}
           filters: |
             gateway:
               - 'backend/gateway/**'
@@ -76,11 +77,13 @@ jobs:
               - 'backend/services/engagement/**'
             web-control:
               - 'backend/services/web-control/**'
-            frontend:
-              - '**'
-              - '!backend/**'
-              - '!deploy/**'
-              - '!scripts/**'
+frontend:
+          - '**'
+          - '!backend/**'
+          - '!deploy/**'
+          - '!scripts/**'
+          - '!ai-context/**'
+          - '!.github/**'
               - '!docker-compose*.yml'
               - '!package*.json'
               - '!README.md'
