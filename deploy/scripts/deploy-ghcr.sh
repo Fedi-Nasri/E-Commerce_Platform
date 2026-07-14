@@ -105,6 +105,11 @@ fi
 mkdir -p "$APP_DIR/current"
 cd "$APP_DIR/current"
 
+if [ -f /tmp/docker-compose.yml ]; then
+  install -m 0644 /tmp/docker-compose.yml "$APP_DIR/current/docker-compose.yml"
+  rm -f /tmp/docker-compose.yml
+fi
+
 if [ -f /tmp/docker-compose.staging.yml ]; then
   install -m 0644 /tmp/docker-compose.staging.yml "$APP_DIR/current/docker-compose.staging.yml"
   rm -f /tmp/docker-compose.staging.yml
