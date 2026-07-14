@@ -87,7 +87,7 @@ jobs:
           host: ${{ secrets.TS_SERVER_IP }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: ".env,deploy-ghcr.sh,check-containers.sh,docker-compose.staging.yml,docker-compose.monitoring.yml,staging.1111.tn.conf,deploy/monitoring"
+          source: ".env,deploy-ghcr.sh,check-containers.sh,docker-compose.yml,docker-compose.staging.yml,docker-compose.monitoring.yml,staging.1111.tn.conf,deploy/monitoring"
           target: "/tmp/"
 
       # --- 5. Activate release and deploy on the target server ---
