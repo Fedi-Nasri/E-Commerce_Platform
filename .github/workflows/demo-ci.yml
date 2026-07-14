@@ -3,9 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - develop
-      - monitoring
-      - containerization-new
+      - ci-workflow-update
   pull_request: 
     branches:
       - develop
