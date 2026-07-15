@@ -118,6 +118,7 @@ jobs:
             IMAGE_PREFIX="${{ secrets.IMAGE_PREFIX }}" \
             GHCR_PAT="${{ secrets.GHCR_TOKEN }}" \
             GITHUB_ACTOR="${{ vars.ACTOR }}" \
+            COMPOSE_FILE="docker-compose.staging.yml" \
             bash /tmp/deploy-ghcr.sh
             rm -f /tmp/deploy-ghcr.sh /tmp/check-containers.sh
 
