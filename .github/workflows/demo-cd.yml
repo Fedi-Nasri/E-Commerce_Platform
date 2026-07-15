@@ -10,6 +10,10 @@ on:
   #     - develop
   workflow_dispatch: {}
 
+concurrency:
+  group: cd-staging
+  cancel-in-progress: false
+
 jobs:
   
   deploy:
@@ -26,6 +30,28 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # --- 0. Get changed services from CI artifact ---
+      - name: Download changed services artifact
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          workflow: demo-ci.yml
+          branch: ci-workflow-update
+          name: changed-services
+          if_no_artifact_found: warn
+        continue-on-error: true
+
+      - name: Read changed services
+        id: read-changed
+        run: |
+          if [ -f "changed-services.txt" ]; then
+            CHANGED=$(cat changed-services.txt)
+            echo "Changed services: $CHANGED"
+          else
+            CHANGED="all"
+            echo "No artifact found — deploying all services"
+          fi
+          echo "services=$CHANGED" >> $GITHUB_OUTPUT
 
       # --- 1. Validate required secrets ---
       - name: Validate required secrets
@@ -119,6 +145,7 @@ jobs:
             GHCR_PAT="${{ secrets.GHCR_TOKEN }}" \
             GITHUB_ACTOR="${{ vars.ACTOR }}" \
             COMPOSE_FILE="docker-compose.staging.yml" \
+            CHANGED_SERVICES="${{ steps.read-changed.outputs.services }}" \
             bash /tmp/deploy-ghcr.sh
             rm -f /tmp/deploy-ghcr.sh /tmp/check-containers.sh
 

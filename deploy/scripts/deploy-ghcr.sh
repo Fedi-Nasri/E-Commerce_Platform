@@ -155,16 +155,42 @@ if [ ! -f "$ENV_FILE" ]; then
 fi
 chmod 600 "$ENV_FILE"
 
+# Check if this SHA is already deployed (skip if nothing changed)
+CURRENT_SHA=$($DOCKER inspect --format='{{index .Config.Labels "org.opencontainers.image.revision"}}' "${IMAGE_PREFIX}-gateway:latest" 2>/dev/null || echo "none")
+if [ "$CURRENT_SHA" = "$GITHUB_SHA" ]; then
+  echo "Already running $GITHUB_SHA — skipping deploy"
+  $DOCKER compose --env-file "$ENV_FILE" "${COMPOSE_FILES[@]}" ps
+  exit 0
+fi
+echo "Current SHA: $CURRENT_SHA → Deploying: $GITHUB_SHA"
+
 echo "Logging into GHCR..."
 echo "$GHCR_PAT" | $DOCKER login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
 
 export TAG="latest"
-for service in "${SERVICES[@]}"; do
-  IMAGE_FULL_NAME="${IMAGE_PREFIX}-${service}:sha-${GITHUB_SHA}"
-  echo "Pulling: $IMAGE_FULL_NAME"
-  $DOCKER pull "$IMAGE_FULL_NAME"
-  $DOCKER tag "$IMAGE_FULL_NAME" "${IMAGE_PREFIX}-${service}:latest"
+
+# Only pull services that changed (or all if CHANGED_SERVICES=all/empty)
+CHANGED_SERVICES="${CHANGED_SERVICES:-all}"
+if [ "$CHANGED_SERVICES" = "all" ] || [ "$CHANGED_SERVICES" = "none" ]; then
+  DEPLOY_SERVICES=("${SERVICES[@]}")
+  echo "Deploying ALL services"
+else
+  IFS=',' read -ra DEPLOY_SERVICES <<< "$CHANGED_SERVICES"
+  echo "Deploying only changed services: ${DEPLOY_SERVICES[*]}"
+fi
+
+# Pull images in parallel
+echo "Pulling images (parallel)..."
+for service in "${DEPLOY_SERVICES[@]}"; do
+  (
+    IMAGE_FULL_NAME="${IMAGE_PREFIX}-${service}:sha-${GITHUB_SHA}"
+    echo "Pulling: $IMAGE_FULL_NAME"
+    $DOCKER pull "$IMAGE_FULL_NAME"
+    $DOCKER tag "$IMAGE_FULL_NAME" "${IMAGE_PREFIX}-${service}:latest"
+  ) &
 done
+wait
+echo "All images pulled"
 
 sudo nginx -t
 sudo systemctl reload nginx

@@ -92,6 +92,39 @@ jobs:
               - 'backend/**/tsconfig*.json'
               - 'backend/shared/**'
 
+      - name: Build changed services list
+        id: changed-list
+        run: |
+          SERVICES=""
+          if [ "${{ steps.filter.outputs.gateway }}" = "true" ]; then SERVICES="$SERVICES,gateway"; fi
+          if [ "${{ steps.filter.outputs.auth }}" = "true" ]; then SERVICES="$SERVICES,auth"; fi
+          if [ "${{ steps.filter.outputs.user }}" = "true" ]; then SERVICES="$SERVICES,user"; fi
+          if [ "${{ steps.filter.outputs.retail }}" = "true" ]; then SERVICES="$SERVICES,retail"; fi
+          if [ "${{ steps.filter.outputs.para }}" = "true" ]; then SERVICES="$SERVICES,para"; fi
+          if [ "${{ steps.filter.outputs.alimentation }}" = "true" ]; then SERVICES="$SERVICES,alimentation"; fi
+          if [ "${{ steps.filter.outputs.fashion }}" = "true" ]; then SERVICES="$SERVICES,fashion"; fi
+          if [ "${{ steps.filter.outputs.mailer-api }}" = "true" ]; then SERVICES="$SERVICES,mailer-api"; fi
+          if [ "${{ steps.filter.outputs.engagement }}" = "true" ]; then SERVICES="$SERVICES,engagement"; fi
+          if [ "${{ steps.filter.outputs.web-control }}" = "true" ]; then SERVICES="$SERVICES,web-control"; fi
+          if [ "${{ steps.filter.outputs.frontend }}" = "true" ]; then SERVICES="$SERVICES,frontend"; fi
+          if [ "${{ steps.filter.outputs.mailer }}" = "true" ]; then SERVICES="$SERVICES,mailer"; fi
+          if [ "${{ steps.filter.outputs.shared }}" = "true" ]; then SERVICES="$SERVICES,shared"; fi
+          SERVICES="${SERVICES#,}"
+          if [ -z "$SERVICES" ]; then SERVICES="none"; fi
+          echo "Changed services: $SERVICES"
+          echo "changed=$SERVICES" >> $GITHUB_OUTPUT
+
+      - name: Save changed services artifact
+        run: |
+          echo "${{ steps.changed-list.outputs.changed }}" > changed-services.txt
+
+      - name: Upload changed services
+        uses: actions/upload-artifact@v4
+        with:
+          name: changed-services-${{ github.sha }}
+          path: changed-services.txt
+          retention-days: 7
+
 # ─────────────────────────────────────────────
 # JOB 2 — BACKEND TESTS (single job for the whole monorepo)
 # All Vitest suites live in backend/tests/ and cover every service.
