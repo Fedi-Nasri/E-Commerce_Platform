@@ -202,5 +202,5 @@ volumes:
 
 networks:
   stack:
-    name: "1111_summer_internship_backend"
+    name: "1111"
     external: true
