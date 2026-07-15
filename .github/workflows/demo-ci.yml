@@ -121,7 +121,7 @@ jobs:
       - name: Upload changed services
         uses: actions/upload-artifact@v4
         with:
-          name: changed-services-${{ github.sha }}
+          name: changed-services
           path: changed-services.txt
           retention-days: 7
 
