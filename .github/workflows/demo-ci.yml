@@ -126,15 +126,6 @@ jobs:
           cache: npm
           cache-dependency-path: backend/package-lock.json
 
-      - name: Clear npm cache
-        run: npm cache clean --force
-        
-      - name: Clean install dependencies
-        working-directory: ./backend
-        run: |
-          rm -rf node_modules package-lock.json
-          npm install
-
       - name: Install dependencies
         working-directory: backend
         run: npm ci
@@ -217,9 +208,15 @@ jobs:
         working-directory: .
         run: npm run typecheck
 
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: nextjs-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
+          restore-keys: nextjs-${{ hashFiles('package-lock.json') }}
+
       - name: Build
         working-directory: .
-       
         env:
           NEXT_PUBLIC_API_BASE_URL: http://localhost:3000
           NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID_CI }}
@@ -321,6 +318,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build and push · ${{ matrix.service }}
+        if: matrix.service.changed == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ${{ matrix.context }}
