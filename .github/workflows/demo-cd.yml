@@ -10,12 +10,15 @@ on:
   #     - develop
   workflow_dispatch: {}
 
+permissions:
+  contents: read
+  actions: read
+
 concurrency:
   group: cd-staging
   cancel-in-progress: false
 
 jobs:
-  
   deploy:
     name: Deploy to Staging
     runs-on: ubuntu-latest
