@@ -392,6 +392,7 @@ jobs:
 
     permissions:
       contents: read
+      packages: read      # required to pull images from GHCR
       security-events: write  # required to upload SARIF
 
     strategy:
