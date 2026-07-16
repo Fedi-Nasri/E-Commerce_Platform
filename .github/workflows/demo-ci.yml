@@ -425,7 +425,7 @@ jobs:
 
     steps:
       - name: Run Trivy vulnerability scanner
-        if: matrix.service.changed == 'true'
+      # (if: matrix.service.changed == 'true')
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('sha-{0}', github.sha) }}
@@ -435,7 +435,7 @@ jobs:
           exit-code: '1'
 
       - name: Upload Trivy scan results to GitHub Security tab
-        if: matrix.service.changed == 'true'
+      # (if: matrix.service.changed == 'true')
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: 'trivy-results.sarif'
