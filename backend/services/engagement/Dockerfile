@@ -1,4 +1,4 @@
-FROM node:20.14.0-alpine3.20 AS builder
+FROM node:20.19.0-alpine3.21 AS builder
 WORKDIR /app
 
 COPY package.json package-lock.json ./
@@ -18,8 +18,8 @@ RUN npm ci --workspace @app/engagement
 COPY services/engagement ./services/engagement
 RUN npm run build --workspace @app/engagement
 
-FROM node:20.14.0-alpine3.20
-RUN apk add --no-cache wget
+FROM node:20.19.0-alpine3.21
+RUN apk add --no-cache wget && apk upgrade --no-cache
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY gateway/package.json ./gateway/package.json
@@ -38,4 +38,5 @@ WORKDIR /app/services/engagement
 COPY --from=builder /app/services/engagement/dist ./dist
 COPY shared/db/migrations ./migrations
 EXPOSE 3008
+USER node
 CMD ["sh", "-c", "node dist/db/migrate.js && node dist/index.js"]

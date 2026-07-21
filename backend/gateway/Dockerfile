@@ -1,4 +1,4 @@
-FROM node:20.14.0-alpine3.20 AS builder
+FROM node:20.19.0-alpine3.21 AS builder
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY gateway/package.json ./gateway/package.json
@@ -16,8 +16,8 @@ RUN npm ci --workspace @app/gateway
 COPY gateway ./gateway
 RUN npm run build --workspace @app/gateway
 
-FROM node:20.14.0-alpine3.20
-RUN apk add --no-cache wget
+FROM node:20.19.0-alpine3.21
+RUN apk add --no-cache wget && apk upgrade --no-cache
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY gateway/package.json ./gateway/package.json
@@ -35,4 +35,5 @@ RUN npm ci --omit=dev --workspace @app/gateway
 WORKDIR /app/gateway
 COPY --from=builder /app/gateway/dist ./dist
 EXPOSE 3000
+USER node
 CMD ["node", "dist/index.js"]

@@ -1,4 +1,4 @@
-FROM node:20.14.0-alpine3.20 AS builder
+FROM node:20.19.0-alpine3.21 AS builder
 WORKDIR /app
 
 COPY package.json package-lock.json ./
@@ -18,8 +18,8 @@ RUN npm ci --workspace @app/web-control
 COPY services/web-control ./services/web-control
 RUN npm run build --workspace @app/web-control
 
-FROM node:20.14.0-alpine3.20
-RUN apk add --no-cache wget
+FROM node:20.19.0-alpine3.21
+RUN apk add --no-cache wget && apk upgrade --no-cache
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY gateway/package.json ./gateway/package.json
