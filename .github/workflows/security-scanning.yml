@@ -248,24 +248,44 @@ jobs:
           sleep 45
           docker compose -f docker-compose.staging.yml ps
 
-      - name: OWASP ZAP Baseline Scan
+      - name: OWASP ZAP Baseline Scan — Frontend (3001)
         if: steps.target.outputs.mode == 'provided' || (steps.target.outputs.mode == 'local' && inputs.zap_mode == 'baseline')
-        uses: zaproxy/action-baseline@v0.14.0
+        uses: zaproxy/action-baseline@v0.15.0
         continue-on-error: true
         with:
           target: ${{ steps.target.outputs.url }}
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a -j -J zap-baseline-report.json -r zap-baseline-report.html -M zap-baseline-report.md'
+          cmd_options: '-a -j -J zap-frontend-baseline.json -r zap-frontend-baseline.html -M zap-frontend-baseline.md'
           allow_issue_writing: false
 
-      - name: OWASP ZAP Full Scan
+      - name: OWASP ZAP Baseline Scan — Backend (3000)
+        if: steps.target.outputs.mode == 'provided' || (steps.target.outputs.mode == 'local' && inputs.zap_mode == 'baseline')
+        uses: zaproxy/action-baseline@v0.15.0
+        continue-on-error: true
+        with:
+          target: http://localhost:3000
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a -j -J zap-backend-baseline.json -r zap-backend-baseline.html -M zap-backend-baseline.md'
+          allow_issue_writing: false
+
+      - name: OWASP ZAP Full Scan — Frontend (3001)
         if: steps.target.outputs.mode == 'local' && inputs.zap_mode == 'full'
         uses: zaproxy/action-full-scan@v0.13.0
         continue-on-error: true
         with:
           target: ${{ steps.target.outputs.url }}
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a -j -J zap-full-report.json -r zap-full-report.html -M zap-full-report.md'
+          cmd_options: '-a -j -J zap-frontend-full.json -r zap-frontend-full.html -M zap-frontend-full.md'
+          allow_issue_writing: false
+
+      - name: OWASP ZAP Full Scan — Backend (3000)
+        if: steps.target.outputs.mode == 'local' && inputs.zap_mode == 'full'
+        uses: zaproxy/action-full-scan@v0.13.0
+        continue-on-error: true
+        with:
+          target: http://localhost:3000
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a -j -J zap-backend-full.json -r zap-backend-full.html -M zap-backend-full.md'
           allow_issue_writing: false
 
       - name: Upload ZAP reports (HTML + JSON + MD)
@@ -274,8 +294,8 @@ jobs:
         with:
           name: zap-report-${{ inputs.zap_mode || 'baseline' }}
           path: |
-            zap-baseline-report.*
-            zap-full-report.*
+            zap-frontend-*
+            zap-backend-*
             report.*
           retention-days: 30
           if-no-files-found: ignore
