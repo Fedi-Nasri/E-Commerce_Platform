@@ -146,11 +146,41 @@ jobs:
           severity: 'CRITICAL,HIGH'
           exit-code: '0'
 
+      - name: Run Trivy scanner (JSON for counting)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:latest
+          format: 'json'
+          output: 'trivy-${{ matrix.service }}.json'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'
+
+      - name: Count findings
+        if: always()
+        run: |
+          if [ -f "trivy-${{ matrix.service }}.json" ]; then
+            CRITICAL=$(cat trivy-${{ matrix.service }}.json | jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "CRITICAL")] | length')
+            HIGH=$(cat trivy-${{ matrix.service }}.json | jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH")] | length')
+          else
+            CRITICAL=0
+            HIGH=0
+          fi
+          echo "CRITICAL=$CRITICAL" >> $GITHUB_ENV
+          echo "HIGH=$HIGH" >> $GITHUB_ENV
+          echo "## ${{ matrix.service }}" > trivy-${{ matrix.service }}-count.md
+          echo "| Severity | Count |" >> trivy-${{ matrix.service }}-count.md
+          echo "|----------|-------|" >> trivy-${{ matrix.service }}-count.md
+          echo "| CRITICAL | $CRITICAL |" >> trivy-${{ matrix.service }}-count.md
+          echo "| HIGH | $HIGH |" >> trivy-${{ matrix.service }}-count.md
+
       - name: Upload Trivy SARIF
         uses: actions/upload-artifact@v4
         with:
           name: trivy-${{ matrix.service }}
-          path: trivy-${{ matrix.service }}.sarif
+          path: |
+            trivy-${{ matrix.service }}.sarif
+            trivy-${{ matrix.service }}.json
+            trivy-${{ matrix.service }}-count.md
           retention-days: 30
 
 # ─────────────────────────────────────────────
@@ -315,7 +345,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: security-reports/
-          pattern: '*report*'
+          pattern: '*'
           merge-multiple: true
 
       - name: Generate summary
@@ -323,18 +353,64 @@ jobs:
         run: |
           echo "## Security Scanning Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Tool | Type | Format | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|------|------|--------|--------|" >> $GITHUB_STEP_SUMMARY
-          # echo "| SonarQube | SAST + SCA | SARIF | ${{ needs.sonarqube-scan.result == 'success' && '✅ Passed' || '⚠️ Soft-fail' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Trivy | SCA (images) | SARIF | ${{ needs.trivy-scan.result == 'success' && '✅ Passed' || '⚠️ Soft-fail' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| ZAP Baseline | DAST | HTML + MD | ${{ needs.zap-scan.result == 'success' && '✅ Passed' || '⚠️ Soft-fail' }} |" >> $GITHUB_STEP_SUMMARY
+
+          # Count totals from Trivy
+          TOTAL_CRITICAL=0
+          TOTAL_HIGH=0
+          for f in security-reports/trivy-*-count.md; do
+            if [ -f "$f" ]; then
+              SVC=$(head -1 "$f" | sed 's/## //')
+              CRIT=$(grep "CRITICAL" "$f" | grep -o '[0-9]*' | head -1)
+              HIGH=$(grep "HIGH" "$f" | grep -o '[0-9]*' | head -1)
+              TOTAL_CRITICAL=$((TOTAL_CRITICAL + CRIT))
+              TOTAL_HIGH=$((TOTAL_HIGH + HIGH))
+            fi
+          done
+
+          echo "### Trivy Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Download Reports" >> $GITHUB_STEP_SUMMARY
-          echo "All reports are available in the **security-reports** artifact." >> $GITHUB_STEP_SUMMARY
+          echo "| Severity | Total Found |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| CRITICAL | **$TOTAL_CRITICAL** |" >> $GITHUB_STEP_SUMMARY
+          echo "| HIGH | **$TOTAL_HIGH** |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          # echo "- **SonarQube:** code quality + security bugs" >> $GITHUB_STEP_SUMMARY
-          echo "- **Trivy:** Docker image CVEs" >> $GITHUB_STEP_SUMMARY
-          echo "- **ZAP:** runtime vulnerabilities (XSS, SQLi, auth flaws)" >> $GITHUB_STEP_SUMMARY
+
+          # Per-service breakdown
+          echo "### Per-Service Breakdown" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Service | CRITICAL | HIGH | Report |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|----------|------|--------|" >> $GITHUB_STEP_SUMMARY
+          for f in security-reports/trivy-*-count.md; do
+            if [ -f "$f" ]; then
+              SVC=$(head -1 "$f" | sed 's/## //')
+              CRIT=$(grep "CRITICAL" "$f" | grep -o '[0-9]*' | head -1)
+              HIGH=$(grep "HIGH" "$f" | grep -o '[0-9]*' | head -1)
+              if [ "$CRIT" -gt 0 ]; then
+                STATUS="🔴"
+              elif [ "$HIGH" -gt 0 ]; then
+                STATUS="🟡"
+              else
+                STATUS="🟢"
+              fi
+              echo "| $SVC | $STATUS $CRIT | $HIGH | [View](../trivy-$SVC) |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # ZAP section
+          echo "### ZAP Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Target | Status | Report |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|--------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Frontend (3001) | ${{ needs.zap-scan.result == 'success' && '✅ Completed' || '⚠️ Soft-fail' }} | [View](../zap-report-${{ inputs.zap_mode || 'baseline' }}) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Backend (3000) | ${{ needs.zap-scan.result == 'success' && '✅ Completed' || '⚠️ Soft-fail' }} | [View](../zap-report-${{ inputs.zap_mode || 'baseline' }}) |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Download links
+          echo "### Download" >> $GITHUB_STEP_SUMMARY
+          echo "- [All Reports (zip)](../security-reports-${{ github.sha }})" >> $GITHUB_STEP_SUMMARY
+          echo "- [Trivy SARIF](../trivy-gateway) — upload to GitHub Security tab" >> $GITHUB_STEP_SUMMARY
+          echo "- [ZAP HTML Reports](../zap-report-${{ inputs.zap_mode || 'baseline' }})" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload combined reports
         uses: actions/upload-artifact@v4
