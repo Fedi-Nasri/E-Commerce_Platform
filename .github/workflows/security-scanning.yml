@@ -351,8 +351,15 @@ jobs:
         with:
           target: ${{ steps.target.outputs.url }}
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a -j -J zap-frontend-baseline.json -r zap-frontend-baseline.html'
+          cmd_options: '-a -j'
           allow_issue_writing: false
+
+      - name: Save Frontend ZAP reports
+        if: always() && (steps.target.outputs.mode == 'provided' || (steps.target.outputs.mode == 'local' && inputs.zap_mode == 'baseline'))
+        run: |
+          cp report_json.json zap-frontend-baseline.json 2>/dev/null || true
+          cp report_html.html zap-frontend-baseline.html 2>/dev/null || true
+          cp report_md.md   zap-frontend-baseline.md   2>/dev/null || true
 
       - name: OWASP ZAP Baseline Scan — Backend (3000)
         if: steps.target.outputs.mode == 'provided' || (steps.target.outputs.mode == 'local' && inputs.zap_mode == 'baseline')
@@ -361,8 +368,15 @@ jobs:
         with:
           target: http://localhost:3000
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a -j -J zap-backend-baseline.json -r zap-backend-baseline.html'
+          cmd_options: '-a -j'
           allow_issue_writing: false
+
+      - name: Save Backend ZAP reports
+        if: always() && (steps.target.outputs.mode == 'provided' || (steps.target.outputs.mode == 'local' && inputs.zap_mode == 'baseline'))
+        run: |
+          cp report_json.json zap-backend-baseline.json 2>/dev/null || true
+          cp report_html.html zap-backend-baseline.html 2>/dev/null || true
+          cp report_md.md   zap-backend-baseline.md   2>/dev/null || true
 
       - name: OWASP ZAP Full Scan — Frontend (3001)
         if: steps.target.outputs.mode == 'local' && inputs.zap_mode == 'full'
@@ -371,8 +385,15 @@ jobs:
         with:
           target: ${{ steps.target.outputs.url }}
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a -j -J zap-frontend-full.json -r zap-frontend-full.html'
+          cmd_options: '-a -j'
           allow_issue_writing: false
+
+      - name: Save Frontend ZAP Full reports
+        if: always() && steps.target.outputs.mode == 'local' && inputs.zap_mode == 'full'
+        run: |
+          cp report_json.json zap-frontend-full.json 2>/dev/null || true
+          cp report_html.html zap-frontend-full.html 2>/dev/null || true
+          cp report_md.md   zap-frontend-full.md   2>/dev/null || true
 
       - name: OWASP ZAP Full Scan — Backend (3000)
         if: steps.target.outputs.mode == 'local' && inputs.zap_mode == 'full'
@@ -381,8 +402,15 @@ jobs:
         with:
           target: http://localhost:3000
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a -j -J zap-backend-full.json -r zap-backend-full.html'
+          cmd_options: '-a -j'
           allow_issue_writing: false
+
+      - name: Save Backend ZAP Full reports
+        if: always() && steps.target.outputs.mode == 'local' && inputs.zap_mode == 'full'
+        run: |
+          cp report_json.json zap-backend-full.json 2>/dev/null || true
+          cp report_html.html zap-backend-full.html 2>/dev/null || true
+          cp report_md.md   zap-backend-full.md   2>/dev/null || true
 
       - name: Upload ZAP reports (HTML + JSON + MD)
         if: always()
