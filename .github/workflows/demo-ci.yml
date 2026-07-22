@@ -477,6 +477,10 @@ jobs:
       - detect-changes
       - docker-build
     if: always() && !failure() && !cancelled()
+    permissions:
+      contents: read
+      packages: write
+      security-events: write
     uses: ./.github/workflows/security-scanning.yml
     with:
       scan_target: trivy

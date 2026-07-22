@@ -44,11 +44,6 @@ concurrency:
   group: security-scanning
   cancel-in-progress: true
 
-permissions:
-  contents: read
-  packages: write
-  security-events: write
-
 jobs:
 # ─────────────────────────────────────────────
 # JOB 1 — SONARQUBE SAST + SCA
@@ -137,7 +132,7 @@ jobs:
       - name: Run Trivy scanner (table)
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ github.sha }}
+          image-ref: ${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:latest
           format: 'table'
           severity: 'CRITICAL,HIGH'
           exit-code: '0'
@@ -145,7 +140,7 @@ jobs:
       - name: Run Trivy scanner (SARIF)
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ github.sha }}
+          image-ref: ${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:latest
           format: 'sarif'
           output: 'trivy-${{ matrix.service }}.sarif'
           severity: 'CRITICAL,HIGH'
@@ -230,12 +225,10 @@ jobs:
       - name: Pull images from GHCR
         if: steps.target.outputs.mode == 'local'
         run: |
-          TAG=${{ github.sha }}
           SERVICES="gateway auth user para retail alimentation fashion mailer-api engagement web-control mailer frontend"
           for SVC in $SERVICES; do
-            echo "Pulling ${IMAGE_PREFIX}-${SVC}:${TAG}..."
-            docker pull ${IMAGE_PREFIX}-${SVC}:${TAG} || echo "WARN: Failed to pull ${SVC}, using :latest"
-            docker tag ${IMAGE_PREFIX}-${SVC}:${TAG} ${IMAGE_PREFIX}-${SVC}:latest 2>/dev/null || true
+            echo "Pulling ${IMAGE_PREFIX}-${SVC}:latest..."
+            docker pull ${IMAGE_PREFIX}-${SVC}:latest || echo "WARN: Failed to pull ${SVC}"
           done
         env:
           IMAGE_PREFIX: ${{ env.IMAGE_PREFIX }}
