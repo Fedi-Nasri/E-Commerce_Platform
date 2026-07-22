@@ -11,8 +11,8 @@ on:
         options:
           - all
           - trivy
-      #- sonarqube
-      - zap
+          #- sonarqube
+          - zap
       zap_mode:
         description: "ZAP scan mode"
         required: false
