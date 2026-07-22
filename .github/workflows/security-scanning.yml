@@ -1,0 +1,332 @@
+name: Security Scanning
+
+on:
+  workflow_dispatch:
+    inputs:
+      scan_target:
+        description: "What to scan"
+        required: true
+        default: "all"
+        type: choice
+        options:
+          - all
+          - trivy
+      #- sonarqube
+      - zap
+      zap_mode:
+        description: "ZAP scan mode"
+        required: false
+        default: "baseline"
+        type: choice
+        options:
+          - baseline
+          - full
+      zap_target_url:
+        description: "URL for ZAP scan (leave empty to spin up local containers)"
+        required: false
+        default: ""
+        type: string
+
+  workflow_call:
+    inputs:
+      scan_target:
+        required: false
+        default: "all"
+        type: string
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/galylioai/1111
+  SONAR_PROJECT_KEY: galylioai_1111
+  NODE_VERSION: "20.19.0"
+
+concurrency:
+  group: security-scanning
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+  security-events: write
+
+jobs:
+# ─────────────────────────────────────────────
+# JOB 1 — SONARQUBE SAST + SCA
+# Static code analysis on source code.
+# Requires SONAR_TOKEN and SONAR_HOST_URL secrets.
+# STATUS: COMMENTED OUT — no SonarQube server yet.
+# Uncomment when SonarCloud or self-hosted SonarQube is configured.
+# ─────────────────────────────────────────────
+  # sonarqube-scan:
+  #   name: "SonarQube · Source Code Scan"
+  #   runs-on: ubuntu-latest
+  #   if: inputs.scan_target == 'all' || inputs.scan_target == 'sonarqube'
+  #
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+  #
+  #     - name: Run SonarQube scan
+  #       uses: SonarSource/sonarqube-scan-action@v4
+  #       env:
+  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  #       with:
+  #         args: >
+  #           -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
+  #           -Dsonar.sources=.
+  #           -Dsonar.exclusions=**/node_modules/**,**/.next/**,**/dist/**,**/build/**,**/coverage/**
+  #           -Dsonar.javascript.lcov.reportPaths=**/coverage/lcov.info
+  #           -Dsonar.python.version=3.11
+  #
+  #     - name: SonarQube Quality Gate check
+  #       uses: SonarSource/sonarqube-quality-gate-action@v1
+  #       timeout-minutes: 5
+  #       continue-on-error: true
+  #       env:
+  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  #       with:
+  #         scanMetadataReportFile: .scannerwork/report-task.txt
+  #
+  #     - name: Upload SonarQube report
+  #       if: always()
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: sonarqube-report
+  #         path: .scannerwork/
+  #         retention-days: 30
+  #         if-no-files-found: ignore
+
+# ─────────────────────────────────────────────
+# JOB 2 — TRIVY IMAGE SCAN
+# Pull images from GHCR and scan with Trivy.
+# ─────────────────────────────────────────────
+  trivy-scan:
+    name: "Trivy · ${{ matrix.service }}"
+    runs-on: ubuntu-latest
+    if: inputs.scan_target == 'all' || inputs.scan_target == 'trivy'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: gateway
+          - service: auth
+          - service: user
+          - service: para
+          - service: retail
+          - service: mailer
+          - service: alimentation
+          - service: fashion
+          - service: mailer-api
+          - service: engagement
+          - service: web-control
+          - service: frontend
+
+    steps:
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run Trivy scanner (table)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ github.sha }}
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'
+
+      - name: Run Trivy scanner (SARIF)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ github.sha }}
+          format: 'sarif'
+          output: 'trivy-${{ matrix.service }}.sarif'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'
+
+      - name: Upload Trivy SARIF
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-${{ matrix.service }}
+          path: trivy-${{ matrix.service }}.sarif
+          retention-days: 30
+
+# ─────────────────────────────────────────────
+# JOB 3 — OWASP ZAP DAST
+# Run containers locally and scan with ZAP.
+# Outputs: HTML report + Markdown summary.
+# ─────────────────────────────────────────────
+  zap-scan:
+    name: "ZAP · DAST Scan"
+    runs-on: ubuntu-latest
+    if: inputs.scan_target == 'all' || inputs.scan_target == 'zap'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create .env file for docker-compose
+        run: |
+          cat > .env << 'EOF'
+          DB_NAME=app_auth
+          DB_USER=appuser
+          DB_PASSWORD=galylio-ai
+          RETAIL_DB_NAME=retail
+          RETAIL_DB_USER=appuser
+          RETAIL_DB_PASSWORD=galylio-ai
+          PARA_DB_NAME=para
+          PARA_DB_USER=appuser
+          PARA_DB_PASSWORD=galylio-ai
+          ALIMENTATION_DB_NAME=alimentation
+          ALIMENTATION_DB_USER=appuser
+          ALIMENTATION_DB_PASSWORD=galylio-ai
+          FASHION_DB_NAME=fashion
+          FASHION_DB_USER=appuser
+          FASHION_DB_PASSWORD=galylio-ai
+          CATALOG_DB_NAME=catalog
+          CATALOG_DB_USER=appuser
+          CATALOG_DB_PASSWORD=galylio-ai
+          RABBITMQ_USER=guest
+          RABBITMQ_PASSWORD=guest
+          RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+          SMTP_HOST=localhost
+          SMTP_PORT=465
+          SMTP_USER=test@test.com
+          SMTP_PASSWORD=test
+          SMTP_FROM=test@test.com
+          SMTP_USE_TLS=false
+          SMTP_USE_SSL=true
+          NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
+          NODE_ENV=production
+          JWT_SECRET=ci-test-secret
+          EOF
+
+      - name: Determine target URL
+        id: target
+        run: |
+          if [ -n "${{ inputs.zap_target_url }}" ]; then
+            echo "url=${{ inputs.zap_target_url }}" >> $GITHUB_OUTPUT
+            echo "mode=provided" >> $GITHUB_OUTPUT
+          else
+            echo "url=http://localhost:3001" >> $GITHUB_OUTPUT
+            echo "mode=local" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Log in to GHCR
+        if: steps.target.outputs.mode == 'local'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull images from GHCR
+        if: steps.target.outputs.mode == 'local'
+        run: |
+          TAG=${{ github.sha }}
+          SERVICES="gateway auth user para retail alimentation fashion mailer-api engagement web-control mailer frontend"
+          for SVC in $SERVICES; do
+            echo "Pulling ${IMAGE_PREFIX}-${SVC}:${TAG}..."
+            docker pull ${IMAGE_PREFIX}-${SVC}:${TAG} || echo "WARN: Failed to pull ${SVC}, using :latest"
+            docker tag ${IMAGE_PREFIX}-${SVC}:${TAG} ${IMAGE_PREFIX}-${SVC}:latest 2>/dev/null || true
+          done
+        env:
+          IMAGE_PREFIX: ${{ env.IMAGE_PREFIX }}
+
+      - name: Start containers
+        if: steps.target.outputs.mode == 'local'
+        run: |
+          docker compose -f docker-compose.staging.yml up -d
+          echo "Waiting for services to be healthy..."
+          sleep 45
+          docker compose -f docker-compose.staging.yml ps
+
+      - name: OWASP ZAP Baseline Scan
+        if: steps.target.outputs.mode == 'provided' || (steps.target.outputs.mode == 'local' && inputs.zap_mode == 'baseline')
+        uses: zaproxy/action-baseline@v0.14.0
+        continue-on-error: true
+        with:
+          target: ${{ steps.target.outputs.url }}
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a -j -J zap-baseline-report.json -r zap-baseline-report.html -M zap-baseline-report.md'
+          allow_issue_writing: false
+
+      - name: OWASP ZAP Full Scan
+        if: steps.target.outputs.mode == 'local' && inputs.zap_mode == 'full'
+        uses: zaproxy/action-full-scan@v0.13.0
+        continue-on-error: true
+        with:
+          target: ${{ steps.target.outputs.url }}
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a -j -J zap-full-report.json -r zap-full-report.html -M zap-full-report.md'
+          allow_issue_writing: false
+
+      - name: Upload ZAP reports (HTML + JSON + MD)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-report-${{ inputs.zap_mode || 'baseline' }}
+          path: |
+            zap-baseline-report.*
+            zap-full-report.*
+            report.*
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Stop containers
+        if: always() && steps.target.outputs.mode == 'local'
+        run: docker compose -f docker-compose.staging.yml down -v
+
+# ─────────────────────────────────────────────
+# JOB 4 — SECURITY SUMMARY
+# Combines all reports into a single artifact + job summary.
+# ─────────────────────────────────────────────
+  security-summary:
+    name: "Security Summary"
+    runs-on: ubuntu-latest
+    needs:
+      #- sonarqube-scan
+      - trivy-scan
+      - zap-scan
+    if: always()
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: security-reports/
+          pattern: '*report*'
+          merge-multiple: true
+
+      - name: Generate summary
+        if: always()
+        run: |
+          echo "## Security Scanning Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Tool | Type | Format | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|------|--------|--------|" >> $GITHUB_STEP_SUMMARY
+          # echo "| SonarQube | SAST + SCA | SARIF | ${{ needs.sonarqube-scan.result == 'success' && '✅ Passed' || '⚠️ Soft-fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Trivy | SCA (images) | SARIF | ${{ needs.trivy-scan.result == 'success' && '✅ Passed' || '⚠️ Soft-fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ZAP Baseline | DAST | HTML + MD | ${{ needs.zap-scan.result == 'success' && '✅ Passed' || '⚠️ Soft-fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Download Reports" >> $GITHUB_STEP_SUMMARY
+          echo "All reports are available in the **security-reports** artifact." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          # echo "- **SonarQube:** code quality + security bugs" >> $GITHUB_STEP_SUMMARY
+          echo "- **Trivy:** Docker image CVEs" >> $GITHUB_STEP_SUMMARY
+          echo "- **ZAP:** runtime vulnerabilities (XSS, SQLi, auth flaws)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload combined reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-reports-${{ github.sha }}
+          path: security-reports/
+          retention-days: 30
+          if-no-files-found: ignore

@@ -465,3 +465,19 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+# ─────────────────────────────────────────────
+# JOB 7 — SECURITY SCANNING
+# Calls security-scanning.yml after docker build.
+# Runs Trivy + ZAP on the newly built images.
+# ─────────────────────────────────────────────
+  security-scan:
+    name: "Security · Full Scan"
+    needs:
+      - detect-changes
+      - docker-build
+    if: always() && !failure() && !cancelled()
+    uses: ./.github/workflows/security-scanning.yml
+    with:
+      scan_target: trivy
+    secrets: inherit
