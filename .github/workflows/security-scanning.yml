@@ -266,6 +266,7 @@ jobs:
       - name: Start containers
         if: steps.target.outputs.mode == 'local'
         run: |
+          docker volume create backend_postgres_data
           docker compose -f docker-compose.staging.yml up -d
           echo "Waiting for services to be healthy..."
           sleep 45
