@@ -483,5 +483,5 @@ jobs:
       security-events: write
     uses: ./.github/workflows/security-scanning.yml
     with:
-      scan_target: trivy
+      scan_target: all
     secrets: inherit

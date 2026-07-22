@@ -378,8 +378,8 @@ jobs:
           # Per-service breakdown
           echo "### Per-Service Breakdown" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Service | CRITICAL | HIGH | Report |" >> $GITHUB_STEP_SUMMARY
-          echo "|---------|----------|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Service | CRITICAL | HIGH |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|----------|------|" >> $GITHUB_STEP_SUMMARY
           for f in security-reports/trivy-*-count.md; do
             if [ -f "$f" ]; then
               SVC=$(head -1 "$f" | sed 's/## //')
@@ -392,7 +392,7 @@ jobs:
               else
                 STATUS="🟢"
               fi
-              echo "| $SVC | $STATUS $CRIT | $HIGH | [View](../trivy-$SVC) |" >> $GITHUB_STEP_SUMMARY
+              echo "| $SVC | $STATUS $CRIT | $HIGH |" >> $GITHUB_STEP_SUMMARY
             fi
           done
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -400,17 +400,27 @@ jobs:
           # ZAP section
           echo "### ZAP Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Target | Status | Report |" >> $GITHUB_STEP_SUMMARY
-          echo "|--------|--------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Frontend (3001) | ${{ needs.zap-scan.result == 'success' && '✅ Completed' || '⚠️ Soft-fail' }} | [View](../zap-report-${{ inputs.zap_mode || 'baseline' }}) |" >> $GITHUB_STEP_SUMMARY
-          echo "| Backend (3000) | ${{ needs.zap-scan.result == 'success' && '✅ Completed' || '⚠️ Soft-fail' }} | [View](../zap-report-${{ inputs.zap_mode || 'baseline' }}) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Target | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Frontend (3001) | ${{ needs.zap-scan.result == 'success' && '✅ Completed' || '⚠️ Soft-fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Backend (3000) | ${{ needs.zap-scan.result == 'success' && '✅ Completed' || '⚠️ Soft-fail' }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          # Download links
-          echo "### Download" >> $GITHUB_STEP_SUMMARY
-          echo "- [All Reports (zip)](../security-reports-${{ github.sha }})" >> $GITHUB_STEP_SUMMARY
-          echo "- [Trivy SARIF](../trivy-gateway) — upload to GitHub Security tab" >> $GITHUB_STEP_SUMMARY
-          echo "- [ZAP HTML Reports](../zap-report-${{ inputs.zap_mode || 'baseline' }})" >> $GITHUB_STEP_SUMMARY
+          # How to access reports
+          echo "### How to Access Reports" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "1. Go to the **Security Scanning** workflow run" >> $GITHUB_STEP_SUMMARY
+          echo "2. Click on **security-reports-${{ github.sha }}** artifact at the bottom" >> $GITHUB_STEP_SUMMARY
+          echo "3. Download and extract the zip file" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Reports included:**" >> $GITHUB_STEP_SUMMARY
+          echo "- \`trivy-<service>.sarif\` — upload to GitHub Security tab" >> $GITHUB_STEP_SUMMARY
+          echo "- \`trivy-<service>.json\` — raw JSON with all findings" >> $GITHUB_STEP_SUMMARY
+          echo "- \`trivy-<service>-count.md\` — per-service summary" >> $GITHUB_STEP_SUMMARY
+          echo "- \`zap-frontend-baseline.html\` — frontend scan report" >> $GITHUB_STEP_SUMMARY
+          echo "- \`zap-backend-baseline.html\` — backend scan report" >> $GITHUB_STEP_SUMMARY
+          echo "- \`zap-frontend-baseline.md\` — frontend summary" >> $GITHUB_STEP_SUMMARY
+          echo "- \`zap-backend-baseline.md\` — backend summary" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload combined reports
         uses: actions/upload-artifact@v4
