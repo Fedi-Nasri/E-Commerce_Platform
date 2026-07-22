@@ -33,6 +33,14 @@ on:
         required: false
         default: "all"
         type: string
+      zap_mode:
+        required: false
+        default: "baseline"
+        type: string
+      zap_target_url:
+        required: false
+        default: ""
+        type: string
 
 env:
   REGISTRY: ghcr.io
