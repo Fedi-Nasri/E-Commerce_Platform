@@ -351,7 +351,7 @@ jobs:
         with:
           target: ${{ steps.target.outputs.url }}
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a -j -J zap-frontend-baseline.json -r zap-frontend-baseline.html -M zap-frontend-baseline.md'
+          cmd_options: '-a -j -J zap-frontend-baseline.json -r zap-frontend-baseline.html -w zap-frontend-baseline.md'
           allow_issue_writing: false
 
       - name: OWASP ZAP Baseline Scan — Backend (3000)
@@ -361,7 +361,7 @@ jobs:
         with:
           target: http://localhost:3000
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a -j -J zap-backend-baseline.json -r zap-backend-baseline.html -M zap-backend-baseline.md'
+          cmd_options: '-a -j -J zap-backend-baseline.json -r zap-backend-baseline.html -w zap-backend-baseline.md'
           allow_issue_writing: false
 
       - name: OWASP ZAP Full Scan — Frontend (3001)
@@ -371,7 +371,7 @@ jobs:
         with:
           target: ${{ steps.target.outputs.url }}
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a -j -J zap-frontend-full.json -r zap-frontend-full.html -M zap-frontend-full.md'
+          cmd_options: '-a -j -J zap-frontend-full.json -r zap-frontend-full.html -w zap-frontend-full.md'
           allow_issue_writing: false
 
       - name: OWASP ZAP Full Scan — Backend (3000)
@@ -381,7 +381,7 @@ jobs:
         with:
           target: http://localhost:3000
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a -j -J zap-backend-full.json -r zap-backend-full.html -M zap-backend-full.md'
+          cmd_options: '-a -j -J zap-backend-full.json -r zap-backend-full.html -w zap-backend-full.md'
           allow_issue_writing: false
 
       - name: Upload ZAP reports (HTML + JSON + MD)
