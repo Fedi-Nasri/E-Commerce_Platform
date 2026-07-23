@@ -162,7 +162,7 @@ services:
       - stack
 
   loki:
-    image: grafana/loki:2.9.1
+    image: grafana/loki:3.7.3
     container_name: 1111-loki
     restart: unless-stopped
     command:
