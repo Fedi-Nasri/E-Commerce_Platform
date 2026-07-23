@@ -183,12 +183,9 @@ services:
       - -config.file=/etc/promtail/promtail.yml
     volumes:
       - ./deploy/monitoring/promtail.yml:/etc/promtail/promtail.yml:ro
-      - ./deploy/monitoring/promtail-positions.yaml:/tmp/positions.yaml
+      - promtail_positions:/tmp
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /var/log:/var/log:ro
-    depends_on:
-      - loki
     networks:
       - stack
 
@@ -199,6 +196,8 @@ volumes:
     name: 1111_grafana_data
   loki_data:
     name: 1111_loki_data
+  promtail_positions:
+    name: 1111_promtail_positions
 
 networks:
   stack:

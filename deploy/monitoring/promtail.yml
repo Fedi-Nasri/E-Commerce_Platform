@@ -13,26 +13,15 @@ scrape_configs:
     pipeline_stages:
       - docker: {}
     relabel_configs:
-      - source_labels: ['__meta_docker_container_label_loki_scrape']
-        regex: 'true'
-        action: keep
-      - source_labels: ['__meta_docker_container_name']
-        regex: '(.*)'
-        target_label: 'container'
-      - source_labels: ['__meta_docker_container_label_loki_tag_service']
-        target_label: 'service'
-      - source_labels: ['__meta_docker_container_label_loki_tag_environment']
-        target_label: 'environment'
-      - source_labels: ['__meta_docker_container_label_com_docker_compose_service']
-        target_label: 'compose_service'
-      - source_labels: ['__meta_docker_container_label_com_docker_compose_project']
-        target_label: 'compose_project'
       - source_labels: ['__meta_docker_container_id']
         target_label: '__path__'
-        replacement: /var/lib/docker/containers/${1}/*log
-      - regex: '__meta_docker_container_label_(.+)'
-        replacement: '$1'
-        action: labelmap
+        replacement: /var/lib/docker/containers/${1}/*.log
+      - source_labels: ['__meta_docker_container_label_com_docker_compose_service']
+        target_label: 'service'
+      - target_label: 'environment'
+        replacement: 'staging'
+      - source_labels: ['__meta_docker_container_name']
+        target_label: 'container'
 
   - job_name: system
     static_configs:
