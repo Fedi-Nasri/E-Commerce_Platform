@@ -674,7 +674,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service=\"gateway\"}",
+          "expr": "{service=\"gateway\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{.level | upper}}\\t{{.message}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -711,7 +711,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service=\"auth\"}",
+          "expr": "{service=\"auth\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{.level | upper}}\\t{{.message}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -748,7 +748,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service=\"user\"}",
+          "expr": "{service=\"user\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{.level | upper}}\\t{{.message}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -785,7 +785,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service=\"retail\"}",
+          "expr": "{service=\"retail\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{.level | upper}}\\t{{.message}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -822,7 +822,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service=\"para\"}",
+          "expr": "{service=\"para\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{.level | upper}}\\t{{.message}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -859,7 +859,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service=\"alimentation\"}",
+          "expr": "{service=\"alimentation\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{.level | upper}}\\t{{.message}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -896,7 +896,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service=\"fashion\"}",
+          "expr": "{service=\"fashion\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{.level | upper}}\\t{{.message}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -933,7 +933,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service=\"mailer-api\"}",
+          "expr": "{service=\"mailer-api\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{.level | upper}}\\t{{.message}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -970,7 +970,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service=\"engagement\"}",
+          "expr": "{service=\"engagement\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{.level | upper}}\\t{{.message}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -1007,7 +1007,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service=\"web-control\"}",
+          "expr": "{service=\"web-control\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{.level | upper}}\\t{{.message}}\"",
           "queryType": "range",
           "refId": "A"
         }
