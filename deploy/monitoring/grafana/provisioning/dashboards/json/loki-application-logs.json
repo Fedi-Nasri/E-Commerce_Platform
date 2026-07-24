@@ -674,7 +674,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service=\"gateway\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{.level | upper}}\\t{{.message}}\"",
+          "expr": "{service=\"gateway\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{ if eq .level \\\"error\\\" }}\\u001b[31m{{.level | upper}}\\u001b[0m{{ else if eq .level \\\"warn\\\" }}\\u001b[33m{{.level | upper}}\\u001b[0m{{ else if eq .level \\\"info\\\" }}\\u001b[32m{{.level | upper}}\\u001b[0m{{ else }}{{.level | upper}}{{ end }}\\t{{.message}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -711,7 +711,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service=\"auth\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{.level | upper}}\\t{{.message}}\"",
+          "expr": "{service=\"auth\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{ if eq .level \\\"error\\\" }}\\u001b[31m{{.level | upper}}\\u001b[0m{{ else if eq .level \\\"warn\\\" }}\\u001b[33m{{.level | upper}}\\u001b[0m{{ else if eq .level \\\"info\\\" }}\\u001b[32m{{.level | upper}}\\u001b[0m{{ else }}{{.level | upper}}{{ end }}\\t{{.message}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -748,7 +748,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service=\"user\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{.level | upper}}\\t{{.message}}\"",
+          "expr": "{service=\"user\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{ if eq .level \\\"error\\\" }}\\u001b[31m{{.level | upper}}\\u001b[0m{{ else if eq .level \\\"warn\\\" }}\\u001b[33m{{.level | upper}}\\u001b[0m{{ else if eq .level \\\"info\\\" }}\\u001b[32m{{.level | upper}}\\u001b[0m{{ else }}{{.level | upper}}{{ end }}\\t{{.message}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -785,7 +785,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service=\"retail\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{.level | upper}}\\t{{.message}}\"",
+          "expr": "{service=\"retail\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{ if eq .level \\\"error\\\" }}\\u001b[31m{{.level | upper}}\\u001b[0m{{ else if eq .level \\\"warn\\\" }}\\u001b[33m{{.level | upper}}\\u001b[0m{{ else if eq .level \\\"info\\\" }}\\u001b[32m{{.level | upper}}\\u001b[0m{{ else }}{{.level | upper}}{{ end }}\\t{{.message}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -822,7 +822,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service=\"para\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{.level | upper}}\\t{{.message}}\"",
+          "expr": "{service=\"para\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{ if eq .level \\\"error\\\" }}\\u001b[31m{{.level | upper}}\\u001b[0m{{ else if eq .level \\\"warn\\\" }}\\u001b[33m{{.level | upper}}\\u001b[0m{{ else if eq .level \\\"info\\\" }}\\u001b[32m{{.level | upper}}\\u001b[0m{{ else }}{{.level | upper}}{{ end }}\\t{{.message}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -859,7 +859,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service=\"alimentation\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{.level | upper}}\\t{{.message}}\"",
+          "expr": "{service=\"alimentation\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{ if eq .level \\\"error\\\" }}\\u001b[31m{{.level | upper}}\\u001b[0m{{ else if eq .level \\\"warn\\\" }}\\u001b[33m{{.level | upper}}\\u001b[0m{{ else if eq .level \\\"info\\\" }}\\u001b[32m{{.level | upper}}\\u001b[0m{{ else }}{{.level | upper}}{{ end }}\\t{{.message}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -896,7 +896,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service=\"fashion\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{.level | upper}}\\t{{.message}}\"",
+          "expr": "{service=\"fashion\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{ if eq .level \\\"error\\\" }}\\u001b[31m{{.level | upper}}\\u001b[0m{{ else if eq .level \\\"warn\\\" }}\\u001b[33m{{.level | upper}}\\u001b[0m{{ else if eq .level \\\"info\\\" }}\\u001b[32m{{.level | upper}}\\u001b[0m{{ else }}{{.level | upper}}{{ end }}\\t{{.message}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -933,7 +933,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service=\"mailer-api\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{.level | upper}}\\t{{.message}}\"",
+          "expr": "{service=\"mailer-api\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{ if eq .level \\\"error\\\" }}\\u001b[31m{{.level | upper}}\\u001b[0m{{ else if eq .level \\\"warn\\\" }}\\u001b[33m{{.level | upper}}\\u001b[0m{{ else if eq .level \\\"info\\\" }}\\u001b[32m{{.level | upper}}\\u001b[0m{{ else }}{{.level | upper}}{{ end }}\\t{{.message}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -970,7 +970,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service=\"engagement\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{.level | upper}}\\t{{.message}}\"",
+          "expr": "{service=\"engagement\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{ if eq .level \\\"error\\\" }}\\u001b[31m{{.level | upper}}\\u001b[0m{{ else if eq .level \\\"warn\\\" }}\\u001b[33m{{.level | upper}}\\u001b[0m{{ else if eq .level \\\"info\\\" }}\\u001b[32m{{.level | upper}}\\u001b[0m{{ else }}{{.level | upper}}{{ end }}\\t{{.message}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -1007,7 +1007,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service=\"web-control\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{.level | upper}}\\t{{.message}}\"",
+          "expr": "{service=\"web-control\"} | regexp `(?P<json>\\{.*\\})` | line_format \"{{.json}}\" | json | line_format \"{{ if eq .level \\\"error\\\" }}\\u001b[31m{{.level | upper}}\\u001b[0m{{ else if eq .level \\\"warn\\\" }}\\u001b[33m{{.level | upper}}\\u001b[0m{{ else if eq .level \\\"info\\\" }}\\u001b[32m{{.level | upper}}\\u001b[0m{{ else }}{{.level | upper}}{{ end }}\\t{{.message}}\"",
           "queryType": "range",
           "refId": "A"
         }
