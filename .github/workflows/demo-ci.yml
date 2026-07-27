@@ -167,6 +167,13 @@ jobs:
         working-directory: backend
         run: npm run typecheck
 
+      # ─────────────────────────────────────────────
+      # SUSPENDED: Backend tests & audit temporarily disabled in CI.
+      # Developers MUST run locally before pushing:
+      #   cd backend && npm test
+      #   cd backend && npm audit --audit-level=high
+      # Re-enable once test setup is fixed.
+      # ─────────────────────────────────────────────
       #- name: Run tests
       #  working-directory: backend
       #  run: npm test -- --passWithNoTests
@@ -233,6 +240,12 @@ jobs:
         working-directory: .
         run: npm ci
 
+      # ─────────────────────────────────────────────
+      # SUSPENDED: Frontend linting temporarily disabled in CI.
+      # Developers MUST run locally before pushing:
+      #   npm run lint
+      # Re-enable once ESLint stylistic rules are agreed upon.
+      # ─────────────────────────────────────────────
       #- name: Lint
       #  working-directory: .
       #  run: npm run lint
