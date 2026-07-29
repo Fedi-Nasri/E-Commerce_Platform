@@ -85,7 +85,6 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         with:
           args: >
-            -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
             -Dsonar.sources=.
             -Dsonar.exclusions=**/node_modules/**,**/.next/**,**/dist/**,**/build/**,**/coverage/**
             -Dsonar.javascript.lcov.reportPaths=**/coverage/lcov.info
