@@ -11,7 +11,7 @@ on:
         options:
           - all
           - trivy
-          #- sonarqube
+          - sonarqube
           - zap
       zap_mode:
         description: "ZAP scan mode"
@@ -56,52 +56,59 @@ jobs:
 # ─────────────────────────────────────────────
 # JOB 1 — SONARQUBE SAST + SCA
 # Static code analysis on source code.
-# Requires SONAR_TOKEN and SONAR_HOST_URL secrets.
-# STATUS: COMMENTED OUT — no SonarQube server yet.
-# Uncomment when SonarCloud or self-hosted SonarQube is configured.
+# Requires SONAR_TOKEN, SONAR_HOST_URL, TAILSCALE_CLIENT_ID,
+# and TAILSCALE_CLIENT_SECRET secrets.
+# Connects via Tailscale to reach self-hosted SonarQube on staging.
 # ─────────────────────────────────────────────
-  # sonarqube-scan:
-  #   name: "SonarQube · Source Code Scan"
-  #   runs-on: ubuntu-latest
-  #   if: inputs.scan_target == 'all' || inputs.scan_target == 'sonarqube'
-  #
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0
-  #
-  #     - name: Run SonarQube scan
-  #       uses: SonarSource/sonarqube-scan-action@v4
-  #       env:
-  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-  #       with:
-  #         args: >
-  #           -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
-  #           -Dsonar.sources=.
-  #           -Dsonar.exclusions=**/node_modules/**,**/.next/**,**/dist/**,**/build/**,**/coverage/**
-  #           -Dsonar.javascript.lcov.reportPaths=**/coverage/lcov.info
-  #           -Dsonar.python.version=3.11
-  #
-  #     - name: SonarQube Quality Gate check
-  #       uses: SonarSource/sonarqube-quality-gate-action@v1
-  #       timeout-minutes: 5
-  #       continue-on-error: true
-  #       env:
-  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-  #       with:
-  #         scanMetadataReportFile: .scannerwork/report-task.txt
-  #
-  #     - name: Upload SonarQube report
-  #       if: always()
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: sonarqube-report
-  #         path: .scannerwork/
-  #         retention-days: 30
-  #         if-no-files-found: ignore
+  sonarqube-scan:
+    name: "SonarQube · Source Code Scan"
+    runs-on: ubuntu-latest
+    if: inputs.scan_target == 'all' || inputs.scan_target == 'sonarqube'
+
+    steps:
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TAILSCALE_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TAILSCALE_CLIENT_SECRET }}
+          tags: tag:githubactions
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run SonarQube scan
+        uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
+            -Dsonar.sources=.
+            -Dsonar.exclusions=**/node_modules/**,**/.next/**,**/dist/**,**/build/**,**/coverage/**
+            -Dsonar.javascript.lcov.reportPaths=**/coverage/lcov.info
+            -Dsonar.python.version=3.11
+
+      - name: SonarQube Quality Gate check
+        uses: SonarSource/sonarqube-quality-gate-action@v1
+        timeout-minutes: 5
+        continue-on-error: true
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          scanMetadataReportFile: .scannerwork/report-task.txt
+
+      - name: Upload SonarQube report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonarqube-report
+          path: .scannerwork/
+          retention-days: 30
+          if-no-files-found: ignore
 
 # ─────────────────────────────────────────────
 # JOB 2 — TRIVY IMAGE SCAN
@@ -341,7 +348,7 @@ jobs:
     name: "Security Summary"
     runs-on: ubuntu-latest
     needs:
-      #- sonarqube-scan
+      - sonarqube-scan
       - trivy-scan
       - zap-scan
     if: always()
