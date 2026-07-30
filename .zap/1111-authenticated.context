@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <context>
+    <name>1111-authenticated</name>
+    <desc>Authenticated DAST context for 1111 platform — scans frontend (3001) and gateway API (3000) as a logged-in demo admin user.</desc>
+    <inscope>true</inscope>
+    <urls>
+      <url>http://localhost:3001</url>
+      <url>http://localhost:3000</url>
+    </urls>
+    <urlsregex/>
+    <includePaths>
+      <path>http://localhost:3001.*</path>
+      <path>http://localhost:3000.*</path>
+    </includePaths>
+    <excludePaths>
+      <path>http://localhost:3000/api/auth/logout</path>
+      <path>http://localhost:3001/api/auth/logout</path>
+    </excludePaths>
+    <authentication>
+      <method>script</method>
+      <properties>
+        <entry key="scriptName">auth-script.js</entry>
+      </properties>
+      <loginurl>http://localhost:3000/api/auth/login</loginurl>
+      <loginpageurl>http://localhost:3001/login</loginpageurl>
+      <loginrequestdata>{"email":"{%email%}","password":"{%password%}"}</loginrequestdata>
+    </authentication>
+    <sessionManagement>
+      <method>script_based</method>
+      <properties>
+        <entry key="scriptName">auth-script.js</entry>
+      </properties>
+    </sessionManagement>
+    <users>
+      <user>
+        <name>demo-admin</name>
+        <enabled>true</enabled>
+        <credentials>
+          <entry key="email">demo.admin@1111.tn</entry>
+          <entry key="password">hayder14405523*</entry>
+        </credentials>
+      </user>
+    </users>
+    <tech>
+      <include>JavaScript</include>
+      <include>Node.js</include>
+      <include>Express.js</include>
+      <include>React</include>
+      <include>Next.js</include>
+      <include>PostgreSQL</include>
+      <include>RabbitMQ</include>
+    </tech>
+  </context>
+</configuration>

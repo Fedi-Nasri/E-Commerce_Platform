@@ -1,27 +1,6 @@
-# OWASP ZAP Baseline Scan Rules
-# Format: <RuleID> <Action>
-# Actions: IGNORE (skip), WARN (flag but don't fail), FAIL (block)
-# Reference: https://www.zaproxy.org/docs/docker/baseline-scan/
-
-# Skip common false positives for SPA/REST APIs
-10021	IGNORE	# X-Content-Type-Options (API may not serve HTML)
-10020	IGNORE	# X-Frame-Options (SPA, not vulnerable to clickjacking)
-10023	IGNORE	# Information disclosure via server headers
-10024	IGNORE	# Information disclosure via X-AspNet-Version
-10036	IGNORE	# Server errors (500 from API during normal ops)
-
-# Flag these as warnings, not failures
-10017	WARN	# Cross-domain JavaScript source inclusion
-10038	WARN	# Content Security Policy header missing
-40012	WARN	# Cross-site scripting (reflected) — may be false positive in APIs
-40014	WARN	# Cross-site scripting (DOM) — may be false positive in SPAs
-40018	WARN	# SQL injection — may be false positive
-
-# Active scan rules (for full scan only)
-40003	IGNORE	# CRLF injection — low risk in REST APIs
-40008	WARN	# Parameter tampering
-40009	WARN	# Server-side include
-40010	WARN	# Remote OS command injection
-40012	WARN	# SQL injection
-40014	WARN	# Cross-site scripting (reflected)
-40016	WARN	# Cross-site scripting (DOM)
+# ZAP rule overrides
+# Format: <rule-id>	TAB	<action>
+# Actions: IGNORE, INFO, WARN, FAIL
+# Rule IDs: https://www.zaproxy.org/docs/alerts/
+#
+# task 56: add tuned rules to reduce false positives

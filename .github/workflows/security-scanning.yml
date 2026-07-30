@@ -255,14 +255,31 @@ jobs:
           sleep 45
           docker compose -f docker-compose.staging.yml ps
 
+      - name: Create ZAP test user for authenticated scanning
+        if: steps.target.outputs.mode == 'local'
+        run: |
+          DB_USER=$(grep '^DB_USER=' .env | head -1 | cut -d= -f2-)
+          DB_NAME=$(grep '^DB_NAME=' .env | head -1 | cut -d= -f2-)
+          HASH=$(docker exec 1111-auth sh -c "node -e \"console.log(require('bcrypt').hashSync('hayder14405523*', 10))\"" 2>/dev/null || echo "")
+          if [ -n "$HASH" ] && [ -n "$DB_USER" ] && [ -n "$DB_NAME" ]; then
+            docker exec 1111-postgres psql -U "$DB_USER" -d "$DB_NAME" -c "
+              INSERT INTO auth.users (id, full_name, email, password_hash, role, is_email_verified, is_active)
+              VALUES (gen_random_uuid(), 'ZAP Scanner', 'demo.admin@1111.tn', '$HASH', 'admin', true, true)
+              ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, is_active = true;
+            " 2>&1 || echo "WARN: Could not create ZAP user"
+          else
+            echo "WARN: Skipping ZAP user creation (hash or DB vars missing)"
+          fi
+
       - name: OWASP ZAP Baseline Scan — Frontend (3001)
         if: steps.target.outputs.mode == 'provided' || (steps.target.outputs.mode == 'local' && inputs.zap_mode == 'baseline')
         uses: zaproxy/action-baseline@v0.15.0
         continue-on-error: true
         with:
           target: ${{ steps.target.outputs.url }}
+          context_file: '.zap/1111-authenticated.context'
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a -j'
+          cmd_options: '-j'
           allow_issue_writing: false
 
       - name: Save Frontend ZAP reports
@@ -278,8 +295,9 @@ jobs:
         continue-on-error: true
         with:
           target: http://localhost:3000
+          context_file: '.zap/1111-authenticated.context'
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a -j'
+          cmd_options: '-j'
           allow_issue_writing: false
 
       - name: Save Backend ZAP reports
@@ -295,8 +313,9 @@ jobs:
         continue-on-error: true
         with:
           target: ${{ steps.target.outputs.url }}
+          context_file: '.zap/1111-authenticated.context'
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a -j'
+          cmd_options: '-j'
           allow_issue_writing: false
 
       - name: Save Frontend ZAP Full reports
@@ -312,8 +331,9 @@ jobs:
         continue-on-error: true
         with:
           target: http://localhost:3000
+          context_file: '.zap/1111-authenticated.context'
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a -j'
+          cmd_options: '-j'
           allow_issue_writing: false
 
       - name: Save Backend ZAP Full reports
