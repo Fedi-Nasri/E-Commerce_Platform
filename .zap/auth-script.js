@@ -5,7 +5,7 @@ function authenticate(helper, paramsValues, credentials) {
   var password = credentials.getParam('password')
 
   var msg = helper.prepareMessage()
-  var uri = new java.net.URI('http://localhost:3000/login', false)
+  var uri = new java.net.URI('http://localhost:3000/api/auth/login', false)
   msg.getRequestHeader().setURI(uri)
   msg.getRequestHeader().setMethod('POST')
   msg.getRequestHeader().setHeader('Content-Type', 'application/json')

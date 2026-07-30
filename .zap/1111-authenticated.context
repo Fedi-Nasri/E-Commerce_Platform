@@ -2,29 +2,24 @@
 <configuration>
   <context>
     <name>1111-authenticated</name>
-    <desc>Authenticated DAST context for 1111 platform — scans frontend (3001) and gateway API (3000) as a logged-in demo admin user.</desc>
+    <desc>Authenticated DAST context for 1111 platform</desc>
     <inscope>true</inscope>
     <urls>
-      <url>http://localhost:3001</url>
       <url>http://localhost:3000</url>
+      <url>http://localhost:3001</url>
     </urls>
-    <urlsregex/>
     <includePaths>
-      <path>http://localhost:3001.*</path>
       <path>http://localhost:3000.*</path>
+      <path>http://localhost:3001.*</path>
     </includePaths>
     <excludePaths>
       <path>http://localhost:3000/api/auth/logout</path>
-      <path>http://localhost:3001/api/auth/logout</path>
     </excludePaths>
     <authentication>
       <method>script</method>
       <properties>
         <entry key="scriptName">auth-script.js</entry>
       </properties>
-      <loginurl>http://localhost:3000/api/auth/login</loginurl>
-      <loginpageurl>http://localhost:3001/login</loginpageurl>
-      <loginrequestdata>{"email":"{%email%}","password":"{%password%}"}</loginrequestdata>
     </authentication>
     <sessionManagement>
       <method>script_based</method>
@@ -49,7 +44,6 @@
       <include>React</include>
       <include>Next.js</include>
       <include>PostgreSQL</include>
-      <include>RabbitMQ</include>
     </tech>
   </context>
 </configuration>
