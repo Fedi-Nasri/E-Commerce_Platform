@@ -164,6 +164,12 @@ if [ "$CURRENT_SHA" = "$GITHUB_SHA" ]; then
 fi
 echo "Current SHA: $CURRENT_SHA → Deploying: $GITHUB_SHA"
 
+# Save previous SHA for rollback
+if [ "$CURRENT_SHA" != "none" ] && [ "$CURRENT_SHA" != "$GITHUB_SHA" ]; then
+  echo "$CURRENT_SHA" > "$APP_DIR/current/.previous-sha"
+  echo "Saved previous SHA for rollback: $CURRENT_SHA"
+fi
+
 echo "Logging into GHCR..."
 echo "$GHCR_PAT" | $DOCKER login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
 
