@@ -147,6 +147,12 @@ Resolved from the **live staging host** (`docker ps` on 2026-08-03) + the active
 | `1111-sonarqube-mcp` | `127.0.0.1:3010` | Yes — `:8085` |
 | `1111-sonarqube-db` | `5432` | Internal |
 
+#### Host-level tools (native on the host, **not** containers)
+
+| Tool | Port | Access | Purpose |
+|---|---|---|---|
+| **Cockpit** (web console) | `9099` | `http://<host-ip>:9099` — login `pc2` / `pc2pass` | Native VM/server monitoring + administration: CPU/memory/disk/network graphs, container + service views, terminal, logs, user management. Runs directly on the host, independent of the Docker monitoring stack (handy when Docker/Prometheus/Grafana are down). |
+
 ### 1.4 Environment map
 
 | Environment | Compose file | Where it runs |
@@ -270,6 +276,23 @@ Defined in `deploy/monitoring/alert-rules.yml` . Table reflects the **actual** r
 | RabbitMQQueueBacklog | `rabbitmq_queue_messages > 100` for 5 min | warning | Mailer consumer stalled or DB down — see §6.4 |
 
 `[MISSING]`: Alertmanager routing (e.g. to Google Chat) is **not yet configured** — see blocker in §9. Until it is, these alerts are only visible by manually checking Grafana/Prometheus, not pushed anywhere.
+
+### 2.6 Cockpit — host/VM monitoring (fallback & admin console)
+
+Cockpit is the **native host-level console** on the server — independent of the Docker monitoring stack, so it stays up even if Prometheus/Grafana/Loki are broken.
+
+| Item | Value |
+|---|---|
+| URL | `http://<host-ip>:9099` |
+| Login | `pc2` / `pc2pass` |
+| What it shows | Real-time CPU/memory/disk/network, per-process view, Docker containers, system logs, terminal, user/service management, software updates |
+
+When to use it instead of Grafana:
+- **Alert fired but Grafana/Prometheus are down** (e.g. §6.6 disk full, §6.1 crash-loops) → Cockpit gives you the host's live view without any container.
+- **Quick sanity check** on host resources before digging into dashboards (`docker stats` equivalent in a web UI).
+- **Admin tasks** — restart services, edit configs, reboot, watch `journalctl` — all in the browser.
+
+> Security note: Cockpit login is currently `pc2` / `pc2pass` (a shared/default credential). It should be moved to per-user keys/passwords or SSO before it's exposed beyond the staging LAN — track alongside the other secret hygiene items in §7.5.
 
 ---
 
