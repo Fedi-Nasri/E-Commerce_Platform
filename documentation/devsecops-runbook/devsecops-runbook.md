@@ -128,10 +128,10 @@ Resolved from the **live staging host** (`docker ps` on 2026-08-03) + the active
 
 #### Monitoring (see §1.2 table above for roles)
 
-| Container | Published port | Host-visible? |
-|---|---|---|
-| `1111-prometheus` | `127.0.0.1:9090` | Yes — `:8083` |
-| `1111-grafana` | `127.0.0.1:3030` | Yes — `:8082` |
+| Container | Published port | Host-visible? | username/pass |
+|---|---|---|---|
+| `1111-prometheus` | `127.0.0.1:9090` | Yes — `:8083` | 
+| `1111-grafana` | `127.0.0.1:3030` | Yes — `:8082` | admin/admin|
 | `1111-loki` | `127.0.0.1:3100` | Internal |
 | `1111-cadvisor` | `127.0.0.1:8080` | Internal |
 | 6× `*-postgres-exporter` | `9187` | Internal |
@@ -141,9 +141,9 @@ Resolved from the **live staging host** (`docker ps` on 2026-08-03) + the active
 
 #### SonarQube stack
 
-| Container | Published port | Host-visible? |
-|---|---|---|
-| `1111-sonarqube` | `127.0.0.1:9000` | Yes — `:8084` |
+| Container | Published port | Host-visible? | username/pass |
+|---|---|---|---|
+| `1111-sonarqube` | `127.0.0.1:9000` | Yes — `:8084` | admin/Sonarqube@123|
 | `1111-sonarqube-mcp` | `127.0.0.1:3010` | Yes — `:8085` |
 | `1111-sonarqube-db` | `5432` | Internal |
 
