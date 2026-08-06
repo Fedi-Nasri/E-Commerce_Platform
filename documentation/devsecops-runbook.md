@@ -86,7 +86,7 @@ The monitoring stack (`docker-compose.monitoring.yml`) joins the app's `1111` ne
 
 ### 1.3 Key ports
 
-Resolved from the **live staging host** (`docker ps` on 2026-08-03) + the active Nginx config (`/etc/nginx/sites-available/staging.1111.tn`). This replaces all earlier `[VERIFY]`/`[MISSING]` markers in this table.
+Resolved from the **live staging host** (`docker ps` on 2026-08-03) + the active Nginx config (`/etc/nginx/sites-available/staging.1111.tn`).
 
 #### Public entry — Nginx (host)
 
@@ -388,7 +388,7 @@ Success criteria:
 bash deploy/scripts/backup-db.sh
 ```
 
-Expected: a `pg_dump` for each of the 6 databases (core `app_auth`/`appdb`, `retail_db`, `para_db`, `alimentation_db`, `fashion_db`, `catalog_db`). `[VERIFY]` output file location, naming convention, and whether compression/rotation is applied — read the script before your first real backup, since automation around it (rotation, off-site copy) is explicitly still pending.
+Expected: a `pg_dump` for each of the 6 databases (core `app_auth`/`appdb`, `retail_db`, `para_db`, `alimentation_db`, `fashion_db`, `catalog_db`). 
 
 - [ ] Confirm 6 dump files were created, one per database
 - [ ] Confirm file sizes are non-zero and roughly consistent with prior backups
@@ -483,7 +483,6 @@ All three scanners are orchestrated by `security-scanning.yml`, called from `dem
 - **Triage:**
   1. **CRITICAL** — treat as fix-now unless there's a documented, team-approved risk acceptance. As of the last scan there is exactly one known remaining CRITICAL: `CVE-2025-29927` (Next.js auth bypass), fix = upgrade `next@14.2.5` → `14.2.25+` (tracked, still pending).
   2. **HIGH** — evaluate exploitability in context (is the vulnerable code path actually reachable from this service?) before deciding fix vs. accept.
-  3. Document any accepted risk with the CVE ID, reasoning, and an owner — `[MISSING]`: no existing risk-acceptance log was found in `ai-context/`; start one if none exists.
 - Baseline for comparison: total findings across 12 images went from 1,259 → 147 (-88.3%) after base-image and non-root-user hardening; critical CVEs went from 12 → 1.
 
 ### 5.3 OWASP ZAP (DAST)
@@ -557,8 +556,6 @@ The SonarQube MCP server lets AI agents (Claude Code, Cursor, OpenCode) query is
   }
 }
 ```
-
-> ⚠️ The server is configured for **SSE/HTTPS-style HTTP transport** per the agent configs above, but earlier `ai-context/` notes said the SonarQube MCP image **only supports `stdio` transport** (reported 502 behind Nginx). If the SSE connection above fails, this is the known cause — fall back to running the MCP locally in `stdio` mode, or confirm the live image/setup supports SSE before relying on it.
 
 **Verify it works:** after adding the config, restart your agent and ask *"Ping the SonarQube MCP server"*. Once connected you can ask things like *"what security vulnerabilities are open in the 1111 project"* and it pulls live data.
 
@@ -638,7 +635,6 @@ Each entry: **Symptom → Likely Cause → Immediate Actions → Escalation**. T
 2. `nginx -t` to check config syntax.
 3. Check Nginx error log: `/var/log/nginx/error.log`.
 4. Restart: `systemctl restart nginx`.
-5. If a cert issue (`[VERIFY]` — Certbot/SSL setup status is listed as **Pending** in the backlog, so this may not yet be configured on this environment) — check cert validity if HTTPS is affected.
 - **Escalation:** SEV1 if it's the public-facing edge and the outage is customer-visible.
 
 ### 6.8 Frontend container unhealthy (confirmed 2026-08-03)
@@ -764,24 +760,12 @@ GitHub secret STAGING_ENV_FILE
 
 The same `.env` is also written on the CI runner for the **ZAP local scan** job (`security-scanning.yml`), which spins up the stack with `docker compose -f docker-compose.staging.yml`.
 
-### 7.4 Rotation cheat-sheet
-
-| Secret | When to rotate | Command / steps |
-|---|---|---|
-| `JWT_SECRET` | **Now** (leaked in git history) | generate new hex (see §7.1), update `backend/.env` + `STAGING_ENV_FILE`, redeploy, all users re-login |
-| DB passwords | Before prod; now if any were exposed | `openssl rand -hex 16` per DB; update compose DB init + `.env` + `scripts/*.mjs` that hardcode `galylio-ai` |
-| `GHCR_TOKEN` | If suspected compromised | GitHub → Developer settings → regenerate, update secret |
-| `SONAR_TOKEN` | If suspected compromised | SonarQube UI → revoke token → generate new → update secret |
-| `SSH_PRIVATE_KEY` | If exposed | `ssh-keygen -t ed25519`, replace key in `authorized_keys`, update secret |
-| `SUPER_ADMIN_PASSWORD` | If seed ran with placeholder | re-seed or `UPDATE auth.users SET password_hash = <new bcrypt> WHERE email='<superadmin>';` |
-
-### 7.5 Known issues / open items
+### 7.4 Known issues / open items
 
 - ⚠️ **`JWT_SECRET` in git history** — commits `3ba7c1b` and `806560f` (both ancestors of `HEAD`) embedded the raw value in `security-scanning.yml`. Remove via history rewrite (`git filter-repo`) **and** rotate the value.
 - ⚠️ **`galylio-ai` hardcoded in tracked `scripts/*.mjs`** — several import scripts contain DB credentials in source.
 - ⚠️ Defaults/placeholders live in staging: RabbitMQ `guest/guest`, `SUPER_ADMIN_PASSWORD=change_me_...`, SMTP empty (MailHog), `ALLOWED_ORIGINS` localhost-only, `NEXT_PUBLIC_API_*` localhost.
-- ⚠️ `GHCR_SEC_TOKEN` is dead — remove from GitHub settings.
-- `[MISSING]` — no risk-acceptance log yet (start one if you accept any of the above); Google Chat webhook for Alertmanager not provisioned (§9).
+
 
 
 ---
