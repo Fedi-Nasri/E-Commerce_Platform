@@ -320,31 +320,18 @@ Artifacts are downloaded from the run page (bottom, **Artifacts** section) or vi
 
 ---
 
-## 8. Phase 5 — Production  (team + Ops/DevSecOps)
+## 8. What the Team Should Hand Back to Ops/DevSecOps
 
-Production deployment is **blocked on missing GitHub secrets** — request these from the mentor/project owner:
+Please document these when you pick them up:
 
-`VPS_HOST`, `VPS_PORT`, `VPS_USER`, `VPS_SSH_PRIVATE_KEY`, `PROD_ENV_FILE`
-
-Once provided, this is the remaining checklist:
-
-- [ ] All §3 security fixes merged
-- [ ] All §4 code fixes merged
-- [ ] SonarQube findings from §5 resolved (or triaged as false positive/won't fix)
-- [ ] CI green with tests and lint enabled (§6)
-- [ ] SonarQube gate passing on new code
-- [ ] SSL/TLS (Certbot) configured for `1111.tn`
-- [ ] `NEXT_PUBLIC_API_URL` set to public HTTPS URL
-- [ ] `ALLOWED_ORIGINS` includes production origin
-- [ ] Real SMTP credentials in place
-- [ ] Database backup automation + restore drill (backlog #34, #65 — needs real DBs)
-- [ ] Log rotation policy (backlog #17)
-- [ ] Health alerts delivered (Alertmanager + Google Chat — backlog #52)
-- [ ] Deploy via `vps-prod-cd.yml`, verify against the runbook §3 checklist
+- Table names to spot-check after a DB restore (runbook §4.2)
+- Exact behavior of `bootstrap-vps.sh` steps (runbook §4.3)
+- Any risk-acceptance decisions you make about the flagged CVEs (runbook §5.2)
+- Your **false-positive triage log** from §5.4 (which SonarQube/ZAP findings you verified as not real, and the rules you adjusted)
 
 ---
 
-## 9. Near-Production Restructuring (forward-looking)
+## 9. pre-Production Restructuring (forward-looking)
 
 > **When to apply this:** these changes are **not** day-one urgent. Apply them once the team is actively fixing problems, the pipeline is stable, and releases become routine. They clean up the DevSecOps workspace and set the project up for production properly.
 
@@ -392,7 +379,7 @@ Introduce a formal release process:
 - **Release flow:**
   1. Cut a release branch/tag from `main`.
   2. Run full CI + full security scan (`security-scanning.yml -f scan_target=all`).
-  3. Validate on staging first (§9.5).
+  3. Validate on staging first (§9.5.1).
   4. Deploy to production via `vps-prod-cd.yml`, tagged with the release version.
 - Keep a per-release changelog (what changed, what was fixed, known issues).
 
@@ -406,7 +393,29 @@ Introduce a formal release process:
 - Keep environment config **separate** — different `.env` per environment, never share secrets across envs.
 - Production deploys should be gated on: CI green + quality gate + staging validation + release tag.
 
-### 9.5 Testing / QA & pentest environment
+
+
+---
+### 9.5 Environment architecture — making staging, QA & production better
+
+The three subsections below are the same concern viewed three ways: **separating environments** so staging and production stay stable. Separation happens in three dimensions:
+
+| Dimension | How | Subsection |
+|---|---|---|
+| By **purpose** | A dedicated testing/QA/pentest environment that mirrors prod but stays isolated | §9.5.2 |
+| By **hardware** | Dedicated servers for heavy security tooling so scans never compete with the app | §9.5.3 |
+| By **network** | VLANs + DMZ so the public tier is cut off from internal services | §9.5.4 |
+
+#### 9.5.1 The environment model
+
+| Environment | Purpose | Where it runs | Who can access |
+|---|---|---|---|
+| Development (local) | Daily coding, quick iteration | Developer machines | Developers |
+| Testing / QA & pentest | Automated + manual validation, security scans | Dedicated/isolated host(s) | QA + security |
+| Staging | Pre-production validation, mirrors prod config | Staging host | Team |
+| Production | Live traffic | Prod VPS | Release team only |
+
+#### 9.5.2 Testing / QA & pentest environment
 
 Dedicate a **testing environment** that mirrors production but stays isolated. This is where QA, automated pentesting, and all pre-release validation happens:
 
@@ -419,7 +428,7 @@ Dedicate a **testing environment** that mirrors production but stays isolated. T
 - **QA process & meetings:** hold a regular QA sync (e.g. weekly) to review coverage, SonarQube metrics, and scan results; define a **Definition of Done** that includes ≥ 60% new-code coverage and a passing security gate.
 - **Organize resources:** separate test DBs with seeded test data, dedicated CI test-runner capacity, and a documented test-data reset procedure.
 
-### 9.6 Dedicated servers for security tooling (scale-out)
+#### 9.5.3 Dedicated servers for security tooling (scale-out)
 
 When the shared staging host's workload grows — CPU/memory saturated, scans interfering with deploys, or SonarQube competing with app containers — **move the security tooling to dedicated hosts**:
 
@@ -428,7 +437,7 @@ When the shared staging host's workload grows — CPU/memory saturated, scans in
 
 **Decision trigger:** when the staging host regularly exceeds ~70–80% CPU/mem during a scan, or a scan run starts failing because the app starves it of resources.
 
-### 9.7 Network segmentation — VLANs & DMZ
+#### 9.5.4 Network segmentation — VLANs & DMZ
 
 Currently everything runs on one host behind UFW (22/80/443). For production, segment the network to shrink the attacker's territory:
 
@@ -450,7 +459,7 @@ Currently everything runs on one host behind UFW (22/80/443). For production, se
 
 **Why:** if the DMZ is compromised, internal databases and tools stay unreachable — the attacker's blast radius is limited to the public tier.
 
-### 9.8 Long-term goals (scaling to more teams/departments)
+## Long-term goals (scaling )
 
 These apply when demand grows, the platform needs to scale beyond the current single-host setup.
 
@@ -485,16 +494,7 @@ These apply when demand grows, the platform needs to scale beyond the current si
 
 ---
 
-## 10. What the Team Should Hand Back to Ops/DevSecOps
 
-Please document these when you pick them up:
-
-- Table names to spot-check after a DB restore (runbook §4.2)
-- Exact behavior of `bootstrap-vps.sh` steps (runbook §4.3)
-- Any risk-acceptance decisions you make about the flagged CVEs (runbook §5.2)
-- Your **false-positive triage log** from §5.4 (which SonarQube/ZAP findings you verified as not real, and the rules you adjusted)
-
----
 
 ## 11. Quick Reference — Key Commands
 
