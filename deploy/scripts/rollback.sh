@@ -17,7 +17,7 @@ fi
 
 GHCR_PAT="${GHCR_PAT:?GHCR_PAT is required (set in .env or as env var)}"
 GITHUB_ACTOR="${GITHUB_ACTOR:?GITHUB_ACTOR is required (set in .env or as env var)}"
-IMAGE_PREFIX="${IMAGE_PREFIX:-ghcr.io/galylioai/1111}"
+IMAGE_PREFIX="${IMAGE_PREFIX:-ghcr.io/fedi-nasri/1111}"
 COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.staging.yml}"
 
 SERVICES=(

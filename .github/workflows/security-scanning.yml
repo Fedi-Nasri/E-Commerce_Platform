@@ -44,7 +44,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_PREFIX: ghcr.io/galylioai/1111
+  IMAGE_PREFIX: ghcr.io/fedi-nasri/1111
   SONAR_PROJECT_KEY: galylioai_1111
   NODE_VERSION: "20.19.0"
 
@@ -56,9 +56,9 @@ jobs:
 # ─────────────────────────────────────────────
 # JOB 1 — SONARQUBE SAST + SCA
 # Static code analysis on source code.
-# Requires SONAR_TOKEN, SONAR_HOST_URL, TAILSCALE_CLIENT_ID,
-# and TAILSCALE_CLIENT_SECRET secrets.
-# Connects via Tailscale to reach self-hosted SonarQube on staging.
+# Requires SONAR_TOKEN and SONAR_HOST_URL secrets.
+# SONAR_HOST_URL must be reachable from GitHub runners
+# (a public URL, or run this job on a self-hosted runner).
 # ─────────────────────────────────────────────
   sonarqube-scan:
     name: "SonarQube · Source Code Scan"
@@ -66,13 +66,6 @@ jobs:
     if: inputs.scan_target == 'all' || inputs.scan_target == 'sonarqube'
 
     steps:
-      - name: Connect to Tailscale
-        uses: tailscale/github-action@v3
-        with:
-          oauth-client-id: ${{ secrets.TAILSCALE_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TAILSCALE_CLIENT_SECRET }}
-          tags: tag:githubactions
-
       - name: Checkout
         uses: actions/checkout@v4
         with:

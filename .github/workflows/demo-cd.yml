@@ -1,4 +1,4 @@
-name: CD - Tailscale Network
+name: CD - EC2 (SSH)
 
 on:
   # workflow_run:
@@ -39,7 +39,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v3
         with:
           workflow: demo-ci.yml
-          branch: ci-workflow-update
+          branch: main
           name: changed-services
           if_no_artifact_found: warn
         continue-on-error: true
@@ -59,19 +59,17 @@ jobs:
       # --- 1. Validate required secrets ---
       - name: Validate required secrets
         env:
-          TAILSCALE_CLIENT_ID: ${{ secrets.TAILSCALE_CLIENT_ID }}
-          TAILSCALE_CLIENT_SECRET: ${{ secrets.TAILSCALE_CLIENT_SECRET }}
-          TS_SERVER_IP: ${{ secrets.TS_SERVER_IP }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
           IMAGE_PREFIX: ${{ secrets.IMAGE_PREFIX }}
           APP_DIR: ${{ secrets.APP_DIR }}
-          STAGING_ENV_FILE: ${{ secrets.STAGING_ENV_FILE }} # Renamed from PROD_ENV_FILE
+          STAGING_ENV_FILE: ${{ secrets.STAGING_ENV_FILE }}
         run: |
-          test -n "$TAILSCALE_CLIENT_ID"
-          test -n "$TAILSCALE_CLIENT_SECRET"
-          test -n "$TS_SERVER_IP"
+          test -n "$DEPLOY_HOST"
+          test -n "$DEPLOY_PORT"
           test -n "$DEPLOY_USER"
           test -n "$SSH_PRIVATE_KEY"
           test -n "$GHCR_TOKEN"
@@ -79,21 +77,13 @@ jobs:
           test -n "$APP_DIR"
           test -n "$STAGING_ENV_FILE"
 
-      # --- 2. Connect to Tailscale Network ---
-      - name: Connect to Tailscale
-        uses: tailscale/github-action@v3
-        with:
-          oauth-client-id: ${{ secrets.TAILSCALE_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TAILSCALE_CLIENT_SECRET }}
-          tags: tag:githubactions # Ensure this tag is configured in your Tailscale ACLs
-     
-          # --- 2. Set up SSH key ---
+      # --- 2. Set up SSH key ---
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H ${{ secrets.TS_SERVER_IP }} >> ~/.ssh/known_hosts
+          ssh-keyscan -p "${{ secrets.DEPLOY_PORT }}" -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
 
       # --- 3. Prepare staging env file locally ---
       - name: Prepare staging env file
@@ -109,11 +99,12 @@ jobs:
           cp deploy/scripts/check-containers.sh ./check-containers.sh
           cp deploy/nginx/staging.1111.tn.conf ./staging.1111.tn.conf
 
-      # --- 4. Upload env file and deploy script to the target server via Tailscale SSH ---
+      # --- 4. Upload env file and deploy script to the target server via SSH ---
       - name: Upload env file and deploy script
         uses: appleboy/scp-action@master
         with:
-          host: ${{ secrets.TS_SERVER_IP }}
+          host: ${{ secrets.DEPLOY_HOST }}
+          port: ${{ secrets.DEPLOY_PORT }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: ".env,deploy-ghcr.sh,check-containers.sh,docker-compose.yml,docker-compose.staging.yml,docker-compose.monitoring.yml,staging.1111.tn.conf,deploy/monitoring"
@@ -123,7 +114,8 @@ jobs:
       - name: Activate release and deploy
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.TS_SERVER_IP }}
+          host: ${{ secrets.DEPLOY_HOST }}
+          port: ${{ secrets.DEPLOY_PORT }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
@@ -151,4 +143,3 @@ jobs:
             CHANGED_SERVICES="${{ steps.read-changed.outputs.services }}" \
             bash /tmp/deploy-ghcr.sh
             rm -f /tmp/deploy-ghcr.sh /tmp/check-containers.sh
-

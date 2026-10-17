@@ -155,7 +155,7 @@ services:
       start_period: 60s
 
   gateway:
-    image: ${IMAGE_PREFIX:-ghcr.io/galylioai/1111}-gateway:${TAG:-latest}
+    image: ${IMAGE_PREFIX:-ghcr.io/fedi-nasri/1111}-gateway:${TAG:-latest}
     container_name: 1111-gateway
     restart: unless-stopped
     ports:
@@ -194,7 +194,7 @@ services:
       start_period: 15s
 
   auth:
-    image: ${IMAGE_PREFIX:-ghcr.io/galylioai/1111}-auth:${TAG:-latest}
+    image: ${IMAGE_PREFIX:-ghcr.io/fedi-nasri/1111}-auth:${TAG:-latest}
     container_name: 1111-auth
     restart: unless-stopped
     env_file: ./.env
@@ -219,7 +219,7 @@ services:
       retries: 5
 
   user:
-    image: ${IMAGE_PREFIX:-ghcr.io/galylioai/1111}-user:${TAG:-latest}
+    image: ${IMAGE_PREFIX:-ghcr.io/fedi-nasri/1111}-user:${TAG:-latest}
     container_name: 1111-user
     restart: unless-stopped
     env_file: ./.env
@@ -244,7 +244,7 @@ services:
       retries: 5
 
   retail:
-    image: ${IMAGE_PREFIX:-ghcr.io/galylioai/1111}-retail:${TAG:-latest}
+    image: ${IMAGE_PREFIX:-ghcr.io/fedi-nasri/1111}-retail:${TAG:-latest}
     container_name: 1111-retail
     restart: unless-stopped
     env_file: ./.env
@@ -267,7 +267,7 @@ services:
       retries: 5
 
   para:
-    image: ${IMAGE_PREFIX:-ghcr.io/galylioai/1111}-para:${TAG:-latest}
+    image: ${IMAGE_PREFIX:-ghcr.io/fedi-nasri/1111}-para:${TAG:-latest}
     container_name: 1111-para
     restart: unless-stopped
     env_file: ./.env
@@ -290,7 +290,7 @@ services:
       retries: 5
 
   alimentation:
-    image: ${IMAGE_PREFIX:-ghcr.io/galylioai/1111}-alimentation:${TAG:-latest}
+    image: ${IMAGE_PREFIX:-ghcr.io/fedi-nasri/1111}-alimentation:${TAG:-latest}
     container_name: 1111-alimentation
     restart: unless-stopped
     env_file: ./.env
@@ -313,7 +313,7 @@ services:
       retries: 5
 
   fashion:
-    image: ${IMAGE_PREFIX:-ghcr.io/galylioai/1111}-fashion:${TAG:-latest}
+    image: ${IMAGE_PREFIX:-ghcr.io/fedi-nasri/1111}-fashion:${TAG:-latest}
     container_name: 1111-fashion
     restart: unless-stopped
     env_file: ./.env
@@ -336,7 +336,7 @@ services:
       retries: 5
 
   mailer-api:
-    image: ${IMAGE_PREFIX:-ghcr.io/galylioai/1111}-mailer-api:${TAG:-latest}
+    image: ${IMAGE_PREFIX:-ghcr.io/fedi-nasri/1111}-mailer-api:${TAG:-latest}
     container_name: 1111-mailer-api
     restart: unless-stopped
     env_file: ./.env
@@ -361,7 +361,7 @@ services:
       retries: 5
 
   engagement:
-    image: ${IMAGE_PREFIX:-ghcr.io/galylioai/1111}-engagement:${TAG:-latest}
+    image: ${IMAGE_PREFIX:-ghcr.io/fedi-nasri/1111}-engagement:${TAG:-latest}
     container_name: 1111-engagement
     restart: unless-stopped
     env_file: ./.env
@@ -384,7 +384,7 @@ services:
       retries: 5
 
   web-control:
-    image: ${IMAGE_PREFIX:-ghcr.io/galylioai/1111}-web-control:${TAG:-latest}
+    image: ${IMAGE_PREFIX:-ghcr.io/fedi-nasri/1111}-web-control:${TAG:-latest}
     container_name: 1111-web-control
     restart: unless-stopped
     env_file: ./.env
@@ -409,7 +409,7 @@ services:
       retries: 5
 
   mailer:
-    image: ${IMAGE_PREFIX:-ghcr.io/galylioai/1111}-mailer:${TAG:-latest}
+    image: ${IMAGE_PREFIX:-ghcr.io/fedi-nasri/1111}-mailer:${TAG:-latest}
     container_name: 1111-mailer
     restart: unless-stopped
     env_file: ./.env
@@ -453,7 +453,7 @@ services:
         done
 
   frontend:
-    image: ${IMAGE_PREFIX:-ghcr.io/galylioai/1111}-frontend:${TAG:-latest}
+    image: ${IMAGE_PREFIX:-ghcr.io/fedi-nasri/1111}-frontend:${TAG:-latest}
     container_name: 1111-frontend
     restart: unless-stopped
     ports:

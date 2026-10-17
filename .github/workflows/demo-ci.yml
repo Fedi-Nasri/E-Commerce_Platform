@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - ci-workflow-update
+      - main
   pull_request: 
     branches:
       - develop
@@ -18,7 +18,7 @@ env:
   NODE_VERSION: "20.19.0"
   REGISTRY: ghcr.io
  
-  IMAGE_PREFIX: ghcr.io/galylioai/1111
+  IMAGE_PREFIX: ghcr.io/fedi-nasri/1111
 
 # ─────────────────────────────────────────────
 # JOB 1 — DETECT CHANGES
