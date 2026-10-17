@@ -10,8 +10,9 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Build-time variable — gets baked into the JS bundle here, not at runtime
-ARG NEXT_PUBLIC_API_BASE_URL
-ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+# Empty (default) means the browser calls the API same-origin (e.g. /api/...).
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .

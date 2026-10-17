@@ -463,7 +463,7 @@ services:
       CATALOG_DB_HOST: catalog-postgres
       CATALOG_DB_PORT: 5432
       GATEWAY_INTERNAL_URL: http://gateway:3000
-      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:3000}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-}
     depends_on:
       catalog-postgres:
         condition: service_healthy

@@ -134,7 +134,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     image: 1111-frontend:${IMAGE_TAG:-latest}
     container_name: frontend
     restart: unless-stopped
